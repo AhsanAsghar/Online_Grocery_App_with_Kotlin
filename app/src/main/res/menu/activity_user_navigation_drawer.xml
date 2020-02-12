@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+                android:id="@+id/user_notifications"
+                android:icon="@drawable/ic_action_bellicon"
+                android:title="@string/menu_notifications"/>
+        <item
+                android:id="@+id/user_settings"
+                android:icon="@drawable/ic_action_settings"
+                android:title="@string/menu_settings"/>
+        <item
+                android:id="@+id/make_store"
+                android:icon="@drawable/ic_action_shopgrey"
+                android:title="@string/menu_make_store"/>
+        <item
+                android:id="@+id/become_delivery_person"
+                android:icon="@drawable/ic_action_motorcycle"
+                android:title="@string/menu_become_delivery_person"
+        />
+        <item
+        android:id="@+id/user_cart"
+        android:icon="@drawable/ic_action_cart"
+        android:title="@string/user_cart"
+        >
+
+        </item>
+    </group>
+
+</menu>

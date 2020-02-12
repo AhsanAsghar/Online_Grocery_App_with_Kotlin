@@ -1,0 +1,3 @@
+package com.example.medicineandgroceryapp
+
+class DataClassForItemsInStoreProfileLabel(val label1 : String): DataItemsInStoreProfileAbstract(DataItemsInStoreProfileAbstract.TYPE.LABEL)

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+    <item
+            android:id="@+id/store_drawer_notifications"
+            android:icon="@drawable/ic_action_bellicon"
+            android:title="@string/menu_notifications"/>
+    <item
+            android:id="@+id/store_drawer_settings"
+            android:icon="@drawable/ic_action_settings"
+            android:title="@string/menu_settings"/>
+    <item
+            android:id="@+id/store_drawer_name"
+            android:icon="@drawable/ic_action_shopgrey"
+            android:title="Store Name"/>
+    <item
+            android:id="@+id/store_drawer_requests"
+            android:icon="@drawable/ic_action_user"
+            android:title="Requests"
+    />
+    </group>
+
+</menu>
