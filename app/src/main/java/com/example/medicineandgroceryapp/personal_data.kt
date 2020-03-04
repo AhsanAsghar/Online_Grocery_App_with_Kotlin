@@ -3,9 +3,15 @@ package com.example.medicineandgroceryapp
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
@@ -15,130 +21,63 @@ import java.util.*
 
 
 class personal_data : AppCompatActivity() {
-    /*var PERMISSION_ID : Int = 2
-    lateinit var mFusedLocationClient : FusedLocationProviderClient
-    var latitude: Double = 0.0
-    var longitude: Double = 0.0*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_personal_data)
-        //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), getString(R.string.api_key),Locale.US);
-        }
-        //getLastLocation()
-        val address : EditText = findViewById(R.id.password)
-        address.setOnClickListener { view ->
-            val fields: List<Place.Field> =
-                Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS)
-            val intent: Intent  = Autocomplete.IntentBuilder(
-                AutocompleteActivityMode.FULLSCREEN, fields
-            ).setCountry("PK")
-                .build(this)
-            //var AUTOCOMPLETE_REQUEST_CODE : Int = 5
-            startActivityForResult(intent,5)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode == 5){
-            if(resultCode == Activity.RESULT_OK){
-                val place : Place = Autocomplete.getPlaceFromIntent(data!!)
-                Toast.makeText(this,place.address,Toast.LENGTH_SHORT ).show()
-            } else if(resultCode == AutocompleteActivity.RESULT_ERROR){
-                Toast.makeText(this,"failed to get",Toast.LENGTH_SHORT ).show()
-            } else if(resultCode == Activity.RESULT_CANCELED){
-                Toast.makeText(this,"result cancel",Toast.LENGTH_SHORT ).show()
+        var phone: String? = "+923450694449"
+        /*if (intent != null) {
+            Log.d("PhoneAuth","IN")
+            var intent = intent
+            phone = intent.getStringExtra("phone")
+        }else{
+            phone = "+923450694449"
+        }*/
+        Log.d("PhoneAuth",phone.toString())
+        var nameEditText : EditText = findViewById(R.id.personaldata_name)
+        var passEditText : EditText = findViewById(R.id.password)
+        var repassEditText : EditText = findViewById(R.id.re_enter_password)
+        var nextButton : Button = findViewById(R.id.button_next)
+        var pass = passEditText.text.toString()
+        nextButton.setOnClickListener(){
+            v ->
+            if(nameEditText.text.toString().equals(null)|| passEditText.text.equals(null) || repassEditText.text.equals(null)){
+                Toast.makeText(applicationContext,"Fill all Fields",Toast.LENGTH_SHORT).show()
+            }
+            else if(passEditText.text.toString().equals(repassEditText.text.toString())&&!checkPass((pass))){
+                val queu = Volley.newRequestQueue(applicationContext)
+                var url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/updatePasswordName.php"
+                val postRequest =object: StringRequest(Request.Method.POST,url, Response.Listener {
+                        response ->
+                    Toast.makeText(applicationContext,response.toString(),Toast.LENGTH_SHORT).show()
+                },Response.ErrorListener {error ->
+                    Toast.makeText(applicationContext,error.toString(),Toast.LENGTH_SHORT).show()
+                }){
+                    override fun getParams() : Map<String,String>{
+                        val params = HashMap<String,String>()
+                        Log.d("PhoneAuth",phone)
+                        params.put("phone", phone.toString())
+                        params.put("name",nameEditText.text.toString())
+                        params.put("password",passEditText.text.toString())
+                        return params
+                    }
+                }
+                queu.add(postRequest)
+            }else{
+                Toast.makeText(applicationContext,"Password mismatch",Toast.LENGTH_SHORT).show()
             }
         }
+
     }
 
-    /*private fun checkPermissions(): Boolean {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+    private fun checkPass(pass: String): Boolean {
+        if(pass.length == 8){
             return true
         }
-        return false
-    }
-    private fun requestPermissions() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-            PERMISSION_ID
-        )
-    }
-    private fun isLocationEnabled(): Boolean {
-        var locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-            LocationManager.NETWORK_PROVIDER
-        )
-    }
-    private fun getLastLocation() {
-        Log.d("DEBUG","1")
-        if (checkPermissions()) {
-            Log.d("DEBUG","2 - have permission")
-            if (isLocationEnabled()) {
-                Log.d("DEBUG","3 - location enable")
-
-                mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
-                    var location: Location? = task.result
-                    if (location == null) {
-                        Log.d("DEBUG","4-null")
-                        requestNewLocationData()
-                        Toast.makeText(this, latitude.toString() + longitude.toString(),Toast.LENGTH_SHORT).show()
-                    } else {
-                        Log.d("DEBUG","4 - not null")
-                        latitude = location.latitude
-                        longitude = location.longitude
-                        Toast.makeText(this, latitude.toString() + longitude.toString(),Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } else {
-                Log.d("DEBUG","3-location disable")
-                Toast.makeText(this, "Turn on location", Toast.LENGTH_LONG).show()
-                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                startActivity(intent)
-                mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
-                    var location: Location? = task.result
-                    if (location == null) {
-                        Log.d("DEBUG","4-null")
-                        while(latitude == 0.0 && longitude == 0.0)
-                        requestNewLocationData()
-                        Toast.makeText(this, latitude.toString() + longitude.toString(),Toast.LENGTH_SHORT).show()
-                    } else {
-                        Log.d("DEBUG","4 - not null")
-                        latitude = location.latitude
-                        longitude = location.longitude
-                        Toast.makeText(this, latitude.toString() + longitude.toString(),Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        } else {
-            Log.d("DEBUG","2 - no permission")
-            requestPermissions()
+        else{
+            Toast.makeText(applicationContext,"Enter 8 characters", Toast.LENGTH_SHORT).show()
+            return false
         }
-    }
-    private fun requestNewLocationData() {
-        var mLocationRequest = LocationRequest()
-        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        mLocationRequest.interval = 0
-        mLocationRequest.fastestInterval = 0
-        mLocationRequest.numUpdates = 1
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        mFusedLocationClient!!.requestLocationUpdates(
-            mLocationRequest, mLocationCallback,
-            Looper.myLooper()
-        )
 
     }
-    private val mLocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            var mLastLocation: Location = locationResult.lastLocation
-            latitude = mLastLocation.latitude
-            longitude = mLastLocation.longitude
-        }
-    }*/
-
 }
 
