@@ -31,29 +31,45 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="120dp"
             android:drawableLeft="@drawable/ic_action_username"/>
+
     <EditText
-        android:id="@+id/personaldata_address"
+        android:id="@+id/password"
         android:layout_width="550dp"
         android:layout_height="60dp"
-        android:hint="Address"
-        android:textSize="25dp"
-        android:drawableLeft="@drawable/ic_action_address"
+        android:layout_below="@+id/personaldata_name"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:inputType="textPassword"
+        android:background="@drawable/edit_texts"
+        android:drawableLeft="@drawable/lock"
         android:drawablePadding="8dp"
+        android:hint="Password"
         android:padding="15dp"
         android:textColor="@android:color/black"
-        android:background="@drawable/edit_texts"
+        android:textSize="25dp" />
+
+
+    <EditText
+        android:id="@+id/re_enter_password"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@+id/password"
         android:layout_marginHorizontal="20dp"
-        android:layout_below="@+id/personaldata_name"
         android:layout_marginTop="20dp"
-        />
-
-
+        android:inputType="textPassword"
+        android:background="@drawable/edit_texts"
+        android:drawableLeft="@drawable/lock"
+        android:drawablePadding="8dp"
+        android:hint="Re-Enter Password"
+        android:padding="15dp"
+        android:textColor="@android:color/black"
+        android:textSize="25dp" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/personaldata_address"
+        android:layout_below="@+id/re_enter_password"
         android:background="@drawable/add_to_cart_green_button"
         android:padding="15dp"
         android:textSize="20sp"

@@ -1,24 +1,11 @@
 package com.example.medicineandgroceryapp
 
-import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import android.os.Bundle
-import android.os.Looper
-import android.provider.Settings
-import android.util.Log
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startActivityForResult
-import com.google.android.gms.location.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
@@ -40,7 +27,7 @@ class personal_data : AppCompatActivity() {
             Places.initialize(getApplicationContext(), getString(R.string.api_key),Locale.US);
         }
         //getLastLocation()
-        val address : EditText = findViewById(R.id.personaldata_address)
+        val address : EditText = findViewById(R.id.password)
         address.setOnClickListener { view ->
             val fields: List<Place.Field> =
                 Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS)
