@@ -18,9 +18,10 @@ class NearestStores : AppCompatActivity() {
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar2)
         setSupportActionBar(mToolbar)
         val recycle = findViewById(R.id.recyclerView) as RecyclerView
+        val recycleButton = findViewById(R.id.recyclerViewStoreSelection) as RecyclerView
         val spinner = findViewById<Spinner>(R.id.spinner)
         val grocormedic = arrayOf("Grocery Store", "Medical Store")
-        spinner.adapter = ArrayAdapter<String> (this, android.R.layout.simple_expandable_list_item_1,grocormedic)
+        /*spinner.adapter = ArrayAdapter<String> (this, android.R.layout.simple_expandable_list_item_1,grocormedic)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -41,8 +42,16 @@ class NearestStores : AppCompatActivity() {
             }
 
 
-        }
+        }*/
         recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
+        recycleButton.layoutManager = LinearLayoutManager(this,RecyclerView.HORIZONTAL,false)
+        val storeCategory = ArrayList<DataClassStoreCategoryButton>()
+        storeCategory.add(DataClassStoreCategoryButton("Grocery Store"))
+        storeCategory.add(DataClassStoreCategoryButton("Bakery Store"))
+        storeCategory.add(DataClassStoreCategoryButton("Pharmacy"))
+        storeCategory.add(DataClassStoreCategoryButton("General Store"))
+        val buttonAdapter = CustomDataStoreCategoryButton(storeCategory)
+        recycleButton.adapter = buttonAdapter
         val users = ArrayList<DataClassForNearbyStores> ()
         val resid = R.drawable.store
         users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
