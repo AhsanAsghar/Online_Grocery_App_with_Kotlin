@@ -9,6 +9,7 @@
         <item>Medical Store</item>
         <item>Bakery</item>
     </string-array>
+    <string name="api_key">AIzaSyDAYCACxPH8ccR_jO3Q1sn2YiBjOoJ1QL8</string>
     <string name="title_activity_categories_and_items">CategoriesAndItems</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "366395013694",
+    "firebase_url": "https://groceryandmedicineapp.firebaseio.com",
+    "project_id": "groceryandmedicineapp",
+    "storage_bucket": "groceryandmedicineapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366395013694:android:29eff4684e9c865737ef6f",
+        "android_client_info": {
+          "package_name": "com.example.medicineandgroceryapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "366395013694-08vdo7gr3oqs0771rag9r64c4342j0h8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.medicineandgroceryapp",
+            "certificate_hash": "bb1fc7a04472200a60e0d9ec6c2e2d86168051ab"
+          }
+        },
+        {
+          "client_id": "366395013694-1vep90e7999u9ao43sii4l45oa6rrpl8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAYCACxPH8ccR_jO3Q1sn2YiBjOoJ1QL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "366395013694-1vep90e7999u9ao43sii4l45oa6rrpl8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
