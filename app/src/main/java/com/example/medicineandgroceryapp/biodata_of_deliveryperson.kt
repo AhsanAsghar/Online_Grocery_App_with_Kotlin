@@ -66,7 +66,7 @@ class biodata_of_deliveryperson : AppCompatActivity() {
         }
     }
     private fun checkEmail(email : String) : Boolean{
-        if(email.contains("@") && !email.equals(null)){
+        if(email.contains("@") && !email.equals(null) && email.contains(".com")){
             return true
         }
         return false
