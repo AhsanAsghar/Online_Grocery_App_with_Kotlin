@@ -11,6 +11,7 @@ class ItemsInStoreProfileViewHolderData(itemView: View) :
     var productName: TextView
     var productPrice: TextView
     var productImage: ImageView
+    var deleteButton : ImageView
     fun setProductName(pn: String?) {
         productName.text = pn
     }
@@ -23,10 +24,12 @@ class ItemsInStoreProfileViewHolderData(itemView: View) :
         productImage.id = pa
     }
 
+
     init {
         productName = itemView.findViewById<View>(R.id.item_name_for_store_profile_items) as TextView
         productPrice = itemView.findViewById<View>(R.id.price_for_store_profile_items) as TextView
         productImage =
             itemView.findViewById<View>(R.id.item_photo_in_store_profile_items) as ImageView
+        deleteButton = itemView.findViewById(R.id.delete_items_in_store_profile) as ImageView
     }
 }

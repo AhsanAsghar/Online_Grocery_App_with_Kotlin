@@ -53,6 +53,12 @@ class CustomAdapterForItemsInStoreProfile (val userList: ArrayList<DataItemsInSt
             (holder as ItemsInStoreProfileViewHolderData).setProductImage(user.idOfImageStoreProfileItems)
             (holder as ItemsInStoreProfileViewHolderData).setProductName(user.nameOfStoreProfileItem)
             (holder as ItemsInStoreProfileViewHolderData).setProductPrice(user.priceOfStoreProfileItems)
+            (holder as ItemsInStoreProfileViewHolderData).deleteButton.setOnClickListener(){
+                v ->
+                var pos : Int = userList.indexOf(user)
+                userList.removeAt(pos)
+                notifyItemRemoved(pos)
+            }
         }
     }
 

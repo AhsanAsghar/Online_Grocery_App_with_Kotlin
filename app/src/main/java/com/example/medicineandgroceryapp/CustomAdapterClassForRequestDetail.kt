@@ -13,6 +13,7 @@ class CustomAdapterClassForRequestDetail(val userList: ArrayList<DataClassForReq
         val nameOfitemRequestDetail = itemView.findViewById(R.id.cart_item_name_request_detail) as TextView
         val itemPhotoRequestDetail = itemView.findViewById(R.id.cart_item_photo_request_detail) as ImageView
         val priceOfItemRequestDetail = itemView.findViewById(R.id.price_request_detail) as TextView
+        val deleteButton = itemView.findViewById(R.id.delete_button_request_detail) as ImageView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,6 +30,16 @@ class CustomAdapterClassForRequestDetail(val userList: ArrayList<DataClassForReq
         holder.itemPhotoRequestDetail.id = user.idOfPhotoRequestDetail
         holder.nameOfitemRequestDetail.text = user.nameOfItemRequestDetail
         holder.priceOfItemRequestDetail.text = user.priceOfItemRequestDetail
+        holder.itemView.setOnClickListener(){
+            v ->
+
+        }
+        holder.deleteButton.setOnClickListener(){
+            v ->
+            var pos : Int = userList.indexOf(user)
+            userList.removeAt(pos)
+            notifyItemRemoved(pos)
+        }
     }
 
 }

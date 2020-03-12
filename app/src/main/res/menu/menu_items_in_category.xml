@@ -5,7 +5,8 @@
         android:id="@+id/search_items_in_category"
         android:icon="@drawable/search"
         android:title="cart"
-        app:showAsAction="withText|ifRoom">
+        app:showAsAction="withText|ifRoom"
+        app:actionViewClass="android.widget.SearchView">
     </item>
     <item
         android:id="@+id/cart_items_in_category"
