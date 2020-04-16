@@ -22,8 +22,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-
-class settings : AppCompatActivity() {
+open class settings : AppCompatActivity() {
     private var requestCodeP: Int = 999
     private var phone: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +38,7 @@ class settings : AppCompatActivity() {
         val imageForBitmap : ImageView = findViewById(R.id.profilePic)
         val imageBitmap : Bitmap = (imageForBitmap.drawable as BitmapDrawable).bitmap
         val name : TextView = findViewById(R.id.nameUnderProfilePic)
-        val nameToEdit : EditText = findViewById(R.id.nameToEdit)
+        val nameToEdit : EditText = findViewById(R.id.nameOfProductCamera)
         val password : EditText = findViewById(R.id.password_setting)
         val done : FloatingActionButton = findViewById(R.id.floatingActionButtonAccept)
         val nameToEditText : String = nameToEdit.text.toString()
@@ -153,7 +152,7 @@ class settings : AppCompatActivity() {
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
-    private fun bitmapToString(bitmap: Bitmap) : String {
+    fun bitmapToString(bitmap: Bitmap) : String {
         var outputStream : ByteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
         var imageBytes = outputStream.toByteArray()
