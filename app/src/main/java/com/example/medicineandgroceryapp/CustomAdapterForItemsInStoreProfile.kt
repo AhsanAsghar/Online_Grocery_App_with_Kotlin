@@ -1,9 +1,16 @@
 package com.example.medicineandgroceryapp
 
+import android.app.Application
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import org.json.JSONArray
+import org.json.JSONObject
 
 class CustomAdapterForItemsInStoreProfile (val userList: ArrayList<DataItemsInStoreProfileAbstract>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
@@ -55,7 +62,20 @@ class CustomAdapterForItemsInStoreProfile (val userList: ArrayList<DataItemsInSt
             (holder as ItemsInStoreProfileViewHolderData).setProductPrice(user.priceOfStoreProfileItems)
             (holder as ItemsInStoreProfileViewHolderData).deleteButton.setOnClickListener(){
                 v ->
-                var pos : Int = userList.indexOf(user)
+                val pid = user.id.toInt()
+                val queue = Volley.newRequestQueue(user.context)
+                val url_delete : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileDeleteItem.php?id=$pid"
+                val request : StringRequest = StringRequest(url_delete, Response.Listener {
+                        response ->
+                    Log.d("json", response.toString())
+                    Toast.makeText(user.context,response.toString(), Toast.LENGTH_SHORT).show()
+                }, Response.ErrorListener {
+                        error ->
+                    Log.d("json", error.toString())
+                    Toast.makeText(user.context,error.toString(), Toast.LENGTH_SHORT).show()
+                })
+                queue.add((request))
+                val pos : Int = userList.indexOf(user)
                 userList.removeAt(pos)
                 notifyItemRemoved(pos)
             }

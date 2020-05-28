@@ -20,6 +20,7 @@
         <activity android:name=".itemsDetailFromCamera" android:exported="true" />
         <activity android:name=".itemsInStoreProfile" android:exported="true"/>
         <activity android:name=".setPassword" android:exported="true"/>
+        <activity android:name=".user_name" android:exported="true"/>
         <activity
             android:name=".Notifications"
             android:exported="true" />

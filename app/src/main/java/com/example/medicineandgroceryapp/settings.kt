@@ -45,7 +45,7 @@ open class settings : AppCompatActivity() {
         val passwordNow : String = password.text.toString()
         //Get data from server
         val queue = Volley.newRequestQueue(this)
-        val url_img = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/settings_img.php?phone=+923450694449"
+        val url_img = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/settings_img.php?phone=$phone"
         val request_img : ImageRequest = ImageRequest(url_img, Response.Listener {
             response ->
             imageForBitmap.setImageBitmap(response)
