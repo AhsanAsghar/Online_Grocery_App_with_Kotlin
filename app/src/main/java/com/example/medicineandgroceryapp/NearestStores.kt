@@ -18,7 +18,7 @@ class NearestStores : AppCompatActivity() {
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar2)
         setSupportActionBar(mToolbar)
         val recycle = findViewById(R.id.recyclerView) as RecyclerView
-        val recycleButton = findViewById(R.id.recyclerViewStoreSelection) as RecyclerView
+        val recycleButton = findViewById(R.id.recyclerView) as RecyclerView
         val spinner = findViewById<Spinner>(R.id.spinner)
         val grocormedic = arrayOf("Grocery Store", "Medical Store")
         /*spinner.adapter = ArrayAdapter<String> (this, android.R.layout.simple_expandable_list_item_1,grocormedic)
