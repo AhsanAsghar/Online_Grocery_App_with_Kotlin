@@ -8,19 +8,29 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.Log
 import android.view.Menu
+import android.widget.ImageView
 import android.widget.SearchView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.toolbox.ImageRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
 class itemsInStoreProfile : AppCompatActivity() {
@@ -32,22 +42,73 @@ class itemsInStoreProfile : AppCompatActivity() {
         setContentView(R.layout.activity_items_in_store_profile)
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_store_profile_items)
         setSupportActionBar(mToolbar)
+        val phone : String = "+923004579023"
+        val storeName: String = "abc"
+        val nameOfStore : TextView = findViewById(R.id.name_of_store)
+        nameOfStore.setText(storeName)
         val recycleViewOfItemsInCategory = findViewById(R.id.recycler_store_profile_items) as RecyclerView
         recycleViewOfItemsInCategory.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
         val resid : Int = R.id.item_photo_in_store_profile_items;
         val users = ArrayList<DataItemsInStoreProfileAbstract>()
-        users.add(DataClassForItemsInStoreProfileLabel("abc"))
-        users.add(DataClassForItemsInStoreProfile(resid,"Detergent", "300Rs"))
-        users.add(DataClassForItemsInStoreProfile(resid,"Detergent", "300Rs"))
-        users.add(DataClassForItemsInStoreProfile(resid,"Detergent", "300Rs"))
-        users.add(DataClassForItemsInStoreProfile(resid,"Detergent", "300Rs"))
-        val adapter = CustomAdapterForItemsInStoreProfile(users)
-        recycleViewOfItemsInCategory.adapter = adapter
+        val storeProfileImage: ImageView = findViewById(R.id.store_profile_image)
         val floatingButton : FloatingActionButton = findViewById(R.id.floatingActionButtonStoreProfile)
         floatingButton.setOnClickListener(){
             v ->
             getAlertBar()
         }
+        val queue = Volley.newRequestQueue(this)
+        val url_img = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileImageGet.php?phone=$phone&storeName=$storeName"
+        val request_img : ImageRequest = ImageRequest(url_img, Response.Listener {
+                response ->
+            storeProfileImage.setImageBitmap(response)
+
+        },0,0,null, Response.ErrorListener {
+                error ->
+            Log.d("photo",error.toString())
+
+        } )
+        queue.add(request_img)
+
+        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileImageOfItemsGet.php?phone=$phone&storeName=$storeName"
+        val request : StringRequest = StringRequest(url_get, Response.Listener {
+                response ->
+            val jObject : JSONObject = JSONObject(response.toString())
+            val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+            Log.d("json",jsonArray.toString())
+            val a = jsonArray.length()
+            Log.d("json",a.toString())
+            val listOfCategoryAdded = mutableListOf<String>()
+            for(x in 1..a-1){
+                val pxcategory = jsonArray.getJSONObject(x).getString("product_category")
+                Log.d("list", "x" + x.toString())
+                if(!listOfCategoryAdded.contains(pxcategory)) {
+                    users.add(DataClassForItemsInStoreProfileLabel(pxcategory))
+                    for(y in 1..a-1){
+                        Log.d("list", "y" + y.toString())
+                        val pycategory = jsonArray.getJSONObject(y).getString("product_category")
+                        if(!listOfCategoryAdded.contains(pycategory) && pycategory.equals(pxcategory)){
+                            Log.d("list", "in")
+                            val pname = jsonArray.getJSONObject(y).getString("product_name")
+                            val pprice = jsonArray.getJSONObject(y).getString("product_price")
+                            val pimageString = jsonArray.getJSONObject(y).getString("product_image")
+                            val pimage = stringToBitmap(pimageString)
+                            val pid = jsonArray.getJSONObject(y).getString("product_id")
+                            Log.d("id",pid)
+                            users.add(DataClassForItemsInStoreProfile(pimage,pname, pprice,pid,this))
+                        }
+                    }
+                    listOfCategoryAdded.add(pxcategory)
+                    Log.d("list", listOfCategoryAdded.toString())
+                }
+            }
+            val adapter = CustomAdapterForItemsInStoreProfile(users)
+            recycleViewOfItemsInCategory.adapter = adapter
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@itemsInStoreProfile,error.toString(),Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request))
     }
 
     override fun onRequestPermissionsResult(
@@ -57,7 +118,7 @@ class itemsInStoreProfile : AppCompatActivity() {
     ) {
         if(requestCode == REQUEST_CODE_FOR_GALLERY){
             if(grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                var intent = Intent(Intent.ACTION_PICK)
+                val intent = Intent(Intent.ACTION_PICK)
                 intent.setType("image/*")
                 startActivityForResult(Intent.createChooser(intent,"Select Image"),requestCode)
 
@@ -158,5 +219,10 @@ class itemsInStoreProfile : AppCompatActivity() {
         var imageBytes = outputStream.toByteArray()
         var encodedImage : String = Base64.encodeToString(imageBytes, Base64.DEFAULT)
         return encodedImage
+    }
+    fun stringToBitmap(imageInString : String) : Bitmap{
+        val imageBytes = Base64.decode(imageInString,0)
+        val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)
+        return image
     }
 }

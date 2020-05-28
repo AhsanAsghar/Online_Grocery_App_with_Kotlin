@@ -13,8 +13,8 @@
 
         <ImageView
             android:id="@+id/item_photo_in_store_profile_items"
-            android:layout_width="40dp"
-            android:layout_height="76dp"
+            android:layout_width="80dp"
+            android:layout_height="100dp"
             android:layout_gravity="start|left"
             android:layout_weight="1"
             app:srcCompat="@drawable/detergent" />

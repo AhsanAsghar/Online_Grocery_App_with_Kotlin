@@ -1,4 +1,7 @@
 package com.example.medicineandgroceryapp
 
-class DataClassForItemsInStoreProfile(val idOfImageStoreProfileItems :Int, val nameOfStoreProfileItem : String, val priceOfStoreProfileItems : String): DataItemsInStoreProfileAbstract(DataItemsInStoreProfileAbstract.TYPE.DATA) {
+import android.content.Context
+import android.graphics.Bitmap
+
+class DataClassForItemsInStoreProfile(val idOfImageStoreProfileItems :Bitmap, val nameOfStoreProfileItem : String, val priceOfStoreProfileItems : String, val id : String, val context : Context): DataItemsInStoreProfileAbstract(DataItemsInStoreProfileAbstract.TYPE.DATA) {
 }

@@ -1,5 +1,7 @@
 package com.example.medicineandgroceryapp
 
-class DataClassForDataItemsInCategory(val idOfImage:Int, val nameOfItem : String, val priceOfItem : String):
+import android.graphics.Bitmap
+
+class DataClassForDataItemsInCategory(val idOfImage: Bitmap, val nameOfItem : String, val priceOfItem : String):
 DataItemsInCategoryParent(DataItemsInCategoryParent.TYPE.DATA){
 }

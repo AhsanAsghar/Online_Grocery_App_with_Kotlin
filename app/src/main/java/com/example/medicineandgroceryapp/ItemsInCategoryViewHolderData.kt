@@ -1,5 +1,6 @@
 package com.example.medicineandgroceryapp
 
+import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,8 +20,8 @@ class ItemsInCategoryViewHolderData(itemView: View) :
         productName.text = pp
     }
 
-    fun setProductImage(pa: Int) {
-        productName.id = pa
+    fun setProductImage(pa: Bitmap) {
+        productImage.setImageBitmap(pa)
     }
 
     init {
