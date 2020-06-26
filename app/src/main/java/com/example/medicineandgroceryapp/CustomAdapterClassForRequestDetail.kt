@@ -27,7 +27,7 @@ class CustomAdapterClassForRequestDetail(val userList: ArrayList<DataClassForReq
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user: DataClassForRequestDetails = userList[position]
-        holder.itemPhotoRequestDetail.id = user.idOfPhotoRequestDetail
+        holder.itemPhotoRequestDetail.setImageBitmap(user.photoBitmapRequestDetail)
         holder.nameOfitemRequestDetail.text = user.nameOfItemRequestDetail
         holder.priceOfItemRequestDetail.text = user.priceOfItemRequestDetail
         holder.itemView.setOnClickListener(){

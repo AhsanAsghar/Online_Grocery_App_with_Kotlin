@@ -25,7 +25,7 @@ class CustomAdapterClassForRequestsOfCustomer(val userList: ArrayList<DataClassF
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user: DataClassForRequestsOfCustomer = userList[position]
-        holder.customerPhoto.id = user.idOfPhotoCustomer;
+        holder.customerPhoto.setImageBitmap(user.photoBitmap)
         holder.nameOfCustomer.text = user.nameOfCustomer
     }
 

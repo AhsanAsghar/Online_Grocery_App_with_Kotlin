@@ -27,7 +27,7 @@ class CustomAdapterClassForCartItems(val userList: ArrayList<DataClassForCartIte
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user: DataClassForCartItems = userList[position]
-        holder.itemPhoto.id = user.idOfPhoto;
+        holder.itemPhoto.setImageBitmap(user.photoBitmap);
         holder.nameOfitem.text = user.nameOfItem
         holder.priceOfItem.text = user.priceOfItem
         holder.itemView.setOnClickListener(){

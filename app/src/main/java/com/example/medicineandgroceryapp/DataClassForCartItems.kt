@@ -1,3 +1,5 @@
 package com.example.medicineandgroceryapp
 
-data class DataClassForCartItems (val idOfPhoto : Int, val nameOfItem : String, val priceOfItem : String)
+import android.graphics.Bitmap
+
+data class DataClassForCartItems (val photoBitmap : Bitmap, val nameOfItem : String, val priceOfItem : String)

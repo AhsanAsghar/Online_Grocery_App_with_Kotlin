@@ -17,6 +17,9 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import kotlinx.android.synthetic.main.activity_personal_data.*
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.*
 
 
@@ -33,11 +36,11 @@ class personal_data : AppCompatActivity() {
             phone = "+923450694449"
         }*/
         Log.d("PhoneAuth",phone.toString())
-        var nameEditText : EditText = findViewById(R.id.personaldata_name)
-        var passEditText : EditText = findViewById(R.id.password)
-        var repassEditText : EditText = findViewById(R.id.re_enter_password)
-        var nextButton : Button = findViewById(R.id.button_next)
-        var pass = passEditText.text.toString()
+        val nameEditText : EditText = findViewById(R.id.personaldata_name)
+        val passEditText : EditText = findViewById(R.id.password)
+        val repassEditText : EditText = findViewById(R.id.re_enter_password)
+        val nextButton : Button = findViewById(R.id.button_next)
+        val pass = passEditText.text.toString()
         nextButton.setOnClickListener(){
             v ->
             if(nameEditText.text.toString().equals(null)|| passEditText.text.equals(null) || repassEditText.text.equals(null)){
@@ -45,7 +48,7 @@ class personal_data : AppCompatActivity() {
             }
             else if(passEditText.text.toString().equals(repassEditText.text.toString())&&!checkPass((pass))){
                 val queu = Volley.newRequestQueue(applicationContext)
-                var url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/updatePasswordName.php"
+                val url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/updatePasswordName.php"
                 val postRequest =object: StringRequest(Request.Method.POST,url, Response.Listener {
                         response ->
                     Toast.makeText(applicationContext,response.toString(),Toast.LENGTH_SHORT).show()
@@ -68,6 +71,8 @@ class personal_data : AppCompatActivity() {
         }
 
     }
+
+
 
     private fun checkPass(pass: String): Boolean {
         if(pass.length == 8){

@@ -29,12 +29,10 @@ class ItemsInCategory : AppCompatActivity() {
         setSupportActionBar(mToolbar)
         val recycleViewOfItemsInCategory = findViewById(R.id.recycler_items_in_category) as RecyclerView
         recycleViewOfItemsInCategory.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
-        val resid : Int = R.id.item_image;
+        val idFromIntent: Int = 6
         val users = ArrayList<DataItemsInCategoryParent>()
-        val storeName = "abc"
-        val user_name = "abcd"
         val queue = Volley.newRequestQueue(this)
-        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileImageOfItemsGet.php?phone=$user_name&storeName=$storeName"
+        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/ItemsInCategory.php?id=$idFromIntent"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
                 response ->
             val jObject : JSONObject = JSONObject(response.toString())
@@ -43,12 +41,12 @@ class ItemsInCategory : AppCompatActivity() {
             val a = jsonArray.length()
             Log.d("json",a.toString())
             val listOfCategoryAdded = mutableListOf<String>()
-            for(x in 1..a-1){
+            for(x in 0..a-1){
                 val pxcategory = jsonArray.getJSONObject(x).getString("product_category")
                 Log.d("list", "x" + x.toString())
                 if(!listOfCategoryAdded.contains(pxcategory)) {
                     users.add(DataClassForDataItemsInCategoryLabel(pxcategory))
-                    for(y in 1..a-1){
+                    for(y in 0..a-1){
                         Log.d("list", "y" + y.toString())
                         val pycategory = jsonArray.getJSONObject(y).getString("product_category")
                         if(!listOfCategoryAdded.contains(pycategory) && pycategory.equals(pxcategory)){
@@ -57,7 +55,9 @@ class ItemsInCategory : AppCompatActivity() {
                             val pprice = jsonArray.getJSONObject(y).getString("product_price")
                             val pimageString = jsonArray.getJSONObject(y).getString("product_image")
                             val pimage = stringToBitmap(pimageString)
-                            users.add(DataClassForDataItemsInCategory(pimage,pname, pprice))
+                            val pid = jsonArray.getJSONObject(y).getString("product_id")
+                            Log.d("id",pid)
+                            users.add(DataClassForDataItemsInCategory(pimage,pname, pprice,this,pid.toInt(),2,"+923450694449"))
                         }
                     }
                     listOfCategoryAdded.add(pxcategory)

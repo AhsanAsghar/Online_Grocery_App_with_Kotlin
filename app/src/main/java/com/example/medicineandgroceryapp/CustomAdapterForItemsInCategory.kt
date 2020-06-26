@@ -1,9 +1,21 @@
 package com.example.medicineandgroceryapp
 
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.collections.ArrayList
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import java.util.HashMap
 
 class CustomAdapterForItemsInCategory (val userList: ArrayList<DataItemsInCategoryParent>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
@@ -48,7 +60,48 @@ class CustomAdapterForItemsInCategory (val userList: ArrayList<DataItemsInCatego
         (holder as ItemsInCategoryViewHolderData).setProductImage(user.idOfImage)
         (holder as ItemsInCategoryViewHolderData).setProductName(user.nameOfItem)
         (holder as ItemsInCategoryViewHolderData).setProductPrice(user.priceOfItem)
+        (holder as ItemsInCategoryViewHolderData).addToCart.setOnClickListener(){
+            v ->
+            getAlertBar(user.context,user.idOfStore,user.customerNumber,user.pid)
+        }
     }
     }
+    private fun getAlertBar(context: Context, store_id: Int,
+                            phone_customer: String,productId: Int) {
+        var builder:AlertDialog.Builder = AlertDialog.Builder(context)
+        val inflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        var view : View = inflater.inflate(R.layout.dialog_add_into_cart,null)
+        var text: EditText = view.findViewById(R.id.number_of_items)
+        builder.setView(view)
+        builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
+            if(text.text.toString().length > 0 && text.text.toString().toInt() <= 10){
+                val queu = Volley.newRequestQueue(context)
+                val url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/addToCart.php"
+                val postRequest =object: StringRequest(Request.Method.POST,url, Response.Listener {
+                        response ->
+                    Toast.makeText(context,response.toString(),Toast.LENGTH_SHORT).show()
+                }, Response.ErrorListener { error ->
+                    Toast.makeText(context,error.toString(),Toast.LENGTH_SHORT).show()
+                }){
+                    override fun getParams() : Map<String,String>{
+                        val params = HashMap<String,String>()
+                        params.put("phone", phone_customer.toString())
+                        params.put("storeID",store_id.toString())
+                        params.put("productID",productId.toString())
+                        params.put("quantity",text.text.toString())
+                        return params
+                    }
+                }
+                queu.add(postRequest)
+                Toast.makeText(context,text.text,Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(context,"Enter a number, less than 10",Toast.LENGTH_SHORT).show()
+            }
+        })
+        builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which ->
 
+        })
+        builder.create().show()
+    }
 }
