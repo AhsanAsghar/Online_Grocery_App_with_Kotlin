@@ -93,7 +93,7 @@ class NearestStores : AppCompatActivity() {
 
         }
         recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        recycleButton.layoutManager = LinearLayoutManager(this,RecyclerView.HORIZONTAL,false)
+        recycleButton.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
         val storeCategory = ArrayList<DataClassStoreCategoryButton>()
         storeCategory.add(DataClassStoreCategoryButton("Grocery Store"))
         storeCategory.add(DataClassStoreCategoryButton("Bakery Store"))

@@ -2,10 +2,12 @@ package com.example.medicineandgroceryapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
+import android.util.Base64
 import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -28,6 +30,8 @@ import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
 import pub.devrel.easypermissions.EasyPermissions
 import kotlinx.android.synthetic.main.activity_biodata_of_store.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -48,6 +52,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationTask()
 
+        val users = ArrayList<DataClassForNearbyStores> ()
 
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar2)
         setSupportActionBar(mToolbar)
@@ -68,29 +73,34 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                id: Long
            ) {
                if(position == 0){
+                   val store_type = "Grocery Store"
                    Toast.makeText(applicationContext , "Grocery", Toast.LENGTH_SHORT).show()
-                   val queu = Volley.newRequestQueue(applicationContext)
-                   var url: String =
-                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php"
-                   val postRequest =
-                       object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
-                           Log.d("response", response.toString())
-                           Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
-                               .show()
-                       }, Response.ErrorListener { error ->
-                           Log.d("error", error.toString())
-                           Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
-                               .show()
-                       }) {
-                           override fun getParams(): Map<String, String> {
-                               val params = HashMap<String, String>()
-                               params.put("store_type", "Grocery Store")
-                               params.put("source_latitude",latitude)
-                               params.put("source_longitude",longitude)
-                               return params
-                           }
+                   val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoreFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
+                   val request : StringRequest = StringRequest(url_get, Response.Listener {
+                           response ->
+                       Log.d("json",response.toString())
+                       val jObject : JSONObject = JSONObject(response.toString())
+                       val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+                       Log.d("json",jsonArray.toString())
+                       val a = jsonArray.length()
+                       Log.d("json",a.toString())
+                       for(y in 0..a-1){
+                           Log.d("Nearest", "Stores")
+                           val product_id = jsonArray.getJSONObject(y).getString("product_id")
+                           val product_name = jsonArray.getJSONObject(y).getString("product_name")
+                           val pimageString = jsonArray.getJSONObject(y).getString("product_image")
+                           val product_img = stringToBitmap(pimageString)
+                           val productPrice = jsonArray.getJSONObject(y).getString("product_price")
+                           //users.add(DataClassForNearbyStores(product_img,product_name, productPrice))
                        }
-                   queu.add(postRequest)
+                       //val adapter = CustomAdapterClassForRequestDetail(users)
+                       //recycleOfCategory.adapter = adapter
+                   }, Response.ErrorListener {
+                           error ->
+                       Log.d("json", error.toString())
+                      // Toast.makeText(this@RequestDetail,error.toString(), Toast.LENGTH_SHORT).show()
+                   })
+                   //queue.add((request))
                }
 
                else if(position == 1){
@@ -135,7 +145,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         storeCategory.add(DataClassStoreCategoryButton("General Store"))
         val buttonAdapter = CustomDataStoreCategoryButton(storeCategory)
         recycleButton.adapter = buttonAdapter
-        val users = ArrayList<DataClassForNearbyStores> ()
         val resid = R.drawable.store
         users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
         users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
@@ -325,6 +334,11 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         val drawerLayout: DrawerLayout = findViewById(R.id.user_drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+    fun stringToBitmap(imageInString : String) : Bitmap {
+        val imageBytes = Base64.decode(imageInString,0)
+        val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)
+        return image
     }
     /*override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_nearest_stores,menu)
