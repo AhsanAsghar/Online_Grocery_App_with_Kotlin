@@ -74,16 +74,23 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
 
                 val queue = Volley.newRequestQueue(applicationContext)
                 val url_get: String =
-                    "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestDeliveryPersonFinding.php?source_latitude =$latitude&source_longitude=$longitude"
+                    "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestDeliveryPersonFinding.php?source_latitude=$latitude&source_longitude=$longitude"
                 var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
                     Log.d("json", response.toString())
                     //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
                     //var json : JSONArray = response.getJSONArray(0)
-                    val jObject = JSONObject(response.toString())
+                    val jObject : JSONObject = JSONObject(response.toString())
                     val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
                     Log.d("json",jsonArray.toString())
-                    val a = jsonArray.length()
-                    Log.d("json",a.toString())
+                    val a :Int = jsonArray.length()
+                    for(y in 1..a-1){
+                        Log.d("list", "in")
+                        val dp_id = jsonArray.getJSONObject(y).getString("dp_id")
+                        val dp_name = jsonArray.getJSONObject(y).getString("dp_name")
+                        val distance = jsonArray.getJSONObject(y).getString("distance")
+                        Log.d("data", dp_id + " " + dp_name + " " + distance)
+                    }
+                    Log.d("list", "out")
                 }, Response.ErrorListener { error ->
                     Log.d("json", error.toString())
                     Toast.makeText(this@MapForHiringDeliveryPerson, error.toString(), Toast.LENGTH_SHORT)
