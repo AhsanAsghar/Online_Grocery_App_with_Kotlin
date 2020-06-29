@@ -1,5 +1,12 @@
 package com.example.medicineandgroceryapp
+import android.Manifest
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.location.Location
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.core.view.GravityCompat
@@ -11,19 +18,35 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.android.gms.location.*
+import pub.devrel.easypermissions.EasyPermissions
+import kotlinx.android.synthetic.main.activity_biodata_of_store.*
 
 class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-
+    private val RC_LOCATION_PERM = 124
+    var phone : String? = null
+    lateinit var mFusedLocationClient: FusedLocationProviderClient
+    val PERMISSION_ID = 42
+    var latitude : String = ""
+    var longitude : String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_navigation)
+        if (intent.getStringExtra("phone") != null) {
+            phone = intent.getStringExtra("phone")
+        } else {
+            phone = "+923450694449"
+        }
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationTask()
 
 
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar2)
@@ -46,14 +69,60 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
            ) {
                if(position == 0){
                    Toast.makeText(applicationContext , "Grocery", Toast.LENGTH_SHORT).show()
+                   val queu = Volley.newRequestQueue(applicationContext)
+                   var url: String =
+                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php"
+                   val postRequest =
+                       object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                           Log.d("response", response.toString())
+                           Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                               .show()
+                       }, Response.ErrorListener { error ->
+                           Log.d("error", error.toString())
+                           Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                               .show()
+                       }) {
+                           override fun getParams(): Map<String, String> {
+                               val params = HashMap<String, String>()
+                               params.put("store_type", "Grocery Store")
+                               params.put("source_latitude",latitude)
+                               params.put("source_longitude",longitude)
+                               return params
+                           }
+                       }
+                   queu.add(postRequest)
                }
+
                else if(position == 1){
                    Toast.makeText(applicationContext , "Medical", Toast.LENGTH_SHORT).show()
+                   val queu = Volley.newRequestQueue(applicationContext)
+                   var url: String =
+                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php"
+                   val postRequest =
+                       object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                           Log.d("response", response.toString())
+                           Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                               .show()
+                       }, Response.ErrorListener { error ->
+                           Log.d("error", error.toString())
+                           Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                               .show()
+                       }) {
+                           override fun getParams(): Map<String, String> {
+                               val params = HashMap<String, String>()
+                               params.put("store_type", "Medical Store")
+                               params.put("source_latitude",latitude)
+                               params.put("source_longitude",longitude)
+                               return params
+                           }
+                       }
+                   queu.add(postRequest)
                }
+
            }
-
-
        }
+
+
 
 
 
@@ -97,6 +166,117 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
         navView.setNavigationItemSelectedListener(this)
     }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+        Toast.makeText(this, "Location given !", Toast.LENGTH_LONG).show()
+    }
+    fun locationTask() {
+        if (hasLocationPermissions())
+        {
+            // Have permission, do the thing!
+            Toast.makeText(this, "TODO: Location things", Toast.LENGTH_LONG).show()
+            mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
+                var location: Location? = task.result
+                if (location == null) {
+                    requestNewLocationData()
+                } else {
+                    latitude = location?.latitude.toString()
+                    longitude = location?.longitude.toString()
+                    findViewById<TextView>(R.id.currentaddress).text = location?.longitude.toString() +"," + location?.latitude.toString()
+                    val queu = Volley.newRequestQueue(applicationContext)
+                    var url: String =
+                        "https://grocerymedicineapp.000webhostapp.com/PHPfiles/InsertAddressOfCustomer.php"
+                    val postRequest =
+                        object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                            Log.d("response", response.toString())
+                            Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                                .show()
+                        }, Response.ErrorListener { error ->
+                            Log.d("error", error.toString())
+                            Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                                .show()
+                        }) {
+                            override fun getParams(): Map<String, String> {
+                                val params = HashMap<String, String>()
+                                params.put("phone", phone.toString())
+                                params.put("latitude",latitude)
+                                params.put("longitude",longitude)
+                                return params
+                            }
+                        }
+                    queu.add(postRequest)
+                    //store_address =  location?.longitude.toString() +"," + location?.latitude.toString()
+                }
+            }
+        }
+        else
+        {
+            // Ask for one permission
+            EasyPermissions.requestPermissions(
+                this,
+                "G allow krso k mood ney !",
+                RC_LOCATION_PERM,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestNewLocationData() {
+        var mLocationRequest = LocationRequest()
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mLocationRequest.interval = 0
+        mLocationRequest.fastestInterval = 0
+        mLocationRequest.numUpdates = 1
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        mFusedLocationClient!!.requestLocationUpdates(
+            mLocationRequest, mLocationCallback,
+            Looper.myLooper()
+        )
+    }
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            var mLastLocation: Location = locationResult.lastLocation
+            if(mLastLocation != null){
+                findViewById<TextView>(R.id.currentaddress).text = mLastLocation.longitude.toString() +"," + mLastLocation.latitude.toString()
+
+                val queu = Volley.newRequestQueue(applicationContext)
+                var url: String =
+                    "https://grocerymedicineapp.000webhostapp.com/PHPfiles/InsertAddressOfCustomer.php"
+                val postRequest =
+                    object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                        Log.d("response", response.toString())
+                        Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                            .show()
+                    }, Response.ErrorListener { error ->
+                        Log.d("error", error.toString())
+                        Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                            .show()
+                    }) {
+                        override fun getParams(): Map<String, String> {
+                            val params = HashMap<String, String>()
+                            params.put("phone", phone.toString())
+                            params.put("latitude",latitude)
+                            params.put("longitude",longitude)
+                            return params
+                        }
+                    }
+                queu.add(postRequest)
+                //store_address =  mLastLocation.longitude.toString() +"," + mLastLocation.latitude.toString()
+            }
+
+        }
+    }
+
+
+    private fun hasLocationPermissions():Boolean {
+        return EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.user_drawer_layout)

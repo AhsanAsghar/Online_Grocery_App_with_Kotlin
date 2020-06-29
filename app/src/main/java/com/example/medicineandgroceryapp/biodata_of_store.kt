@@ -27,6 +27,8 @@ import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_biodata_of_store.*
+import kotlinx.android.synthetic.main.activity_items_detail_from_camera.view.*
+import pub.devrel.easypermissions.EasyPermissions
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -36,6 +38,8 @@ class biodata_of_store : AppCompatActivity() {
     lateinit var mFusedLocationClient: FusedLocationProviderClient
     var name: String = "null"
     val PERMISSION_ID = 42
+    var latitude : String = ""
+    var longitude : String = ""
     private var requestCodeP: Int = 999
     var store_type_spinner: String = "null"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +53,7 @@ class biodata_of_store : AppCompatActivity() {
         }
 
         val store_nameET: EditText = findViewById(R.id.store_name)
-        val store_addressET: EditText = findViewById(R.id.store_address)
+        val store_addressET: TextView = findViewById(R.id.store_address)
         val store_emailET: EditText = findViewById(R.id.store_email)
         val imageBitmap: CircleImageView = findViewById(R.id.store_image)
         val next: Button = findViewById(R.id.store_next_button)
@@ -97,35 +101,52 @@ class biodata_of_store : AppCompatActivity() {
         next.setOnClickListener {
             val store_name = store_nameET.text.toString()
             val store_email = store_emailET.text.toString()
-            val queu = Volley.newRequestQueue(applicationContext)
-            var url: String =
-                "https://grocerymedicineapp.000webhostapp.com/PHPfiles/biodata_of_store.php"
-            val postRequest =
-                object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
-                    Log.d("response", response.toString())
-                    Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
-                        .show()
-                }, Response.ErrorListener { error ->
-                    Log.d("error", error.toString())
-                    Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
-                        .show()
-                }) {
-                    override fun getParams(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        params.put("phone", phone)
-                        params.put("name_of_store", store_name.toString())
-                        params.put("address_of_store", store_address.toString())
-                        params.put("email_address", store_email.toString())
-                        params.put("store_type", store_type_spinner)
-                        var image: ImageView = findViewById(R.id.store_image)
-                        var bitmap: Bitmap = (image.drawable as BitmapDrawable).bitmap
-                        var photo: String = bitmapToString(bitmap)
-                        params.put("image_of_store", photo)
-                        params.put("owner_name", name)
-                        return params
+            var image: ImageView = findViewById(R.id.store_image)
+
+            if(!checkEmail(store_email)){
+                store_emailET.error = "Fill it correctly"
+            }
+            if(store_name.isEmpty()){
+                store_nameET.error = "Please Fill Store's Name"
+            }
+            if(store_type_spinner.isEmpty()){
+                Toast.makeText(this, "Please Select your Store's Category", Toast.LENGTH_LONG).show()
+            }
+            if(image.drawable == null){
+                Toast.makeText(this, "Please Selet Image", Toast.LENGTH_SHORT).show()
+            }
+            if(checkEmail(store_email) && !(store_name.isEmpty()) && !(store_type_spinner.isEmpty()) && !(image.drawable==null)){
+                val queu = Volley.newRequestQueue(applicationContext)
+                var url: String =
+                    "https://grocerymedicineapp.000webhostapp.com/PHPfiles/biodata_of_store.php"
+                val postRequest =
+                    object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                        Log.d("response", response.toString())
+                        Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                            .show()
+                    }, Response.ErrorListener { error ->
+                        Log.d("error", error.toString())
+                        Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                            .show()
+                    }) {
+                        override fun getParams(): Map<String, String> {
+                            val params = HashMap<String, String>()
+                            params.put("phone", phone)
+                            params.put("name_of_store", store_name.toString())
+                            params.put("email_address", store_email.toString())
+                            params.put("latitude", latitude)
+                            params.put("longitude", longitude)
+                            params.put("store_type", store_type_spinner)
+                            var image: ImageView = findViewById(R.id.store_image)
+                            var bitmap: Bitmap = (image.drawable as BitmapDrawable).bitmap
+                            var photo: String = bitmapToString(bitmap)
+                            params.put("image_of_store", photo)
+                            params.put("owner_name", name)
+                            return params
+                        }
                     }
-                }
-            queu.add(postRequest)
+                queu.add(postRequest)
+            }
         }
     }
 
@@ -141,8 +162,10 @@ class biodata_of_store : AppCompatActivity() {
                     if (location == null) {
                         requestNewLocationData()
                     } else {
+                        latitude = location?.latitude.toString()
+                        longitude = location?.longitude.toString()
                         findViewById<TextView>(R.id.store_address).text = location?.longitude.toString() +"," + location?.latitude.toString()
-                        store_address =  location?.longitude.toString() +"," + location?.latitude.toString()
+                        //store_address =  location?.longitude.toString() +"," + location?.latitude.toString()
                     }
                 }
             } else {
@@ -233,6 +256,10 @@ class biodata_of_store : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Don't have access", Toast.LENGTH_SHORT).show()
             }
         }
+        else{
+            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+            Toast.makeText(this, "Location given !", Toast.LENGTH_LONG).show()
+        }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
@@ -249,7 +276,12 @@ class biodata_of_store : AppCompatActivity() {
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
-
+    private fun checkEmail(email : String) : Boolean{
+        if(email.contains("@") && !email.equals(null) && email.contains(".com")){
+            return true
+        }
+        return false
+    }
     private fun bitmapToString(bitmap: Bitmap): String {
         var outputStream: ByteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)

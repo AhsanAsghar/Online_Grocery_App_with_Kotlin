@@ -1,4 +1,5 @@
 package com.example.medicineandgroceryapp
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,19 +18,34 @@ import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import com.android.volley.Request
+import android.location.Location
+import android.os.Handler
+import android.os.Looper
+import com.google.android.gms.location.*
+import pub.devrel.easypermissions.EasyPermissions
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.HashMap
 
 class delivery_person_profile : AppCompatActivity() {
     var phone : String? = null
     var requestCodeP: Int = 999
+    private var mFusedLocationProviderClient: FusedLocationProviderClient? = null
+    private val INTERVAL: Long = 2000
+    private val FASTEST_INTERVAL: Long = 1000
+    private val RC_LOCATION_PERM = 124
+    internal lateinit var mLocationRequest: LocationRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +55,7 @@ class delivery_person_profile : AppCompatActivity() {
         } else {
             phone = "+923450694449"
         }
+        mLocationRequest = LocationRequest()
         val dp_nameToEditET: EditText = findViewById(R.id.deliveryperson_name_toedit)
         val dp_bikeNumberET: EditText = findViewById(R.id.deliveryperson_bike_number)
         val dp_licenseET: EditText = findViewById(R.id.deliveryperson_lisence_number)
@@ -63,7 +80,7 @@ class delivery_person_profile : AppCompatActivity() {
         queue.add(request_img)
         val url_get: String =
             "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deliveryPersonProfileGet.php?phone=$phone"
-        val request: StringRequest = StringRequest(url_get, Response.Listener { response ->
+        var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
             //var json : JSONArray = response.getJSONArray(0)
@@ -86,9 +103,12 @@ class delivery_person_profile : AppCompatActivity() {
             if (dp_license_number_json != "null")
                 dp_licenseET.setText(dp_license_number_json)
             if(dp_available_json == "1"){
+
                 dp_available.isChecked = true
                 dp_availableNow = true
+
             }else{
+                stoplocationUpdates()
                 dp_available.isChecked = false
                 dp_availableNow = false
             }
@@ -109,11 +129,22 @@ class delivery_person_profile : AppCompatActivity() {
         var dp_available_in: Boolean? = dp_availableNow
         dp_available.setOnCheckedChangeListener(){
                 buttonView, isChecked ->
+            if(isChecked){
+                Handler().postDelayed({
+
+                    locationTask()
+                }, 6000)
+            }
+            else{
+
+                stoplocationUpdates()
+            }
             Log.d("avail",isChecked.toString())
             dp_available_in = isChecked
             Log.d("avail", dp_available_in.toString())
         }
-        dp_image.setOnClickListener() { v ->
+        dp_image.setOnClickListener() {
+                v ->
             ActivityCompat.requestPermissions(
                 this@delivery_person_profile,
                 arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
@@ -175,12 +206,14 @@ class delivery_person_profile : AppCompatActivity() {
 
         }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if(requestCode == requestCode){
+        if(requestCode == 999){
+
             if(grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 var intent = Intent(Intent.ACTION_PICK)
                 intent.setType("image/*")
@@ -190,8 +223,15 @@ class delivery_person_profile : AppCompatActivity() {
                 Toast.makeText(applicationContext,"Don't have access",Toast.LENGTH_SHORT).show()
             }
         }
+        else
+        {
+            // Forward results to EasyPermissions
+            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+            Toast.makeText(this, "Location given !", Toast.LENGTH_LONG).show()
+        }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == requestCodeP && resultCode == Activity.RESULT_OK && data != null){
             var filepath : Uri = data.data
@@ -204,6 +244,101 @@ class delivery_person_profile : AppCompatActivity() {
             photo.setImageBitmap(scaled)
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+   /*
+
+        fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            // Forward results to EasyPermissions
+            EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+            Toast.makeText(this, "Location given !", Toast.LENGTH_LONG).show()
+        }*/
+    fun locationTask() {
+        if (hasLocationPermissions())
+        {
+            // Have permission, do the thing!
+            Toast.makeText(this, "TODO: Location things", Toast.LENGTH_LONG).show()
+            startLocationUpdates()
+
+        }
+        else
+        {
+            // Ask for one permission
+            EasyPermissions.requestPermissions(
+                this,
+                "G allow krso k mood ney !",
+                RC_LOCATION_PERM,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+    private fun hasLocationPermissions():Boolean {
+        return EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+
+    protected fun startLocationUpdates() {
+
+        // Create the location request to start receiving updates
+
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mLocationRequest.setInterval(INTERVAL)
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL)
+
+        // Create LocationSettingsRequest object using location request
+        val builder = LocationSettingsRequest.Builder()
+        builder.addLocationRequest(mLocationRequest!!)
+        val locationSettingsRequest = builder.build()
+
+        val settingsClient = LocationServices.getSettingsClient(this)
+        settingsClient.checkLocationSettings(locationSettingsRequest)
+
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
+        mFusedLocationProviderClient!!.requestLocationUpdates(mLocationRequest, mLocationCallback,
+            Looper.myLooper())
+
+    }
+
+
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            // do work here
+            locationResult.lastLocation
+            onLocationChanged(locationResult.lastLocation)
+        }
+    }
+
+    fun onLocationChanged(location: Location) {
+        // New location has now been determined
+        var latitude = location.latitude
+        var longitude = location.longitude
+        //latitude = mLastLocation.latitude
+        //longitude = mLastLocation.longitude
+        val phone = phone
+        val queu = Volley.newRequestQueue(applicationContext)
+        var url: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/TrackDP.php"
+        val postRequest =
+            object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                Log.d("response", response.toString())
+                Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }, Response.ErrorListener { error ->
+                Log.d("error", error.toString())
+                Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }) {
+                override fun getParams(): Map<String, String> {
+                    val params = java.util.HashMap<String, String>()
+                        params.put("phone",phone.toString())
+                    params.put("latitude", latitude.toString())
+                    params.put("longitude", longitude.toString())
+                    return params
+                }
+            }
+        queu.add(postRequest)
+    }
+    private fun stoplocationUpdates() {
+        mFusedLocationProviderClient!!.removeLocationUpdates(mLocationCallback)
     }
     private fun checkEmail(email : String) : Boolean{
         if(email.contains("@") && !email.equals(null) && email.contains(".com")){

@@ -13,6 +13,8 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -22,11 +24,25 @@ import kotlin.collections.ArrayList
 
 class ItemsInCategory : AppCompatActivity() {
 
+    var phone: String = "null"
+    var name :String = "null"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_items_in_category)
+
+        if (intent.getStringExtra("phone") != null && intent.getStringExtra("name") != null) {
+
+        } else {
+            phone = "+923004579023"
+            name = "Ahsan"
+        }
+
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_items_in_category)
         setSupportActionBar(mToolbar)
+
+        checkIfStoreOwner();
+        chekIfDeliveryPerson();
+
         val recycleViewOfItemsInCategory = findViewById(R.id.recycler_items_in_category) as RecyclerView
         recycleViewOfItemsInCategory.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
         val idFromIntent: Int = 6
@@ -74,6 +90,86 @@ class ItemsInCategory : AppCompatActivity() {
         queue.add((request))
 
     }
+
+
+    private fun chekIfDeliveryPerson() {
+        val queu = Volley.newRequestQueue(applicationContext)
+        var url: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkIfDeliveryPerson.php"
+        val postRequest =
+            object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                Log.d("response", response.toString())
+                Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }, Response.ErrorListener { error ->
+                Log.d("error", error.toString())
+                Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }) {
+                override fun getParams(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    params.put("phone", phone)
+                    return params
+                }
+            }
+        queu.add(postRequest)
+
+
+        var queue: RequestQueue
+        queue = Volley.newRequestQueue(this)
+        val URL: String =  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkIfDeliveryPerson.php"
+        val request = StringRequest(
+            Request.Method.GET,
+            URL,
+            Response.Listener { response ->
+                val deliveryPerson = response;
+            },
+            Response.ErrorListener { error -> Log.d("error", error.toString()) })
+        queue.add(request)
+
+    }
+
+    private fun checkIfStoreOwner() {
+        val queu = Volley.newRequestQueue(applicationContext)
+        var url: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkIfStoreOwner.php"
+        val postRequest =
+            object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                Log.d("response", response.toString())
+                Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }, Response.ErrorListener { error ->
+                Log.d("error", error.toString())
+                Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }) {
+                override fun getParams(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    params.put("phone", phone)
+                    return params
+                }
+            }
+        queu.add(postRequest)
+
+
+
+        var queue: RequestQueue
+        queue = Volley.newRequestQueue(this)
+        val URL: String =  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkIfStoreOwner.php"
+        val request = StringRequest(
+            Request.Method.GET,
+            URL,
+            Response.Listener { response ->
+                val storeOwner = response;
+            },
+            Response.ErrorListener { error -> Log.d("error", error.toString()) })
+        queue.add(request)
+    }
+
+
+
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_items_in_category,menu)
