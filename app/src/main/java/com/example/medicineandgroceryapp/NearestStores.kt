@@ -66,7 +66,6 @@ class NearestStores : AppCompatActivity() {
 */
 
         val recycle = findViewById(R.id.recyclerView) as RecyclerView
-        val recycleButton = findViewById(R.id.recyclerView) as RecyclerView
         val spinner = findViewById<Spinner>(R.id.spinner)
         val grocormedic = arrayOf("Grocery Store", "Medical Store")
         spinner.adapter = ArrayAdapter<String> (this, android.R.layout.simple_expandable_list_item_1,grocormedic)
@@ -92,15 +91,15 @@ class NearestStores : AppCompatActivity() {
 
 
         }
+
         recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        recycleButton.layoutManager = LinearLayoutManager(this,RecyclerView.HORIZONTAL,false)
         val storeCategory = ArrayList<DataClassStoreCategoryButton>()
         storeCategory.add(DataClassStoreCategoryButton("Grocery Store"))
         storeCategory.add(DataClassStoreCategoryButton("Bakery Store"))
         storeCategory.add(DataClassStoreCategoryButton("Pharmacy"))
         storeCategory.add(DataClassStoreCategoryButton("General Store"))
         val buttonAdapter = CustomDataStoreCategoryButton(storeCategory)
-        recycleButton.adapter = buttonAdapter
+        recycle.adapter = buttonAdapter
         val users = ArrayList<DataClassForNearbyStores> ()
         val resid = R.drawable.store
         users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
