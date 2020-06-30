@@ -1,3 +1,5 @@
 package com.example.medicineandgroceryapp
 
-data class DataClassForNearbyStores(val idOfPhoto: Int, val nameOfStore: String, val distance: String)
+import android.graphics.Bitmap
+
+data class DataClassForNearbyStores(val idOfPhoto: Bitmap, val nameOfStore: String, val distance: String)

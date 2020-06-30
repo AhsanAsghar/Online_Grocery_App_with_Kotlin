@@ -28,6 +28,6 @@ class CustomAdapterForNearbyStores (val userList: ArrayList<DataClassForNearbySt
         val user:DataClassForNearbyStores = userList[position]
         holder.nameOfStore.text = user.nameOfStore
         holder.distance.text = user.distance
-        holder.photo.id = user.idOfPhoto
+        holder.photo.setImageBitmap(user.idOfPhoto)
     }
 }
