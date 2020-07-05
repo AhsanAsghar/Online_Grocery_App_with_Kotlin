@@ -137,10 +137,10 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         recycleButton.adapter = buttonAdapter
         val users = ArrayList<DataClassForNearbyStores> ()
         val resid = R.drawable.store
-        users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
+        users.add(DataClassForNearbyStores(resid,"Store name","3 km","1",this))
+        users.add(DataClassForNearbyStores(resid,"Store name","3 km","2",this))
+        users.add(DataClassForNearbyStores(resid,"Store name","3 km","3",this))
+        users.add(DataClassForNearbyStores(resid,"Store name","3 km","4",this))
 
         val adapter = CustomAdapterForNearbyStores(users)
         recycle.adapter = adapter
