@@ -163,8 +163,32 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
         navView.setNavigationItemSelectedListener(this)
+        //get WHO IS USER
+        val queue = Volley.newRequestQueue(this)
+        val url_get_hiring_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/whoIsUser.php?phone=$phone"
+        val request_hiring_status : StringRequest = StringRequest(url_get_hiring_status, Response.Listener {
+                response ->
+            var statusOfUser  = response.toString().split(":").toTypedArray()
+            val whoIsUser = statusOfUser[1].substring(1,statusOfUser[1].length - 2)
+            Log.d("WHO", whoIsUser)
+            if(whoIsUser.equals("SO")){
+                Log.d("WHOin", "in")
+                navView.menu.clear()
+                navView.inflateMenu(R.menu.activity_store_navigation_bar_drawer)
+            }else if (whoIsUser.equals("DP")){
+                Log.d("WHOin", "in")
+                navView.menu.clear()
+                navView.inflateMenu(R.menu.activity_deliveryperson_navigation_drawer)
+            }
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@UserNavigation,error.toString(), Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_hiring_status))
+        //End getting WHO IS USER
+
     }
 
 
@@ -308,18 +332,40 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         when (item.itemId) {
             R.id.user_notifications-> {
                 // Handle the camera action
+                Toast.makeText(this@UserNavigation,"User Notification",Toast.LENGTH_SHORT).show()
             }
             R.id.user_settings -> {
-
+                Toast.makeText(this@UserNavigation,"User Setting",Toast.LENGTH_SHORT).show()
             }
             R.id.make_store -> {
-
+                Toast.makeText(this@UserNavigation,"Make Store",Toast.LENGTH_SHORT).show()
             }
             R.id.become_delivery_person -> {
-
+                Toast.makeText(this@UserNavigation,"Become a delivery person",Toast.LENGTH_SHORT).show()
             }
             R.id.user_cart -> {
-
+                Toast.makeText(this@UserNavigation,"User Cart",Toast.LENGTH_SHORT).show()
+            }
+            R.id.store_drawer_notifications -> {
+                Toast.makeText(this@UserNavigation,"Store drawer notification",Toast.LENGTH_SHORT).show()
+            }
+            R.id.store_drawer_name -> {
+                Toast.makeText(this@UserNavigation,"Store drawer name",Toast.LENGTH_SHORT).show()
+            }
+            R.id.store_drawer_requests -> {
+                Toast.makeText(this@UserNavigation,"Store drawer request",Toast.LENGTH_SHORT).show()
+            }
+            R.id.store_drawer_settings -> {
+                Toast.makeText(this@UserNavigation,"Store drawer settings",Toast.LENGTH_SHORT).show()
+            }
+            R.id.deliveryperson_drawer_notifications -> {
+                Toast.makeText(this@UserNavigation,"Delivery person drawer notification",Toast.LENGTH_SHORT).show()
+            }
+            R.id.deliveryperson_drawer_profile  -> {
+                Toast.makeText(this@UserNavigation,"Delivery person drawer profile",Toast.LENGTH_SHORT).show()
+            }
+            R.id.deliveryperson_drawer_requests -> {
+                Toast.makeText(this@UserNavigation,"Delivery person drawer requests",Toast.LENGTH_SHORT).show()
             }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.user_drawer_layout)
