@@ -2,10 +2,11 @@ package com.example.medicineandgroceryapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
+import android.util.Base64
 import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -27,7 +28,10 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
 import pub.devrel.easypermissions.EasyPermissions
-import kotlinx.android.synthetic.main.activity_biodata_of_store.*
+import org.json.JSONArray
+import org.json.JSONObject
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -40,6 +44,8 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_navigation)
+        val recycle = findViewById(R.id.recyclerView) as RecyclerView
+        recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
         if (intent.getStringExtra("phone") != null) {
             phone = intent.getStringExtra("phone")
         } else {
@@ -48,11 +54,10 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationTask()
 
+        val users = ArrayList<DataClassForNearbyStores> ()
 
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar2)
         setSupportActionBar(mToolbar)
-        val recycle = findViewById(R.id.recyclerView) as RecyclerView
-        val recycleButton = findViewById(R.id.recyclerView) as RecyclerView
         val spinner = findViewById<Spinner>(R.id.spinner)
         val grocormedic = arrayOf("Grocery Store", "Medical Store")
         spinner.adapter = ArrayAdapter<String> (this, android.R.layout.simple_expandable_list_item_1,grocormedic)
@@ -68,79 +73,101 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                id: Long
            ) {
                if(position == 0){
+                   val store_type = "Grocery Store"
                    Toast.makeText(applicationContext , "Grocery", Toast.LENGTH_SHORT).show()
-                   val queu = Volley.newRequestQueue(applicationContext)
-                   var url: String =
-                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php"
-                   val postRequest =
-                       object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
-                           Log.d("response", response.toString())
-                           Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
-                               .show()
-                       }, Response.ErrorListener { error ->
-                           Log.d("error", error.toString())
-                           Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
-                               .show()
-                       }) {
-                           override fun getParams(): Map<String, String> {
-                               val params = HashMap<String, String>()
-                               params.put("store_type", "Grocery Store")
-                               params.put("source_latitude",latitude)
-                               params.put("source_longitude",longitude)
-                               return params
-                           }
+                   val queue = Volley.newRequestQueue(applicationContext)
+                   val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
+                   val request : StringRequest = StringRequest(url_get, Response.Listener {
+                           response ->
+                       Log.d("json",response.toString())
+                       val jObject : JSONObject = JSONObject(response.toString())
+                       val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+                       Log.d("json",jsonArray.toString())
+                       val a :Int = jsonArray.length()
+                       Log.d("json",a.toString())
+                       for(y in 1..a-1){
+                           Log.d("Nearest", "Stores")
+                           val store_id = jsonArray.getJSONObject(y).getString("store_id")
+                           val pimageString = jsonArray.getJSONObject(y).getString("store_image")
+                           val store_image = stringToBitmap(pimageString)
+                           val store_name = jsonArray.getJSONObject(y).getString("store_name")
+                           val distance = jsonArray.getJSONObject(y).getString("distance")
+                           val distance1 = distance.toDouble()
+                           val distance2 = "%.2f".format(distance1)
+                           users.add(DataClassForNearbyStores(store_image,store_name, distance2+"KM", store_id, this@UserNavigation))
                        }
-                   queu.add(postRequest)
+                       val adapter = CustomAdapterForNearbyStores(users)
+                       recycle.adapter = adapter
+                   }, Response.ErrorListener {
+                           error ->
+                       Log.d("json", error.toString())
+                       Toast.makeText(this@UserNavigation,error.toString(), Toast.LENGTH_SHORT).show()
+                   })
+                   queue.add((request))
                }
 
                else if(position == 1){
                    Toast.makeText(applicationContext , "Medical", Toast.LENGTH_SHORT).show()
-                   val queu = Volley.newRequestQueue(applicationContext)
-                   var url: String =
-                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php"
-                   val postRequest =
-                       object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
-                           Log.d("response", response.toString())
-                           Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
-                               .show()
-                       }, Response.ErrorListener { error ->
-                           Log.d("error", error.toString())
-                           Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
-                               .show()
-                       }) {
-                           override fun getParams(): Map<String, String> {
-                               val params = HashMap<String, String>()
-                               params.put("store_type", "Medical Store")
-                               params.put("source_latitude",latitude)
-                               params.put("source_longitude",longitude)
-                               return params
-                           }
+                   val store_type = "Medical Store"
+                   val queue = Volley.newRequestQueue(applicationContext)
+                   val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
+                   val request : StringRequest = StringRequest(url_get, Response.Listener {
+                           response ->
+                       Log.d("json",response.toString())
+                       val jObject : JSONObject = JSONObject(response.toString())
+                       val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+                       Log.d("json",jsonArray.toString())
+                       val a = jsonArray.length()
+                       Log.d("json",a.toString())
+                       for(y in 1..a-1){
+                           Log.d("Nearest", "Stores")
+                           val store_id = jsonArray.getJSONObject(y).getString("store_id")
+                           val pimageString = jsonArray.getJSONObject(y).getString("store_image")
+                           val store_image = stringToBitmap(pimageString)
+                           val store_name = jsonArray.getJSONObject(y).getString("store_name")
+                           val distance = jsonArray.getJSONObject(y).getString("distance")
+                          // val distance1 = distance.toDouble()
+                           //val distance2 = Math.round(distance1 * 100.0) / 100.0
+                           //val distance1 = DecimalFormat("#.###")
+                           //distance1.roundingMode = RoundingMode.CEILING
+                           //val distance2 = distance1.format(distance)
+                           val distance1 = distance.toDouble()
+                           val distance2 = "%.2f".format(distance1)
+                           Toast.makeText(this@UserNavigation,"Distance:"+distance2,Toast.LENGTH_LONG).show()
+                           users.add(DataClassForNearbyStores(store_image,store_name, distance2.toString() + "KM",store_id,this@UserNavigation))
                        }
-                   queu.add(postRequest)
+                       val adapter = CustomAdapterForNearbyStores(users)
+                       recycle.adapter = adapter
+                   }, Response.ErrorListener {
+                           error ->
+                       Log.d("json", error.toString())
+                       Toast.makeText(this@UserNavigation,error.toString(), Toast.LENGTH_SHORT).show()
+                   })
+                   queue.add((request))
                }
 
            }
+
        }
 
 
 
 
 
-        recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        recycleButton.layoutManager = LinearLayoutManager(this,RecyclerView.HORIZONTAL,false)
-        val storeCategory = ArrayList<DataClassStoreCategoryButton>()
-        storeCategory.add(DataClassStoreCategoryButton("Grocery Store"))
-        storeCategory.add(DataClassStoreCategoryButton("Bakery Store"))
-        storeCategory.add(DataClassStoreCategoryButton("Pharmacy"))
-        storeCategory.add(DataClassStoreCategoryButton("General Store"))
-        val buttonAdapter = CustomDataStoreCategoryButton(storeCategory)
-        recycleButton.adapter = buttonAdapter
-        val users = ArrayList<DataClassForNearbyStores> ()
-        val resid = R.drawable.store
 
-
-        val adapter = CustomAdapterForNearbyStores(users)
-        recycle.adapter = adapter
+        //recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
+        //val storeCategory = ArrayList<DataClassStoreCategoryButton>()
+        //storeCategory.add(DataClassStoreCategoryButton("Grocery Store"))
+        //storeCategory.add(DataClassStoreCategoryButton("Bakery Store"))
+        //storeCategory.add(DataClassStoreCategoryButton("Pharmacy"))
+        //storeCategory.add(DataClassStoreCategoryButton("General Store"))
+        //val buttonAdapter = CustomDataStoreCategoryButton(storeCategory)
+        //recycle.adapter = buttonAdapter
+        //val resid = R.drawable.store
+        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
+        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
+        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
+        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
 
 
 
@@ -178,7 +205,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 Log.d("WHOin", "in")
                 navView.menu.clear()
                 navView.inflateMenu(R.menu.activity_deliveryperson_navigation_drawer)
-            } else if(whoIsUser.equals("C")){
+            }else if(whoIsUser.equals("C")){
 
             }
         }, Response.ErrorListener {
@@ -191,7 +218,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         //End code to change or copy
 
     }
-
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -374,6 +400,11 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         val drawerLayout: DrawerLayout = findViewById(R.id.user_drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+    fun stringToBitmap(imageInString : String) : Bitmap {
+        val imageBytes = Base64.decode(imageInString,0)
+        val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)
+        return image
     }
     /*override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_nearest_stores,menu)

@@ -1,6 +1,7 @@
 package com.example.medicineandgroceryapp
 
 import android.Manifest
+import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -41,12 +42,14 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
     val store_id = "8"
     var latitude:String = ""
     var longitude:String = ""
+    var list1 = mutableListOf<HiringModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_for_hiring_delivery_person)
         gettingStoreAddress()
+        gettingCustomerAddress()
+
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_map_for_hiring_delivery_person) as SupportMapFragment
-        val customer_location:EditText = findViewById(R.id.customer_location)
 
 
        // mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -88,6 +91,12 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
                                         dp_name,
                                         "Distance:" + distance2.toString() + "KM"
                                     )
+                                    val hiringModel = HiringModel()
+                                    hiringModel.latitude=dp_latitude
+                                    hiringModel.longitude=dp_longitude
+                                    hiringModel.dp_id=dp_id.toInt()
+                                    list1.add(hiringModel)
+
                                     Toast.makeText(
                                         this@MapForHiringDeliveryPerson,
                                         "Distance:" + distance2 + "KM",
@@ -116,6 +125,8 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
 
     }
 
+
+
      fun gettingStoreAddress() {
         val store_location:EditText =findViewById(R.id.store_location)
         val queue = Volley.newRequestQueue(applicationContext)
@@ -142,6 +153,7 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
                 //googleMap.animateCamera(CameraUpdateFactory.zoomTo(16f))
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location2,13f))
                 Toast.makeText(this@MapForHiringDeliveryPerson, "Marker Updated", Toast.LENGTH_SHORT).show()
+
             })
 
 
@@ -165,17 +177,57 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
         queue.add((request))
         //To change body of created functions use File | Settings | File Templates.
     }
+    fun gettingCustomerAddress(){
+        val customer_location:EditText =findViewById(R.id.customer_location)
+        val queue = Volley.newRequestQueue(applicationContext)
+        val url_get: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?store_id=$store_id"
+        var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
+            Log.d("json", response.toString())
+            //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
+            //var json : JSONArray = response.getJSONArray(0)
+            val jObject: JSONObject = JSONObject(response.toString())
+            val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+            val jsonObject: JSONObject = jsonArray.getJSONObject(0);
+            latitude = jsonObject.getString("latitude")
+            longitude = jsonObject.getString("longitude")
+            //latitude = "32.1474"
+            //longitude = "74.21"
+
+            val geocoder:Geocoder
+            val addresses: List<Address>
+            geocoder = Geocoder(this, Locale.getDefault())
+            addresses = geocoder.getFromLocation(latitude.toDouble(),longitude.toDouble(),1)
+            val address:String= addresses.get(0).getAddressLine(0)
+            val city:String = addresses.get(0).locality
+            val state: String  = addresses.get(0).getAdminArea();
+            val country: String = addresses.get(0).getCountryName();
+
+            customer_location.setText(address+","+city)
+
+
+        }, Response.ErrorListener { error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@MapForHiringDeliveryPerson, error.toString(), Toast.LENGTH_SHORT)
+                .show()
+        })
+        queue.add((request))
+        //To change body of created functions use File | Settings | File Templates.
+    }
 
 
 
     protected fun createMarker(latitude : Double, longitude:Double,  title:String, snippets: String): Marker {
+        var map = googleMap.addMarker(
+            MarkerOptions()
+                .position(LatLng(latitude, longitude))
+                .title(title).snippet(snippets)
+        )
+        map.showInfoWindow()
+        return map
+    }
 
-    return googleMap.addMarker(MarkerOptions()
-            .position(LatLng(latitude, longitude))
-            .title(title).snippet(snippets)
-    )}
-
-
+    
 
 
 
