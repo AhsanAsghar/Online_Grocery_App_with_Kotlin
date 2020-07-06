@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 class CustomAdapterForNearbyStores (val userList: ArrayList<DataClassForNearbyStores>) : RecyclerView.Adapter<CustomAdapterForNearbyStores.ViewHolder>(){
@@ -28,6 +29,10 @@ class CustomAdapterForNearbyStores (val userList: ArrayList<DataClassForNearbySt
         val user:DataClassForNearbyStores = userList[position]
         holder.nameOfStore.text = user.nameOfStore
         holder.distance.text = user.distance
-        holder.photo.setImageBitmap(user.idOfPhoto)
+        holder.photo.id = user.idOfPhoto
+        val idOfStore = user.idOfStore
+        holder.itemView.setOnClickListener(){
+            Toast.makeText(user.context,"Onclick",Toast.LENGTH_SHORT).show()
+        }
     }
 }

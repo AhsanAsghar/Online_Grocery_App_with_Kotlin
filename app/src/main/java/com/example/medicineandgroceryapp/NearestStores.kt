@@ -1,11 +1,22 @@
 package com.example.medicineandgroceryapp
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.android.material.navigation.NavigationView
 
 
 class NearestStores : AppCompatActivity() {
@@ -91,13 +102,7 @@ class NearestStores : AppCompatActivity() {
         recycle.adapter = buttonAdapter
         val users = ArrayList<DataClassForNearbyStores> ()
         val resid = R.drawable.store
-        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
 
-        val adapter = CustomAdapterForNearbyStores(users)
-        recycle.adapter = adapter
     }
 
 //    private fun chekIfDeliveryPerson(): StringRequest {
