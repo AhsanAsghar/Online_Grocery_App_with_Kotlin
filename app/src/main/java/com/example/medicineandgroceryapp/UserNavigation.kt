@@ -153,6 +153,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+        //Code to change or copy
         val drawerLayout: DrawerLayout = findViewById(R.id.user_drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val toggle = ActionBarDrawerToggle(
@@ -177,6 +178,8 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 Log.d("WHOin", "in")
                 navView.menu.clear()
                 navView.inflateMenu(R.menu.activity_deliveryperson_navigation_drawer)
+            } else if(whoIsUser.equals("C")){
+
             }
         }, Response.ErrorListener {
                 error ->
@@ -185,6 +188,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         })
         queue.add((request_hiring_status))
         //End getting WHO IS USER
+        //End code to change or copy
 
     }
 
@@ -326,6 +330,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
+        //Code to change or copy
         when (item.itemId) {
             R.id.user_notifications-> {
                 // Handle the camera action
@@ -365,6 +370,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 Toast.makeText(this@UserNavigation,"Delivery person drawer requests",Toast.LENGTH_SHORT).show()
             }
         }
+        //end code to change or copy
         val drawerLayout: DrawerLayout = findViewById(R.id.user_drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
