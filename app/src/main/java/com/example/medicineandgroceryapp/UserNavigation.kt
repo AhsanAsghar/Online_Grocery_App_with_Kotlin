@@ -92,7 +92,9 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                            val store_image = stringToBitmap(pimageString)
                            val store_name = jsonArray.getJSONObject(y).getString("store_name")
                            val distance = jsonArray.getJSONObject(y).getString("distance")
-                           users.add(DataClassForNearbyStores(store_image,store_name, distance))
+                           val distance1 = distance.toDouble()
+                           val distance2 = "%.2f".format(distance1)
+                           users.add(DataClassForNearbyStores(store_image,store_name, distance2+"KM"))
                        }
                        val adapter = CustomAdapterForNearbyStores(users)
                        recycle.adapter = adapter

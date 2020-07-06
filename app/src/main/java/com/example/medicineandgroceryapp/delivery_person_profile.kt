@@ -103,12 +103,15 @@ class delivery_person_profile : AppCompatActivity() {
             if (dp_license_number_json != "null")
                 dp_licenseET.setText(dp_license_number_json)
             if(dp_available_json == "1"){
+                Handler().postDelayed({
 
+                    locationTask()
+                }, 6000)
                 dp_available.isChecked = true
                 dp_availableNow = true
 
             }else{
-                stoplocationUpdates()
+                //stoplocationUpdates()
                 dp_available.isChecked = false
                 dp_availableNow = false
             }
