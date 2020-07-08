@@ -46,7 +46,7 @@
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/store" />
+            app:srcCompat="@drawable/loading" />
     </androidx.cardview.widget.CardView>
 
     <TextView
@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Name of Store"
+        android:text="Loading..."
         android:textColor="#000000"
         android:textSize="24sp"
         android:textStyle="bold"

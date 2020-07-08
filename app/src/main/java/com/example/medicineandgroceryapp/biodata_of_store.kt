@@ -36,7 +36,6 @@ class biodata_of_store : AppCompatActivity() {
     var phone: String = "null"
     var store_address : String = "null"
     lateinit var mFusedLocationClient: FusedLocationProviderClient
-    var name: String = "null"
     val PERMISSION_ID = 42
     var latitude : String = ""
     var longitude : String = ""
@@ -45,13 +44,7 @@ class biodata_of_store : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_biodata_of_store)
-        if (intent.getStringExtra("phone") != null && intent.getStringExtra("name") != null) {
-
-        } else {
-            phone = "+923004579023"
-            name = "Ahsan"
-        }
-
+        phone = intent.getStringExtra("phone")
         val store_nameET: EditText = findViewById(R.id.store_name)
         val store_addressET: TextView = findViewById(R.id.store_address)
         val store_emailET: EditText = findViewById(R.id.store_email)
@@ -122,8 +115,15 @@ class biodata_of_store : AppCompatActivity() {
                 val postRequest =
                     object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
                         Log.d("response", response.toString())
-                        Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
-                            .show()
+                        val result  = response.toString().split(":").toTypedArray()
+                        val yesORno = result[1].substring(1,result[1].length - 2)
+                        if(yesORno.equals("YES")){
+                            val intent = Intent(this@biodata_of_store,itemsInStoreProfile::class.java)
+                            intent.putExtra("phone",phone)
+                            startActivity(intent)
+                        }else{
+                            Toast.makeText(this,"Problem in query",Toast.LENGTH_SHORT).show()
+                        }
                     }, Response.ErrorListener { error ->
                         Log.d("error", error.toString())
                         Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
@@ -134,14 +134,13 @@ class biodata_of_store : AppCompatActivity() {
                             params.put("phone", phone)
                             params.put("name_of_store", store_name.toString())
                             params.put("email_address", store_email.toString())
-                            params.put("latitude", latitude)
-                            params.put("longitude", longitude)
+                            params.put("latitude", latitude.toString())
+                            params.put("longitude", longitude.toString())
                             params.put("store_type", store_type_spinner)
                             var image: ImageView = findViewById(R.id.store_image)
                             var bitmap: Bitmap = (image.drawable as BitmapDrawable).bitmap
                             var photo: String = bitmapToString(bitmap)
                             params.put("image_of_store", photo)
-                            params.put("owner_name", name)
                             return params
                         }
                     }

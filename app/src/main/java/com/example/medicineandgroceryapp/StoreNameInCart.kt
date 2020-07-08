@@ -29,7 +29,7 @@ class StoreNameInCart : AppCompatActivity() {
         recycleOfCategory.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
         val resid = R.id.category_photo
         val users = ArrayList<DataClassStoreNameInCart>()
-        val phone = "+923450694449"
+        val phone = intent.getStringExtra("phone")
         val queue = Volley.newRequestQueue(this)
         val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/cartStoreGet.php?phone=$phone"
         val request : StringRequest = StringRequest(url_get, Response.Listener {

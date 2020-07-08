@@ -28,12 +28,7 @@ open class settings : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        if(intent.getStringExtra("phone") != null){
-            Log.d("Error","inside")
-        }
-        else{
-            phone = "+923450694449"
-        }
+        phone = intent.getStringExtra("phone")
         val card_setting : CardView = findViewById(R.id.cardView_setting)
         val imageForBitmap : ImageView = findViewById(R.id.profilePic)
         val imageBitmap : Bitmap = (imageForBitmap.drawable as BitmapDrawable).bitmap

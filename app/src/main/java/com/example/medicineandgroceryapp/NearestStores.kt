@@ -20,7 +20,7 @@ import com.google.android.material.navigation.NavigationView
 
 
 class NearestStores : AppCompatActivity() {
-    var phone: String = "null"
+    /*var phone: String = "null"
     var name :String = "null"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -184,7 +184,7 @@ class NearestStores : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_nearest_stores,menu)
         return super.onCreateOptionsMenu(menu)
-    }
+    }*/
 }
 
 

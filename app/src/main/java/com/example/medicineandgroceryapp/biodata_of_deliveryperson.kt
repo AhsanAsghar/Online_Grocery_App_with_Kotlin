@@ -3,8 +3,10 @@ package com.example.medicineandgroceryapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.Response
@@ -16,11 +18,7 @@ class biodata_of_deliveryperson : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_biodata_of_deliveryperson)
-        if(intent.getStringExtra("phone") != null){
-
-        }else{
-            phone = "+923450694449"
-        }
+        phone = intent.getStringExtra("phone")
         val bikeNumberET : EditText = findViewById(R.id.bike_number)
         val licenseNumberET : EditText = findViewById(R.id.lisence_number)
         val emailAddressET : EditText = findViewById(R.id.deliverperson_email)
@@ -45,7 +43,15 @@ class biodata_of_deliveryperson : AppCompatActivity() {
                 var url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/biodata_delivery_person.php"
                 val postRequest =object: StringRequest(Request.Method.POST,url, Response.Listener {
                         response ->
-                    Toast.makeText(applicationContext,response.toString(), Toast.LENGTH_SHORT).show()
+                    val result  = response.toString().split(":").toTypedArray()
+                    val yesORno = result[1].substring(1,result[1].length - 2)
+                    if(yesORno.equals("YES")){
+                        val intent = Intent(this@biodata_of_deliveryperson,delivery_person_profile::class.java)
+                        intent.putExtra("phone",phone)
+                        startActivity(intent)
+                    }else{
+                        Toast.makeText(this,"Problem in query",Toast.LENGTH_SHORT).show()
+                    }
                 }, Response.ErrorListener { error ->
                     Toast.makeText(applicationContext,error.toString(), Toast.LENGTH_SHORT).show()
                 }){

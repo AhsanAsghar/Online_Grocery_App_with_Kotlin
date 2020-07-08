@@ -42,10 +42,24 @@ class itemsInStoreProfile : AppCompatActivity() {
         setContentView(R.layout.activity_items_in_store_profile)
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_store_profile_items)
         setSupportActionBar(mToolbar)
-        val phone : String = "+923004579023"
-        val storeName: String = "abc"
+        val phone : String = intent.getStringExtra("phone")
         val nameOfStore : TextView = findViewById(R.id.name_of_store)
-        nameOfStore.setText(storeName)
+        //Get Name of store
+        val queue = Volley.newRequestQueue(this)
+        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileNameGet.php?phone=$phone"
+        val request_name : StringRequest = StringRequest(url_get_name, Response.Listener {
+                response ->
+            val store  = response.toString().split(":").toTypedArray()
+            val storeName = store[1].substring(1,store[1].length - 2)
+            findViewById<TextView>(R.id.name_of_store).setText(storeName)
+
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@itemsInStoreProfile,error.toString(),Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_name))
+        //End getting name of store
         val recycleViewOfItemsInCategory = findViewById(R.id.recycler_store_profile_items) as RecyclerView
         recycleViewOfItemsInCategory.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
         val resid : Int = R.id.item_photo_in_store_profile_items;
@@ -56,8 +70,7 @@ class itemsInStoreProfile : AppCompatActivity() {
             v ->
             getAlertBar()
         }
-        val queue = Volley.newRequestQueue(this)
-        val url_img = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileImageGet.php?phone=$phone&storeName=$storeName"
+        val url_img = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileImageGet.php?phone=$phone"
         val request_img : ImageRequest = ImageRequest(url_img, Response.Listener {
                 response ->
             storeProfileImage.setImageBitmap(response)
@@ -69,7 +82,7 @@ class itemsInStoreProfile : AppCompatActivity() {
         } )
         queue.add(request_img)
 
-        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileImageOfItemsGet.php?phone=$phone&storeName=$storeName"
+        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileImageOfItemsGet.php?phone=$phone"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
                 response ->
             val jObject : JSONObject = JSONObject(response.toString())

@@ -18,8 +18,8 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme">
         <activity android:name=".itemsDetailFromCamera" android:exported="true" />
-        <activity android:name=".itemsInStoreProfile" android:exported="true"/>
-        <activity android:name=".setPassword" android:exported="true"/>
+        <activity android:name=".itemsInStoreProfile" android:exported="true" android:parentActivityName=".UserNavigation"/>
+        <activity android:name=".checkPassword" android:exported="true"/>
         <activity android:name=".user_name" android:exported="true"/>
         <activity
             android:name=".Notifications"
@@ -53,8 +53,8 @@
             android:exported="true" />
         <activity
             android:name=".settings"
-            android:exported="true" />
-        <activity android:name=".delivery_person_profile" android:exported="true">
+            android:exported="true" android:parentActivityName=".UserNavigation"/>
+        <activity android:name=".delivery_person_profile" android:exported="true" android:parentActivityName=".UserNavigation">
         </activity>
         <activity
             android:name=".store_navigation_bar"
@@ -76,9 +76,9 @@
         </activity>
         <activity android:name=".item_details">
         </activity>
-        <activity android:name=".biodata_of_store" android:exported="true">
+        <activity android:name=".biodata_of_store" android:exported="true" android:parentActivityName=".UserNavigation">
         </activity>
-        <activity android:name=".biodata_of_deliveryperson" android:exported="true">
+        <activity android:name=".biodata_of_deliveryperson" android:exported="true" android:parentActivityName=".UserNavigation">
         </activity>
         <activity android:name=".personal_data" android:exported="true">
         </activity>

@@ -11,15 +11,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.android.volley.AuthFailureError
 import com.android.volley.Request
-import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import java.util.concurrent.TimeUnit
@@ -82,47 +79,51 @@ class login_with_phone : AppCompatActivity() {
             override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
                 if (actionId == EditorInfo.IME_ACTION_DONE){
                     phone = textView.text.toString()
-                    var phone1 = makePhoneNumber(phone)
-                    if (phone1 != null) {
+                    val phone1 = makePhoneNumber(phone)
+                    if(phone1 != null){
                         phone = phone1
+                        startPhoneVerificationBySendingCode(phone1)
                     }
-                    val queu = Volley.newRequestQueue(applicationContext)
-                    var url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkIfNumberExists.php"
-                    val postRequest =object: StringRequest(Request.Method.POST,url,Response.Listener {
-                            response ->
-                        if(response.equals("[\"Record Exists\"]")){
-                            Toast.makeText(applicationContext,response.toString(),Toast.LENGTH_SHORT).show()
-                            val intent = Intent(applicationContext,setPassword::class.java)
-                            intent.putExtra("phone", phone1)
-                            startActivity(intent)
-                        }else{
-                            Log.d(TAG,"here")
-                            phoneNumberExistInDB = false
-                            if(phone1 != null){
-                                startPhoneVerificationBySendingCode(phone1)
+                    /*if (phone1 != null) {
+                        phone = phone1
+                        val queu = Volley.newRequestQueue(applicationContext)
+                        var url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkIfNumberExists.php"
+                        val postRequest =object: StringRequest(Request.Method.POST,url,Response.Listener {
+                                response ->
+                            if(response.equals("[\"Record Exists\"]")){
+                                Toast.makeText(applicationContext,response.toString(),Toast.LENGTH_SHORT).show()
+                                val intent = Intent(applicationContext,checkPassword::class.java)
+                                intent.putExtra("phone", phone1)
+                                startActivity(intent)
+                            }else{
+                                Log.d(TAG,"here")
+                                phoneNumberExistInDB = false
+                                if(phone1 != null){
+                                    startPhoneVerificationBySendingCode(phone1)
+                                }
+                                Toast.makeText(applicationContext,response.toString(),Toast.LENGTH_SHORT).show()
                             }
-                            Toast.makeText(applicationContext,response.toString(),Toast.LENGTH_SHORT).show()
-                        }
 
 
-                    },Response.ErrorListener {error ->
-                        Toast.makeText(applicationContext,error.toString(),Toast.LENGTH_SHORT).show()
-                    }){
-                        override fun getParams() : Map<String,String>{
-                            val params = HashMap<String,String>()
-                            if(phone1 != null)
-                            params.put("phone",phone1)
-                            return params
+                        },Response.ErrorListener {error ->
+                            Toast.makeText(applicationContext,error.toString(),Toast.LENGTH_SHORT).show()
+                        }){
+                            override fun getParams() : Map<String,String>{
+                                val params = HashMap<String,String>()
+                                if(phone1 != null)
+                                    params.put("phone",phone1)
+                                return params
+                            }
                         }
+                        queu.add(postRequest)
+                        return true
                     }
-                    queu.add(postRequest)
-                    return true
-                }
-                else{
-                    Toast.makeText(applicationContext,"Phone number is wrong",Toast.LENGTH_SHORT).show()
-                    return false
-                }
-
+                    else{
+                        Toast.makeText(applicationContext,"Phone number is wrong",Toast.LENGTH_SHORT).show()
+                        return false
+                    }*/
+                    }
+                return false
             }
         })
 
@@ -176,16 +177,29 @@ class login_with_phone : AppCompatActivity() {
                     var url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/signUpWIthPhoneNumber.php"
                     val postRequest =object: StringRequest(Request.Method.POST,url,Response.Listener {
                             response ->
+                        Log.d(TAG,"Data entered")
+                        Log.d(TAG,phone)
                         Toast.makeText(applicationContext,response.toString(),Toast.LENGTH_SHORT).show()
-                        val intent = Intent(applicationContext,personal_data::class.java)
-                        intent.putExtra("phone", phone)
-                        startActivity(intent)
+                        val resultfull  = response.toString().split(":").toTypedArray()
+                        val result = resultfull[1].substring(1,resultfull[1].length - 2)
+                        if(result.equals("NO")){
+                            val intent = Intent(applicationContext,UserNavigation::class.java)
+                            intent.putExtra("phone", phone)
+                            startActivity(intent)
+                        }else{
+                            val intent = Intent(applicationContext,personal_data::class.java)
+                            intent.putExtra("phone", phone)
+                            startActivity(intent)
+                        }
+
                     },Response.ErrorListener {error ->
+                        Log.d(TAG,error.toString())
                         Toast.makeText(applicationContext,error.toString(),Toast.LENGTH_SHORT).show()
                     }){
                         override fun getParams() : Map<String,String>{
                             val params = HashMap<String,String>()
-                            params.put("phone",phone)
+                            Log.d(TAG,phone)
+                            params.put("phone", phone)
                             return params
                         }
                     }

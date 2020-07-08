@@ -50,11 +50,7 @@ class delivery_person_profile : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_profile)
-        if (intent.getStringExtra("phone") != null) {
-            phone = intent.getStringExtra("phone")
-        } else {
-            phone = "+923450694449"
-        }
+        phone = intent.getStringExtra("phone")
         mLocationRequest = LocationRequest()
         val dp_nameToEditET: EditText = findViewById(R.id.deliveryperson_name_toedit)
         val dp_bikeNumberET: EditText = findViewById(R.id.deliveryperson_bike_number)
@@ -63,10 +59,25 @@ class delivery_person_profile : AppCompatActivity() {
         val dp_nameET: TextView = findViewById(R.id.deliveryperson_name)
         val dp_available : SwitchCompat = findViewById(R.id.availability)
         val dp_done: FloatingActionButton = findViewById(R.id.deliveryperson_done)
+        //Get Name of Delivery person
+        val queue = Volley.newRequestQueue(this)
+        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/dpNameGet.php?phone=$phone"
+        val request_name : StringRequest = StringRequest(url_get_name, Response.Listener {
+                response ->
+            val dp  = response.toString().split(":").toTypedArray()
+            val dpName = dp[1].substring(1,dp[1].length - 2)
+            findViewById<TextView>(R.id.deliveryperson_name).setText(dpName)
+            findViewById<EditText>(R.id.deliveryperson_name_toedit).setText(dpName)
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@delivery_person_profile,error.toString(),Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_name))
+        //End getting name of Delivery person
         val dp_image: de.hdodenhof.circleimageview.CircleImageView =
             findViewById(R.id.deliveryperson_profile_image)
         //Get data from server
-        val queue = Volley.newRequestQueue(this)
         var dp_availableNow : Boolean? = null
         val url_img =
             "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deliveryPersonProfileImg.php?phone=+923450694449"

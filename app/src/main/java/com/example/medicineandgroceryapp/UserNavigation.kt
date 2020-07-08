@@ -1,6 +1,7 @@
 package com.example.medicineandgroceryapp
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
@@ -46,11 +47,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         setContentView(R.layout.activity_user_navigation)
         val recycle = findViewById(R.id.recyclerView) as RecyclerView
         recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        if (intent.getStringExtra("phone") != null) {
-            phone = intent.getStringExtra("phone")
-        } else {
-            phone = "+923450694449"
-        }
+        phone = intent.getStringExtra("phone")
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationTask()
 
@@ -154,24 +151,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
 
 
-
-        //recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        //val storeCategory = ArrayList<DataClassStoreCategoryButton>()
-        //storeCategory.add(DataClassStoreCategoryButton("Grocery Store"))
-        //storeCategory.add(DataClassStoreCategoryButton("Bakery Store"))
-        //storeCategory.add(DataClassStoreCategoryButton("Pharmacy"))
-        //storeCategory.add(DataClassStoreCategoryButton("General Store"))
-        //val buttonAdapter = CustomDataStoreCategoryButton(storeCategory)
-        //recycle.adapter = buttonAdapter
-        //val resid = R.drawable.store
-        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-        //users.add(DataClassForNearbyStores(resid,"Store name","3 km"))
-
-
-
-
         val toolbar: Toolbar = findViewById(R.id.toolbarItemDetailCamera)
         setSupportActionBar(toolbar)
 
@@ -194,7 +173,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         val url_get_hiring_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/whoIsUser.php?phone=$phone"
         val request_hiring_status : StringRequest = StringRequest(url_get_hiring_status, Response.Listener {
                 response ->
-            var statusOfUser  = response.toString().split(":").toTypedArray()
+            val statusOfUser  = response.toString().split(":").toTypedArray()
             val whoIsUser = statusOfUser[1].substring(1,statusOfUser[1].length - 2)
             Log.d("WHO", whoIsUser)
             if(whoIsUser.equals("SO")){
@@ -360,24 +339,45 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         when (item.itemId) {
             R.id.user_notifications-> {
                 // Handle the camera action
+                val intent = Intent(this@UserNavigation,Notifications::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"User Notification",Toast.LENGTH_SHORT).show()
             }
             R.id.user_settings -> {
+                val intent = Intent(this@UserNavigation,settings::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"User Setting",Toast.LENGTH_SHORT).show()
             }
             R.id.make_store -> {
+                val intent = Intent(this@UserNavigation,biodata_of_store::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Make Store",Toast.LENGTH_SHORT).show()
             }
             R.id.become_delivery_person -> {
+                val intent = Intent(this@UserNavigation,biodata_of_deliveryperson::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Become a delivery person",Toast.LENGTH_SHORT).show()
             }
             R.id.user_cart -> {
+                val intent = Intent(this@UserNavigation,StoreNameInCart::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"User Cart",Toast.LENGTH_SHORT).show()
             }
             R.id.store_drawer_notifications -> {
+                val intent = Intent(this@UserNavigation,Notifications::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Store drawer notification",Toast.LENGTH_SHORT).show()
             }
             R.id.store_drawer_name -> {
+                val intent = Intent(this@UserNavigation,itemsInStoreProfile::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Store drawer name",Toast.LENGTH_SHORT).show()
             }
             R.id.store_drawer_requests -> {
@@ -387,9 +387,15 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 Toast.makeText(this@UserNavigation,"Store drawer settings",Toast.LENGTH_SHORT).show()
             }
             R.id.deliveryperson_drawer_notifications -> {
+                val intent = Intent(this@UserNavigation,Notifications::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Delivery person drawer notification",Toast.LENGTH_SHORT).show()
             }
             R.id.deliveryperson_drawer_profile  -> {
+                val intent = Intent(this@UserNavigation,delivery_person_profile::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Delivery person drawer profile",Toast.LENGTH_SHORT).show()
             }
             R.id.deliveryperson_drawer_requests -> {

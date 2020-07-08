@@ -15,7 +15,7 @@
     <item
             android:id="@+id/store_drawer_name"
             android:icon="@drawable/ic_action_shopgrey"
-            android:title="Store Name"/>
+            android:title="Store Profile"/>
     <item
             android:id="@+id/store_drawer_requests"
             android:icon="@drawable/ic_action_user"
