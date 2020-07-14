@@ -27,7 +27,6 @@ class StoreNameInCart : AppCompatActivity() {
         setSupportActionBar(mToolbar)
         val recycleOfCategory = findViewById<RecyclerView>(R.id.recyclerView_store_name_in_cart)
         recycleOfCategory.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        val resid = R.id.category_photo
         val users = ArrayList<DataClassStoreNameInCart>()
         val phone = intent.getStringExtra("phone")
         val queue = Volley.newRequestQueue(this)
@@ -35,23 +34,27 @@ class StoreNameInCart : AppCompatActivity() {
         val request : StringRequest = StringRequest(url_get, Response.Listener {
                 response ->
             Log.d("json",response.toString())
-            //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
-            //var json : JSONArray = response.getJSONArray(0)
-            val jObject : JSONObject = JSONObject(response.toString())
-            val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
-            Log.d("json",jsonArray.toString())
-            val a = jsonArray.length()
-            Log.d("json",a.toString())
-            for(y in 0..a-1){
-                Log.d("list", "in")
-                val store_name = jsonArray.getJSONObject(y).getString("store_name")
-                val store_id = jsonArray.getJSONObject(y).getString("store_id")
-                val pimageString = jsonArray.getJSONObject(y).getString("store_image")
-                val store_img = stringToBitmap(pimageString)
-                users.add(DataClassStoreNameInCart(store_img,store_name,store_id,this))
+            if(response.toString() == "{\"response\":[null]}"){
+                Log.d("json",response.toString())
+            }else{
+                //var json : JSONArray = response.getJSONArray(0)
+                val jObject : JSONObject = JSONObject(response.toString())
+                val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+                Log.d("json",jsonArray.toString())
+                val a = jsonArray.length()
+                Log.d("json",a.toString())
+                for(y in 1..a-1){
+                    Log.d("list", "in")
+                    val store_name = jsonArray.getJSONObject(y).getString("store_name")
+                    val store_id = jsonArray.getJSONObject(y).getString("store_id")
+                    val pimageString = jsonArray.getJSONObject(y).getString("store_image")
+                    val store_img = stringToBitmap(pimageString)
+                    users.add(DataClassStoreNameInCart(store_img,store_name,store_id,this))
+                }
+                val adapter = CustomAdapterClassForStoreNameInCart(users)
+                recycleOfCategory.adapter = adapter
             }
-            val adapter = CustomAdapterClassForStoreNameInCart(users)
-            recycleOfCategory.adapter = adapter
+
         }, Response.ErrorListener {
                 error ->
             Log.d("json", error.toString())
@@ -60,10 +63,6 @@ class StoreNameInCart : AppCompatActivity() {
         queue.add((request))
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_nearest_stores,menu)
-        return super.onCreateOptionsMenu(menu)
-    }
     fun stringToBitmap(imageInString : String) : Bitmap {
         val imageBytes = Base64.decode(imageInString,0)
         val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)

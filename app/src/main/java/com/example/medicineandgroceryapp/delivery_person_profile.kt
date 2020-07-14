@@ -56,7 +56,6 @@ class delivery_person_profile : AppCompatActivity() {
         val dp_bikeNumberET: EditText = findViewById(R.id.deliveryperson_bike_number)
         val dp_licenseET: EditText = findViewById(R.id.deliveryperson_lisence_number)
         val dp_emailAddressET: EditText = findViewById(R.id.deliveryperson_email_address)
-        val dp_nameET: TextView = findViewById(R.id.deliveryperson_name)
         val dp_available : SwitchCompat = findViewById(R.id.availability)
         val dp_done: FloatingActionButton = findViewById(R.id.deliveryperson_done)
         //Get Name of Delivery person
@@ -98,15 +97,10 @@ class delivery_person_profile : AppCompatActivity() {
             val jObject: JSONObject = JSONObject(response.toString())
             val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
             val jsonObject: JSONObject = jsonArray.getJSONObject(0);
-            val dp_namejson: String = jsonObject.getString("dp_name")
             val dp_emailjson: String = jsonObject.getString("dp_email")
             val dp_bike_number_json: String = jsonObject.getString("bike_number")
             val dp_license_number_json: String = jsonObject.getString("lisence_number")
             val dp_available_json: String = jsonObject.getString("available")
-            if (dp_namejson != "null") {
-                dp_nameET.text = dp_namejson
-                dp_nameToEditET.setText(dp_namejson)
-            }
             if (dp_emailjson != "null")
                 dp_emailAddressET.setText(dp_emailjson)
             if (dp_bike_number_json != "null")
@@ -135,11 +129,11 @@ class delivery_person_profile : AppCompatActivity() {
         })
         queue.add((request))
         // End getting
-        val dp_nameNow = dp_nameToEditET.text.toString()
+        val dp_namenow = dp_nameToEditET.text.toString()
         val dp_bikeNumberNow = dp_bikeNumberET.text.toString()
         val dp_licenseNumberNow = dp_licenseET.text.toString()
         val dp_emailAddressNow = dp_emailAddressET.text.toString()
-        var imageBitmap: Bitmap = (dp_image.drawable as BitmapDrawable).bitmap
+        val imageBitmap: Bitmap = (dp_image.drawable as BitmapDrawable).bitmap
         var dp_available_in: Boolean? = dp_availableNow
         dp_available.setOnCheckedChangeListener(){
                 buttonView, isChecked ->
@@ -166,30 +160,32 @@ class delivery_person_profile : AppCompatActivity() {
             )
         }
         dp_done.setOnClickListener() { v ->
-            Log.d("avail",dp_availableNow.toString())
-            var imageForBitmapTest: ImageView = findViewById(R.id.deliveryperson_profile_image)
-            var imageBitmapTest: Bitmap = (dp_image.drawable as BitmapDrawable).bitmap
+            Log.d("avail","dp_availableNow.toString()")
+            val imageBitmapTest: Bitmap = (dp_image.drawable as BitmapDrawable).bitmap
             if (!checkBikeNumber(dp_bikeNumberET.text.toString())) {
                 dp_bikeNumberET.error = "Add correct Bike Number"
             } else if(!checkEmail(dp_emailAddressET.text.toString()))
                 dp_emailAddressET.error = "Enter Correct Email"
             else if(!checkLicenseNumber(dp_licenseET.text.toString()))
                 dp_licenseET.error = "Enter correct license Number"
-            else if(dp_nameToEditET.text.toString() != dp_nameNow || dp_bikeNumberET.text.toString() != dp_bikeNumberNow
+            else if(dp_nameToEditET.text.toString() != dp_namenow ||dp_bikeNumberET.text.toString() != dp_bikeNumberNow
                 || dp_licenseET.text.toString() != dp_licenseNumberNow || dp_emailAddressET.text.toString() != dp_emailAddressNow
                 || imageBitmap != imageBitmapTest || dp_available_in != dp_availableNow){
                 Log.d("Error", "inside If")
                 val queu = Volley.newRequestQueue(applicationContext)
-                var url: String =
+                val url: String =
                     "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deliveryPersonProfile.php"
                 val postRequest =
-                    object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                    object : StringRequest(Request.Method.POST, url, Response.Listener {
+                            response ->
                         Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
                             .show()
+                        Log.d("problem",response.toString())
                     }, Response.ErrorListener { error ->
                         Log.d("Error", error.toString())
                         Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_LONG)
                             .show()
+                        Log.d("problem",error.toString())
                     }) {
                         override fun getParams(): Map<String, String> {
                             val params = HashMap<String, String>()
@@ -208,9 +204,9 @@ class delivery_person_profile : AppCompatActivity() {
                             }else{
                                 Log.d("avail","its null")
                             }
-                            var image: ImageView = findViewById(R.id.deliveryperson_profile_image)
-                            var bitmap: Bitmap = (image.drawable as BitmapDrawable).bitmap
-                            var photo: String = bitmapToString(bitmap)
+                            val image: ImageView = findViewById(R.id.deliveryperson_profile_image)
+                            val bitmap: Bitmap = (image.drawable as BitmapDrawable).bitmap
+                            val photo: String = bitmapToString(bitmap)
                             params.put("image", photo)
                             return params
                         }

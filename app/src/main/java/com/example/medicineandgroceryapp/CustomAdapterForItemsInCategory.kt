@@ -62,17 +62,17 @@ class CustomAdapterForItemsInCategory (val userList: ArrayList<DataItemsInCatego
         (holder as ItemsInCategoryViewHolderData).setProductPrice(user.priceOfItem)
         (holder as ItemsInCategoryViewHolderData).addToCart.setOnClickListener(){
             v ->
-            getAlertBar(user.context,user.idOfStore,user.customerNumber,user.pid)
+            getAlertBar(user.context,user.idOfStore.toInt(),user.customerNumber,user.pid)
         }
     }
     }
     private fun getAlertBar(context: Context, store_id: Int,
                             phone_customer: String,productId: Int) {
-        var builder:AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder:AlertDialog.Builder = AlertDialog.Builder(context)
         val inflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        var view : View = inflater.inflate(R.layout.dialog_add_into_cart,null)
-        var text: EditText = view.findViewById(R.id.number_of_items)
+        val view : View = inflater.inflate(R.layout.dialog_add_into_cart,null)
+        val text: EditText = view.findViewById(R.id.number_of_items)
         builder.setView(view)
         builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
             if(text.text.toString().length > 0 && text.text.toString().toInt() <= 10){
