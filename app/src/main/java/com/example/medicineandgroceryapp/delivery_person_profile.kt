@@ -79,7 +79,7 @@ class delivery_person_profile : AppCompatActivity() {
         //Get data from server
         var dp_availableNow : Boolean? = null
         val url_img =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deliveryPersonProfileImg.php?phone=+923450694449"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deliveryPersonProfileImg.php?phone=$phone"
         val request_img: ImageRequest = ImageRequest(url_img, Response.Listener { response ->
             dp_image.setImageBitmap(response)
 
@@ -116,7 +116,6 @@ class delivery_person_profile : AppCompatActivity() {
                 dp_availableNow = true
 
             }else{
-                //stoplocationUpdates()
                 dp_available.isChecked = false
                 dp_availableNow = false
             }
@@ -147,7 +146,6 @@ class delivery_person_profile : AppCompatActivity() {
                 }, 6000)
             }
             else{
-
                 stoplocationUpdates()
             }
         }
