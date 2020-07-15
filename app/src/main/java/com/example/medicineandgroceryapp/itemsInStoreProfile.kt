@@ -29,6 +29,7 @@ import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.android.synthetic.main.map_dialogue.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -37,12 +38,13 @@ class itemsInStoreProfile : AppCompatActivity() {
     val CAMERA_REQUEST_CODE : Int = 2
     val CAMERA_CODE : Int = 0
     val REQUEST_CODE_FOR_GALLERY : Int = 1
+    var phone: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_items_in_store_profile)
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_store_profile_items)
         setSupportActionBar(mToolbar)
-        val phone : String = intent.getStringExtra("phone")
+        phone = intent.getStringExtra("phone")
         val nameOfStore : TextView = findViewById(R.id.name_of_store)
         //Get Name of store
         val queue = Volley.newRequestQueue(this)
@@ -187,6 +189,7 @@ class itemsInStoreProfile : AppCompatActivity() {
                 val intent = Intent(this@itemsInStoreProfile,itemsDetailFromCamera::class.java)
                 intent.putExtra("image",bitmapToString(image))
                 intent.putExtra("type",true)
+                intent.putExtra("phone",phone)
                 startActivity(intent)
             }
 
@@ -196,6 +199,7 @@ class itemsInStoreProfile : AppCompatActivity() {
                 val intent = Intent(this@itemsInStoreProfile,itemsDetailFromCamera::class.java)
                 intent.putExtra("image",selectedimage.toString())
                 intent.putExtra("type",false)
+                intent.putExtra("phone",phone)
                 startActivity(intent)
             }
         } else{

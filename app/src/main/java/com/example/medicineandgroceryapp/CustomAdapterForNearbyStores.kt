@@ -32,12 +32,12 @@ class CustomAdapterForNearbyStores (val userList: ArrayList<DataClassForNearbySt
         holder.nameOfStore.text = user.nameOfStore
         holder.distance.text = user.distance
         holder.photo.setImageBitmap(user.idOfPhoto)
-        val storePhone = user.storePhoneStore
+        val customerPhone = user.customerPhoneStore
         val context = user.context
         holder.itemView.setOnClickListener(){
             Toast.makeText(user.context,"Onclick",Toast.LENGTH_SHORT).show()
             val intent = Intent(context, ItemsInCategory::class.java)
-            intent.putExtra("phone",storePhone)
+            intent.putExtra("phone",customerPhone)
             intent.putExtra("idOfStore",user.idOfStore)
             context.startActivity(intent)
         }

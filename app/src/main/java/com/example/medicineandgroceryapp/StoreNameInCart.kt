@@ -49,7 +49,7 @@ class StoreNameInCart : AppCompatActivity() {
                     val store_id = jsonArray.getJSONObject(y).getString("store_id")
                     val pimageString = jsonArray.getJSONObject(y).getString("store_image")
                     val store_img = stringToBitmap(pimageString)
-                    users.add(DataClassStoreNameInCart(store_img,store_name,store_id,this))
+                    users.add(DataClassStoreNameInCart(store_img,store_name,store_id,this,phone))
                 }
                 val adapter = CustomAdapterClassForStoreNameInCart(users)
                 recycleOfCategory.adapter = adapter

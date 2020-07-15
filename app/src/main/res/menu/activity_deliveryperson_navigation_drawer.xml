@@ -20,7 +20,7 @@
         <item
             android:id="@+id/deliveryperson_drawer_cart"
             android:icon="@drawable/ic_action_cart"
-            android:title="Requests"
+            android:title="Cart"
             />
     </group>
 

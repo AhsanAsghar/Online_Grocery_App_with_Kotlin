@@ -26,12 +26,12 @@ import kotlin.collections.ArrayList
 
 class ItemsInCategory : AppCompatActivity() {
 
-    var phone: String = "+923167617639"
-    var idFromIntent : String = "25"
+    var phoneCustomer: String? = null
+    var idFromIntent : String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_items_in_category)
-        phone = intent.getStringExtra("phone")
+        phoneCustomer = intent.getStringExtra("phone")
         idFromIntent = intent.getStringExtra("idOfStore")
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_items_in_category)
         setSupportActionBar(mToolbar)
@@ -72,7 +72,7 @@ class ItemsInCategory : AppCompatActivity() {
                                 val pimage = stringToBitmap(pimageString)
                                 val pid = jsonArray.getJSONObject(y).getString("product_id")
                                 Log.d("id",pid)
-                                users.add(DataClassForDataItemsInCategory(pimage,pname, pprice,this,pid.toInt(),idFromIntent,"+923450694449"))
+                                users.add(DataClassForDataItemsInCategory(pimage,pname, pprice,this,pid.toInt(),idFromIntent!!,phoneCustomer!!))
                             }
                         }
                         listOfCategoryAdded.add(pxcategory)
@@ -109,7 +109,7 @@ class ItemsInCategory : AppCompatActivity() {
             }) {
                 override fun getParams(): Map<String, String> {
                     val params = HashMap<String, String>()
-                    params.put("phone", phone)
+                    params.put("phone", phoneCustomer!!)
                     return params
                 }
             }
@@ -146,7 +146,7 @@ class ItemsInCategory : AppCompatActivity() {
             }) {
                 override fun getParams(): Map<String, String> {
                     val params = HashMap<String, String>()
-                    params.put("phone", phone)
+                    params.put("phone", phoneCustomer!!)
                     return params
                 }
             }
@@ -172,7 +172,7 @@ class ItemsInCategory : AppCompatActivity() {
         return when (item?.itemId) {
             R.id.cart_items_in_category -> {
                 val intent = Intent(this@ItemsInCategory,StoreNameInCart::class.java)
-                intent.putExtra("phone",phone)
+                intent.putExtra("phone",phoneCustomer)
                 intent.putExtra("id",idFromIntent)
                 startActivity(intent)
                 true

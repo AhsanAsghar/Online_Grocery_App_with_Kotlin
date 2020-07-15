@@ -1,5 +1,6 @@
 package com.example.medicineandgroceryapp
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +9,8 @@ import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,27 +30,33 @@ class cart_items : AppCompatActivity() {
         setSupportActionBar(mToolbar)
         val recycleOfCategory = findViewById<RecyclerView>(R.id.recyclerView_cart_items)
         recycleOfCategory.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        val resid = R.id.cart_item_photo
         val users = ArrayList<DataClassForCartItems>()
 
         //get status
-        val phone = "+923450694449"
-        val store_id = 8
+        val customerPhone = intent.getStringExtra("phone")
+        val store_id = intent.getStringExtra("id")
+        val store_image = intent.getParcelableExtra<Bitmap>("image")
+        val store_name = intent.getStringExtra("name")
         var status = "Request not yet send"
         val queue = Volley.newRequestQueue(this)
-        val url_get_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStatusOfRequest.php?storeid=$store_id&phone=$phone"
+        val url_get_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStatusOfRequest.php?storeid=$store_id&phone=$customerPhone"
         val request_status : StringRequest = StringRequest(url_get_status, Response.Listener {
                 response ->
             Log.d("json",response.toString())
-            val jObject : JSONObject = JSONObject(response.toString())
-            val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
-            Log.d("json",jsonArray.toString())
-            val a = jsonArray.length()
-            Log.d("json",a.toString())
-            for(y in 0..a-1){
-                status  = jsonArray.getJSONObject(y).getString("status")
-                Log.d("status", status)
-                //users.add(DataClassForCartItems(resid,"Al Habib", status))
+            val result  = response.toString().split(":").toTypedArray()
+            val yesORno = result[1].substring(1,result[1].length - 2)
+            Log.d("piq1",yesORno)
+            if(!yesORno.equals("NULL")&&!yesORno.equals("NO")){
+                findViewById<ImageView>(R.id.storeImageCartItem).setImageBitmap(store_image)
+                findViewById<TextView>(R.id.store_name_cart_items).setText(store_name)
+                findViewById<TextView>(R.id.request_status_cart_items).setText(yesORno)
+                //users.add(DataClassForCartItems(store_image,store_name, yesORno))
+            }else if(yesORno.equals("NULL")){
+                findViewById<ImageView>(R.id.storeImageCartItem).setImageBitmap(store_image)
+                findViewById<TextView>(R.id.store_name_cart_items).setText(store_name)
+                findViewById<TextView>(R.id.request_status_cart_items).setText("Send request")
+            }else{
+                Toast.makeText(this,yesORno,Toast.LENGTH_SHORT).show()
             }
             val adapter = CustomAdapterClassForCartItems(users)
             recycleOfCategory.adapter = adapter
@@ -58,26 +67,35 @@ class cart_items : AppCompatActivity() {
         })
         queue.add((request_status))
         // end getting status
-        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/cartItemsGet.php?storeid=$store_id&phone=$phone"
+        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/cartItemsGet.php?storeid=$store_id&phone=$customerPhone"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
                 response ->
-            Log.d("json",response.toString())
-            val jObject : JSONObject = JSONObject(response.toString())
-            val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
-            Log.d("json",jsonArray.toString())
-            val a = jsonArray.length()
-            Log.d("json",a.toString())
-            for(y in 0..a-1){
-                Log.d("list", "in")
-                val product_id = jsonArray.getJSONObject(y).getString("product_id")
-                val product_name = jsonArray.getJSONObject(y).getString("product_name")
-                val pimageString = jsonArray.getJSONObject(y).getString("product_image")
-                val product_img = stringToBitmap(pimageString)
-                val productPrice = jsonArray.getJSONObject(y).getString("product_price")
-                users.add(DataClassForCartItems(product_img,product_name, productPrice))
+            val result  = response.toString().split(":").toTypedArray()
+            val yesORno = result[1].substring(1,result[1].length - 2)
+            Log.d("piq",yesORno)
+            if(yesORno.equals("NO")){
+                Toast.makeText(this,yesORno,Toast.LENGTH_SHORT).show()
+            }else{
+                Log.d("json",response.toString())
+                val jObject : JSONObject = JSONObject(response.toString())
+                val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+                Log.d("json",jsonArray.toString())
+                val a = jsonArray.length()
+                Log.d("json",a.toString())
+                for(y in 0..a-1){
+                    Log.d("list", "in")
+                    val cart_id = jsonArray.getJSONObject(y).getString("cart_id")
+                    val product_id = jsonArray.getJSONObject(y).getString("product_id")
+                    val product_name = jsonArray.getJSONObject(y).getString("product_name")
+                    val pimageString = jsonArray.getJSONObject(y).getString("product_image")
+                    val product_img = stringToBitmap(pimageString)
+                    val productPrice = jsonArray.getJSONObject(y).getString("product_price")
+                    users.add(DataClassForCartItems(product_img,product_name, productPrice,cart_id,this))
+                }
+                val adapter = CustomAdapterClassForCartItems(users)
+                recycleOfCategory.adapter = adapter
             }
-            val adapter = CustomAdapterClassForCartItems(users)
-            recycleOfCategory.adapter = adapter
+
         }, Response.ErrorListener {
                 error ->
             Log.d("json", error.toString())
@@ -86,10 +104,6 @@ class cart_items : AppCompatActivity() {
         queue.add((request))
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_nearest_stores,menu)
-        return super.onCreateOptionsMenu(menu)
-    }
     fun stringToBitmap(imageInString : String) : Bitmap {
         val imageBytes = Base64.decode(imageInString,0)
         val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)
