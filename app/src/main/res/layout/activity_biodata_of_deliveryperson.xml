@@ -27,6 +27,7 @@
         android:background="@drawable/edit_texts"
         android:drawableLeft="@drawable/ic_action_motorcycle"
         android:drawablePadding="8dp"
+        android:paddingLeft="20dp"
         android:hint="Bike Number"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
@@ -38,6 +39,7 @@
         android:layout_below="@+id/bike_number"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
+        android:paddingLeft="20dp"
         android:background="@drawable/edit_texts"
         android:drawableLeft="@drawable/ic_action_cnic"
         android:drawablePadding="8dp"
@@ -52,6 +54,7 @@
         android:layout_below="@+id/lisence_number"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
+        android:paddingLeft="20dp"
         android:background="@drawable/edit_texts"
         android:drawableLeft="@drawable/ic_action_email"
         android:drawablePadding="8dp"

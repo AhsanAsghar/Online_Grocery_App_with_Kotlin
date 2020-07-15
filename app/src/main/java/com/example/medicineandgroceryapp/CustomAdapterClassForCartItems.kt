@@ -1,12 +1,18 @@
 package com.example.medicineandgroceryapp
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 
 class CustomAdapterClassForCartItems(val userList: ArrayList<DataClassForCartItems>) : RecyclerView.Adapter<CustomAdapterClassForCartItems.ViewHolder>() {
     class ViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView) {
@@ -36,9 +42,25 @@ class CustomAdapterClassForCartItems(val userList: ArrayList<DataClassForCartIte
         }
         holder.deleteButton.setOnClickListener(){
             v ->
-            var pos : Int = userList.indexOf(user)
-            userList.removeAt(pos)
-            notifyItemRemoved(pos)
+            val queue = Volley.newRequestQueue(user.context)
+            val url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deleteProductFromCart.php"
+            val postRequest =object: StringRequest(Request.Method.POST,url, Response.Listener {
+                    response ->
+                Toast.makeText(user.context,response.toString(), Toast.LENGTH_SHORT).show()
+                val pos : Int = userList.indexOf(user)
+                userList.removeAt(pos)
+                notifyItemRemoved(pos)
+            }, Response.ErrorListener { error ->
+                Log.d("Error",error.toString())
+                Toast.makeText(user.context,error.toString(), Toast.LENGTH_LONG).show()
+            }){
+                override fun getParams() : Map<String,String>{
+                    val params = HashMap<String,String>()
+                    params.put("cartId",user.cartId)
+                    return params
+                }
+            }
+            queue.add(postRequest)
         }
     }
 

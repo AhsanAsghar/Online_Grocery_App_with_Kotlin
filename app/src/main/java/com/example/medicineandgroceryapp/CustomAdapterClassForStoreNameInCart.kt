@@ -1,7 +1,10 @@
 package com.example.medicineandgroceryapp
 
+import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -40,7 +43,13 @@ class CustomAdapterClassForStoreNameInCart(val userList: ArrayList<DataClassStor
         holder.nameOfStoreInCart.text = user.nameOfStore
         holder.itemView.setOnClickListener(){
             v ->
-            Log.d("rv","IN")
+            val intent = Intent(user.context,cart_items::class.java)
+            intent.putExtra("phone",user.phone)
+            intent.putExtra("id",user.id_of_store)
+            intent.putExtra("name",user.nameOfStore)
+            val image = Bitmap.createScaledBitmap(user.idOfPhoto, 70, 70, true);
+            intent.putExtra("image", image)
+            user.context.startActivity(intent)
         }
         holder.deleteButton.setOnClickListener(){
             v ->
@@ -67,5 +76,9 @@ class CustomAdapterClassForStoreNameInCart(val userList: ArrayList<DataClassStor
 
         }
     }
-
+    fun stringToBitmap(imageInString : String) : Bitmap {
+        val imageBytes = Base64.decode(imageInString,0)
+        val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)
+        return image
+    }
 }

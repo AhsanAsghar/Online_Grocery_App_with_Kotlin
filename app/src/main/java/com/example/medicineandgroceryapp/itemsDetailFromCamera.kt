@@ -62,8 +62,7 @@ class itemsDetailFromCamera : AppCompatActivity() {
             val bitmap: Bitmap = BitmapFactory.decodeStream(inputStram)
             imageToShow.setImageBitmap(bitmap)
         }
-        val storeName : String = "abc"
-        val phone : String = "+923004579023"
+        val phone : String = intent.getStringExtra("phone")
         val typeSpinner: Spinner = findViewById(R.id.itemTypeSpinner)
         val options = arrayOf("Category of Item",
 
@@ -119,30 +118,41 @@ class itemsDetailFromCamera : AppCompatActivity() {
                     }
 
                 }
-            }
-            val queu = Volley.newRequestQueue(applicationContext)
-            val url: String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsDetailFromCamera.php"
-            val postRequest =
-                object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
-                    Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT).show()
-                }, Response.ErrorListener { error ->
-                    Log.d("Error", error.toString())
-                    Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_LONG).show()
-                }) {
-                    override fun getParams(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        params.put("phone",phone)
-                        params.put("store_name",storeName)
-                        params.put("name",itemName.text.toString())
-                        params.put("price", itemPrice.text.toString())
-                        params.put("category", typeSpinner.selectedItem.toString())
-                        val bitmap : Bitmap = (imageToShow.drawable as BitmapDrawable).bitmap
-                        val photo : String = bitmapToString(bitmap)
-                        params.put("image",photo)
-                        return params
+            } else{
+                val queu = Volley.newRequestQueue(applicationContext)
+                val url: String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsDetailFromCamera.php"
+                val postRequest =
+                    object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                        Log.d("response", response.toString())
+                        val result  = response.toString().split(":").toTypedArray()
+                        val yesORno = result[1].substring(1,result[1].length - 2)
+                        Log.d("piq",yesORno)
+                        if(yesORno.equals("YES")){
+                            val intent = Intent(this@itemsDetailFromCamera,itemsInStoreProfile::class.java)
+                            intent.putExtra("phone",phone)
+                            startActivity(intent)
+                        }else{
+                            Toast.makeText(this,yesORno,Toast.LENGTH_SHORT).show()
+                        }
+                    }, Response.ErrorListener { error ->
+                        Log.d("Error", error.toString())
+                        Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_LONG).show()
+                    }) {
+                        override fun getParams(): Map<String, String> {
+                            val params = HashMap<String, String>()
+                            params.put("phone",phone)
+                            params.put("name",itemName.text.toString())
+                            params.put("price", itemPrice.text.toString())
+                            params.put("category", typeSpinner.selectedItem.toString())
+                            val bitmap : Bitmap = (imageToShow.drawable as BitmapDrawable).bitmap
+                            val photo : String = bitmapToString(bitmap)
+                            params.put("image",photo)
+                            return params
+                        }
                     }
-                }
-            queu.add(postRequest)
+                queu.add(postRequest)
+            }
+
 
         }
             }

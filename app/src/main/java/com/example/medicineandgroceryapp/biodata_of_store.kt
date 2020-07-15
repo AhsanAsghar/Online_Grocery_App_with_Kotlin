@@ -26,8 +26,6 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.android.synthetic.main.activity_biodata_of_store.*
-import kotlinx.android.synthetic.main.activity_items_detail_from_camera.view.*
 import pub.devrel.easypermissions.EasyPermissions
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -117,12 +115,13 @@ class biodata_of_store : AppCompatActivity() {
                         Log.d("response", response.toString())
                         val result  = response.toString().split(":").toTypedArray()
                         val yesORno = result[1].substring(1,result[1].length - 2)
+                        Log.d("piq",yesORno)
                         if(yesORno.equals("YES")){
                             val intent = Intent(this@biodata_of_store,itemsInStoreProfile::class.java)
                             intent.putExtra("phone",phone)
                             startActivity(intent)
                         }else{
-                            Toast.makeText(this,"Problem in query",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this,yesORno,Toast.LENGTH_SHORT).show()
                         }
                     }, Response.ErrorListener { error ->
                         Log.d("error", error.toString())

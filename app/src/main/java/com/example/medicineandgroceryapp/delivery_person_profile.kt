@@ -129,6 +129,7 @@ class delivery_person_profile : AppCompatActivity() {
         })
         queue.add((request))
         // End getting
+        Log.d("avail status",dp_availableNow.toString())
         val dp_namenow = dp_nameToEditET.text.toString()
         val dp_bikeNumberNow = dp_bikeNumberET.text.toString()
         val dp_licenseNumberNow = dp_licenseET.text.toString()
@@ -137,6 +138,8 @@ class delivery_person_profile : AppCompatActivity() {
         var dp_available_in: Boolean? = dp_availableNow
         dp_available.setOnCheckedChangeListener(){
                 buttonView, isChecked ->
+            dp_available_in = isChecked
+            Log.d("avail status","inside " + dp_available_in.toString())
             if(isChecked){
                 Handler().postDelayed({
 
@@ -147,9 +150,6 @@ class delivery_person_profile : AppCompatActivity() {
 
                 stoplocationUpdates()
             }
-            Log.d("avail",isChecked.toString())
-            dp_available_in = isChecked
-            Log.d("avail", dp_available_in.toString())
         }
         dp_image.setOnClickListener() {
                 v ->
@@ -178,9 +178,15 @@ class delivery_person_profile : AppCompatActivity() {
                 val postRequest =
                     object : StringRequest(Request.Method.POST, url, Response.Listener {
                             response ->
-                        Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
-                            .show()
-                        Log.d("problem",response.toString())
+                        val result  = response.toString().split(":").toTypedArray()
+                        val yesORno = result[1].substring(1,result[1].length - 2)
+                        if(yesORno.equals("YES")){
+                            val intent = Intent(this@delivery_person_profile,UserNavigation::class.java)
+                            intent.putExtra("phone",phone)
+                            startActivity(intent)
+                        }else{
+                            Log.d("piq",yesORno)
+                        }
                     }, Response.ErrorListener { error ->
                         Log.d("Error", error.toString())
                         Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_LONG)
