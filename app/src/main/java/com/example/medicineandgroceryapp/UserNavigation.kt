@@ -56,7 +56,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar2)
         setSupportActionBar(mToolbar)
         val spinner = findViewById<Spinner>(R.id.spinner)
-        val grocormedic = arrayOf("Grocery Store", "Medical Store")
+        val grocormedic = arrayOf("Please Select Store Category","Grocery Store", "Medical Store")
         spinner.adapter = ArrayAdapter<String> (this, android.R.layout.simple_expandable_list_item_1,grocormedic)
        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
            override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -69,7 +69,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                position: Int,
                id: Long
            ) {
-               if(position == 0){
+               if(position == 1){
                    val store_type = "Grocery Store"
                    Toast.makeText(applicationContext , "Grocery", Toast.LENGTH_SHORT).show()
                    val queue = Volley.newRequestQueue(applicationContext)
@@ -103,7 +103,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                    queue.add((request))
                }
 
-               else if(position == 1){
+               else if(position == 3){
                    Toast.makeText(applicationContext , "Medical", Toast.LENGTH_SHORT).show()
                    val store_type = "Medical Store"
                    val queue = Volley.newRequestQueue(applicationContext)

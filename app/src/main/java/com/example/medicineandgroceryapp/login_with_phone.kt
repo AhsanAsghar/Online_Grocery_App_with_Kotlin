@@ -67,7 +67,7 @@ class login_with_phone : AppCompatActivity() {
                     mVerificationField.isEnabled = true
                     mVerifyButton.isEnabled = true
                     mVerifyButton.setOnClickListener(){
-                        v ->
+                            v ->
                         val credential = PhoneAuthProvider.getCredential(p0!!,mVerificationField.text.toString())
                         signInWIthPhoneNumber(credential)
                     }
@@ -122,7 +122,7 @@ class login_with_phone : AppCompatActivity() {
                         Toast.makeText(applicationContext,"Phone number is wrong",Toast.LENGTH_SHORT).show()
                         return false
                     }*/
-                    }
+                }
                 return false
             }
         })
