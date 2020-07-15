@@ -1,5 +1,6 @@
 package com.example.medicineandgroceryapp
 
+import android.content.Intent
 import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 
 class CustomAdapterForNearbyStores (val userList: ArrayList<DataClassForNearbyStores>) : RecyclerView.Adapter<CustomAdapterForNearbyStores.ViewHolder>(){
@@ -30,9 +32,14 @@ class CustomAdapterForNearbyStores (val userList: ArrayList<DataClassForNearbySt
         holder.nameOfStore.text = user.nameOfStore
         holder.distance.text = user.distance
         holder.photo.setImageBitmap(user.idOfPhoto)
-        val idOfStore = user.idOfStore
+        val storePhone = user.storePhoneStore
+        val context = user.context
         holder.itemView.setOnClickListener(){
             Toast.makeText(user.context,"Onclick",Toast.LENGTH_SHORT).show()
+            val intent = Intent(context, ItemsInCategory::class.java)
+            intent.putExtra("phone",storePhone)
+            intent.putExtra("idOfStore",user.idOfStore)
+            context.startActivity(intent)
         }
     }
 }

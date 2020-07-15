@@ -2,6 +2,7 @@ package com.example.medicineandgroceryapp
 
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,64 +26,63 @@ import kotlin.collections.ArrayList
 
 class ItemsInCategory : AppCompatActivity() {
 
-    var phone: String = "null"
-    var name :String = "null"
+    var phone: String = "+923167617639"
+    var idFromIntent : String = "25"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_items_in_category)
-
-        if (intent.getStringExtra("phone") != null && intent.getStringExtra("name") != null) {
-
-        } else {
-            phone = "+923004579023"
-            name = "Ahsan"
-        }
-
+        phone = intent.getStringExtra("phone")
+        idFromIntent = intent.getStringExtra("idOfStore")
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_items_in_category)
         setSupportActionBar(mToolbar)
 
-        checkIfStoreOwner();
-        chekIfDeliveryPerson();
+        //checkIfStoreOwner();
+        //chekIfDeliveryPerson();
 
         val recycleViewOfItemsInCategory = findViewById(R.id.recycler_items_in_category) as RecyclerView
         recycleViewOfItemsInCategory.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
-        val idFromIntent: Int = 6
         val users = ArrayList<DataItemsInCategoryParent>()
         val queue = Volley.newRequestQueue(this)
-        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/ItemsInCategory.php?id=$idFromIntent"
+        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/ItemsInCategory.php?id=$idFromIntent&"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
                 response ->
-            val jObject : JSONObject = JSONObject(response.toString())
-            val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
-            Log.d("json",jsonArray.toString())
-            val a = jsonArray.length()
-            Log.d("json",a.toString())
-            val listOfCategoryAdded = mutableListOf<String>()
-            for(x in 0..a-1){
-                val pxcategory = jsonArray.getJSONObject(x).getString("product_category")
-                Log.d("list", "x" + x.toString())
-                if(!listOfCategoryAdded.contains(pxcategory)) {
-                    users.add(DataClassForDataItemsInCategoryLabel(pxcategory))
-                    for(y in 0..a-1){
-                        Log.d("list", "y" + y.toString())
-                        val pycategory = jsonArray.getJSONObject(y).getString("product_category")
-                        if(!listOfCategoryAdded.contains(pycategory) && pycategory.equals(pxcategory)){
-                            Log.d("list", "in")
-                            val pname = jsonArray.getJSONObject(y).getString("product_name")
-                            val pprice = jsonArray.getJSONObject(y).getString("product_price")
-                            val pimageString = jsonArray.getJSONObject(y).getString("product_image")
-                            val pimage = stringToBitmap(pimageString)
-                            val pid = jsonArray.getJSONObject(y).getString("product_id")
-                            Log.d("id",pid)
-                            users.add(DataClassForDataItemsInCategory(pimage,pname, pprice,this,pid.toInt(),2,"+923450694449"))
+            Log.d("in",response.toString())
+            if(response.toString() == "{\"response\":[null]}"){
+                Log.d("in","in")
+            }else{
+                val jObject : JSONObject = JSONObject(response.toString())
+                val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+                Log.d("json",jsonArray.toString())
+                val a = jsonArray.length()
+                Log.d("json",a.toString())
+                val listOfCategoryAdded = mutableListOf<String>()
+                for(x in 1..a-1){
+                    val pxcategory = jsonArray.getJSONObject(x).getString("product_category")
+                    Log.d("list", "x" + x.toString())
+                    if(!listOfCategoryAdded.contains(pxcategory)) {
+                        users.add(DataClassForDataItemsInCategoryLabel(pxcategory))
+                        for(y in 1..a-1){
+                            Log.d("list", "y" + y.toString())
+                            val pycategory = jsonArray.getJSONObject(y).getString("product_category")
+                            if(!listOfCategoryAdded.contains(pycategory) && pycategory.equals(pxcategory)){
+                                Log.d("list", "in")
+                                val pname = jsonArray.getJSONObject(y).getString("product_name")
+                                val pprice = jsonArray.getJSONObject(y).getString("product_price")
+                                val pimageString = jsonArray.getJSONObject(y).getString("product_image")
+                                val pimage = stringToBitmap(pimageString)
+                                val pid = jsonArray.getJSONObject(y).getString("product_id")
+                                Log.d("id",pid)
+                                users.add(DataClassForDataItemsInCategory(pimage,pname, pprice,this,pid.toInt(),idFromIntent,"+923450694449"))
+                            }
                         }
+                        listOfCategoryAdded.add(pxcategory)
+                        Log.d("list", listOfCategoryAdded.toString())
                     }
-                    listOfCategoryAdded.add(pxcategory)
-                    Log.d("list", listOfCategoryAdded.toString())
                 }
+                val adapter = CustomAdapterForItemsInCategory(users)
+                recycleViewOfItemsInCategory.adapter = adapter
             }
-            val adapter = CustomAdapterForItemsInCategory(users)
-            recycleViewOfItemsInCategory.adapter = adapter
+
         }, Response.ErrorListener {
                 error ->
             Log.d("json", error.toString())
@@ -167,8 +168,19 @@ class ItemsInCategory : AppCompatActivity() {
     }
 
 
-
-
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.cart_items_in_category -> {
+                val intent = Intent(this@ItemsInCategory,StoreNameInCart::class.java)
+                intent.putExtra("phone",phone)
+                intent.putExtra("id",idFromIntent)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -193,6 +205,8 @@ class ItemsInCategory : AppCompatActivity() {
         })
         return super.onCreateOptionsMenu(menu)
     }
+
+
     fun stringToBitmap(imageInString : String) : Bitmap {
         val imageBytes = Base64.decode(imageInString,0)
         val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)

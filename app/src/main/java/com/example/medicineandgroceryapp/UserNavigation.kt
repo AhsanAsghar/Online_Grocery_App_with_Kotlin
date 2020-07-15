@@ -91,7 +91,11 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                            val distance = jsonArray.getJSONObject(y).getString("distance")
                            val distance1 = distance.toDouble()
                            val distance2 = "%.2f".format(distance1)
-                           users.add(DataClassForNearbyStores(store_image,store_name, distance2+"KM", store_id, this@UserNavigation))
+                           if(phone != null){
+                               users.add(DataClassForNearbyStores(store_image,store_name, distance2+"KM",
+                                   phone!!, this@UserNavigation,store_id))
+                           }
+
                        }
                        val adapter = CustomAdapterForNearbyStores(users)
                        recycle.adapter = adapter
@@ -131,7 +135,8 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                            val distance1 = distance.toDouble()
                            val distance2 = "%.2f".format(distance1)
                            Toast.makeText(this@UserNavigation,"Distance:"+distance2,Toast.LENGTH_LONG).show()
-                           users.add(DataClassForNearbyStores(store_image,store_name, distance2.toString() + "KM",store_id,this@UserNavigation))
+                           if(phone != null)
+                           users.add(DataClassForNearbyStores(store_image,store_name, distance2.toString() + "KM",phone!!,this@UserNavigation,store_id))
                        }
                        val adapter = CustomAdapterForNearbyStores(users)
                        recycle.adapter = adapter
@@ -146,10 +151,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
            }
 
        }
-
-
-
-
 
         val toolbar: Toolbar = findViewById(R.id.toolbarItemDetailCamera)
         setSupportActionBar(toolbar)
@@ -317,7 +318,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.user_navigation, menu)
         return true
@@ -331,7 +332,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
-    }
+    }*/
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
@@ -386,6 +387,12 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
             R.id.store_drawer_settings -> {
                 Toast.makeText(this@UserNavigation,"Store drawer settings",Toast.LENGTH_SHORT).show()
             }
+            R.id.store_drawer_cart -> {
+                val intent = Intent(this@UserNavigation,StoreNameInCart::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
+                Toast.makeText(this@UserNavigation,"Store Cart",Toast.LENGTH_SHORT).show()
+            }
             R.id.deliveryperson_drawer_notifications -> {
                 val intent = Intent(this@UserNavigation,Notifications::class.java)
                 intent.putExtra("phone",phone)
@@ -400,6 +407,12 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
             }
             R.id.deliveryperson_drawer_requests -> {
                 Toast.makeText(this@UserNavigation,"Delivery person drawer requests",Toast.LENGTH_SHORT).show()
+            }
+            R.id.deliveryperson_drawer_cart ->{
+                val intent = Intent(this@UserNavigation,StoreNameInCart::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
+                Toast.makeText(this@UserNavigation,"Dilivery person Cart",Toast.LENGTH_SHORT).show()
             }
         }
         //end code to change or copy

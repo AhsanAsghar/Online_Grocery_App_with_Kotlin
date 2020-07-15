@@ -29,6 +29,9 @@ open class settings : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         phone = intent.getStringExtra("phone")
+        //val toolbar = findViewById<Toolbar>(R.id.toolbar_settings)
+        //setSupportActionBar(toolbar)
+        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val card_setting : CardView = findViewById(R.id.cardView_setting)
         val imageForBitmap : ImageView = findViewById(R.id.profilePic)
         val imageBitmap : Bitmap = (imageForBitmap.drawable as BitmapDrawable).bitmap
