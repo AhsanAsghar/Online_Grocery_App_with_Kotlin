@@ -16,7 +16,6 @@ import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.Menu
-import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
@@ -29,7 +28,6 @@ import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.map_dialogue.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -47,6 +45,8 @@ class itemsInStoreProfile : AppCompatActivity() {
         phone = intent.getStringExtra("phone")
         val nameOfStore : TextView = findViewById(R.id.name_of_store)
         //Get Name of store
+        val progress = ProgressBar(this@itemsInStoreProfile)
+        progress.startLoading(true,"Getting your profile")
         val queue = Volley.newRequestQueue(this)
         val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileNameGet.php?phone=$phone"
         val request_name : StringRequest = StringRequest(url_get_name, Response.Listener {
@@ -64,9 +64,8 @@ class itemsInStoreProfile : AppCompatActivity() {
         //End getting name of store
         val recycleViewOfItemsInCategory = findViewById(R.id.recycler_store_profile_items) as RecyclerView
         recycleViewOfItemsInCategory.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
-        val resid : Int = R.id.item_photo_in_store_profile_items;
         val users = ArrayList<DataItemsInStoreProfileAbstract>()
-        val storeProfileImage: ImageView = findViewById(R.id.store_profile_image)
+        val storeProfileImage: de.hdodenhof.circleimageview.CircleImageView = findViewById(R.id.store_profile_image)
         val floatingButton : FloatingActionButton = findViewById(R.id.floatingActionButtonStoreProfile)
         floatingButton.setOnClickListener(){
             v ->
@@ -118,6 +117,7 @@ class itemsInStoreProfile : AppCompatActivity() {
             }
             val adapter = CustomAdapterForItemsInStoreProfile(users)
             recycleViewOfItemsInCategory.adapter = adapter
+            progress.dismissDialog()
         }, Response.ErrorListener {
                 error ->
             Log.d("json", error.toString())
@@ -125,6 +125,7 @@ class itemsInStoreProfile : AppCompatActivity() {
         })
         queue.add((request))
     }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -209,7 +210,7 @@ class itemsInStoreProfile : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_items_in_category,menu)
+        menuInflater.inflate(R.menu.menu_items_in_store_profile,menu)
         val manager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val searchItem = menu?.findItem(R.id.search_items_in_category)
         val searchView = searchItem?.actionView as SearchView

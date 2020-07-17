@@ -36,6 +36,8 @@ class biodata_of_deliveryperson : AppCompatActivity() {
             }
             if(checkEmail(emailAddressET.text.toString())
                 && checkBikeNumber(bikeNumberET.text.toString()) && checkLicenseNumber(licenseNumberET.text.toString())){
+                val progressBar = ProgressBar(this@biodata_of_deliveryperson)
+                progressBar.startLoading(true,"Storedeck is setting profile. Please wait!")
                 val bikeNumber = bikeNumberET.text.toString()
                 val licenseNumber = licenseNumberET.text.toString()
                 val emailAddress = emailAddressET.text.toString()
@@ -45,12 +47,15 @@ class biodata_of_deliveryperson : AppCompatActivity() {
                         response ->
                     val result  = response.toString().split(":").toTypedArray()
                     val yesORno = result[1].substring(1,result[1].length - 2)
+                    progressBar.dismissDialog()
                     if(yesORno.equals("YES")){
                         val intent = Intent(this@biodata_of_deliveryperson,delivery_person_profile::class.java)
                         intent.putExtra("phone",phone)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
+                        this@biodata_of_deliveryperson.finish()
                     }else{
-                        Toast.makeText(this,"Problem in query",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this,"Unable to set up profile. Try again",Toast.LENGTH_SHORT).show()
                     }
                 }, Response.ErrorListener { error ->
                     Toast.makeText(applicationContext,error.toString(), Toast.LENGTH_SHORT).show()

@@ -146,7 +146,7 @@ class delivery_person_profile : AppCompatActivity() {
                 }, 6000)
             }
             else{
-                stoplocationUpdates()
+                //stoplocationUpdates()
             }
         }
         dp_image.setOnClickListener() {
@@ -170,20 +170,26 @@ class delivery_person_profile : AppCompatActivity() {
                 || dp_licenseET.text.toString() != dp_licenseNumberNow || dp_emailAddressET.text.toString() != dp_emailAddressNow
                 || imageBitmap != imageBitmapTest || dp_available_in != dp_availableNow){
                 Log.d("Error", "inside If")
+                val progress = ProgressBar(this@delivery_person_profile)
+                progress.startLoading(true,"Making changes")
                 val queu = Volley.newRequestQueue(applicationContext)
                 val url: String =
                     "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deliveryPersonProfile.php"
                 val postRequest =
                     object : StringRequest(Request.Method.POST, url, Response.Listener {
                             response ->
+                        progress.dismissDialog()
                         val result  = response.toString().split(":").toTypedArray()
                         val yesORno = result[1].substring(1,result[1].length - 2)
                         if(yesORno.equals("YES")){
                             val intent = Intent(this@delivery_person_profile,UserNavigation::class.java)
                             intent.putExtra("phone",phone)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             startActivity(intent)
+                            this@delivery_person_profile.finish()
                         }else{
-                            Log.d("piq",yesORno)
+                            Toast.makeText(this@delivery_person_profile,yesORno,
+                            Toast.LENGTH_SHORT).show()
                         }
                     }, Response.ErrorListener { error ->
                         Log.d("Error", error.toString())
@@ -206,6 +212,7 @@ class delivery_person_profile : AppCompatActivity() {
                                 Log.d("avail",dp_available_in.toString())
                                 params.put("available","false")
                             }else{
+                                params.put("available","false")
                                 Log.d("avail","its null")
                             }
                             val image: ImageView = findViewById(R.id.deliveryperson_profile_image)

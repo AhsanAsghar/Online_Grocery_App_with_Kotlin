@@ -42,6 +42,8 @@ class ItemsInCategory : AppCompatActivity() {
         val recycleViewOfItemsInCategory = findViewById(R.id.recycler_items_in_category) as RecyclerView
         recycleViewOfItemsInCategory.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
         val users = ArrayList<DataItemsInCategoryParent>()
+        val progress = ProgressBar(this@ItemsInCategory)
+        progress.startLoading(true,"Getting Items - Please wait")
         val queue = Volley.newRequestQueue(this)
         val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/ItemsInCategory.php?id=$idFromIntent&"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
@@ -81,6 +83,7 @@ class ItemsInCategory : AppCompatActivity() {
                 }
                 val adapter = CustomAdapterForItemsInCategory(users)
                 recycleViewOfItemsInCategory.adapter = adapter
+                progress.dismissDialog()
             }
 
         }, Response.ErrorListener {

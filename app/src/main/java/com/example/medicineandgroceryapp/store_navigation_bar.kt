@@ -230,9 +230,7 @@ class store_navigation_bar : AppCompatActivity(), NavigationView.OnNavigationIte
             R.id.store_drawer_notifications -> {
                 // Handle the camera action
             }
-            R.id.store_drawer_settings -> {
 
-            }
             R.id.store_drawer_name -> {
 
             }

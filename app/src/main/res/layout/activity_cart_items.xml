@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".categories">
+    tools:context=".cart_items">
 
 
 
@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Items"
-                android:textColor="#000000"
+                android:textColor="#ffffff"
                 android:textSize="23sp">
 
             </TextView>
@@ -87,6 +87,7 @@
         app:layout_constraintTop_toBottomOf="@+id/recyclerView_cart_items">
 
         <LinearLayout
+            android:id="@+id/linear_cart_items"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
@@ -152,30 +153,39 @@
 
     <Button
         android:id="@+id/track_delivery_person"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/add_to_cart_green_button"
-        android:elevation="4dp"
-        android:padding="10dp"
         android:text="Track Delivery Person"
-        app:layout_constraintRight_toLeftOf="@+id/send_request"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/total_price_label" />
+        app:layout_constraintTop_toBottomOf="@+id/send_request"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/send_request"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/add_to_cart_green_button"
-        android:elevation="4dp"
-        android:padding="10dp"
+
         android:text="Send Request"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/track_delivery_person"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/total_price" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

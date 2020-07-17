@@ -29,11 +29,9 @@ open class settings : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         phone = intent.getStringExtra("phone")
-        //val toolbar = findViewById<Toolbar>(R.id.toolbar_settings)
-        //setSupportActionBar(toolbar)
         //supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val card_setting : CardView = findViewById(R.id.cardView_setting)
-        val imageForBitmap : ImageView = findViewById(R.id.profilePic)
+        val imageForBitmap : de.hdodenhof.circleimageview.CircleImageView = findViewById(R.id.profilePic)
         val imageBitmap : Bitmap = (imageForBitmap.drawable as BitmapDrawable).bitmap
         val name : TextView = findViewById(R.id.nameUnderProfilePic)
         val nameToEdit : EditText = findViewById(R.id.nameOfProductCamera)
@@ -42,11 +40,15 @@ open class settings : AppCompatActivity() {
         val nameToEditText : String = nameToEdit.text.toString()
         val passwordNow : String = password.text.toString()
         //Get data from server
+        val progress = ProgressBar(this@settings)
+        progress.startLoading(true, "Getting data from server")
+
         val queue = Volley.newRequestQueue(this)
         val url_img = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/settings_img.php?phone=$phone"
         val request_img : ImageRequest = ImageRequest(url_img, Response.Listener {
             response ->
             imageForBitmap.setImageBitmap(response)
+            progress.dismissDialog()
 
         },0,0,null,Response.ErrorListener {
             error ->
@@ -85,6 +87,8 @@ open class settings : AppCompatActivity() {
         }
         done.setOnClickListener(){
             v ->
+            val progress_edit = ProgressBar(this@settings)
+            progress_edit.startLoading(true, "Changing data in server")
             var imageForBitmapTest : ImageView = findViewById(R.id.profilePic)
             if(password.text.toString().length != 8){
                 Toast.makeText(this@settings, "Enter 8 characters in password", Toast.LENGTH_SHORT).show()
@@ -97,8 +101,22 @@ open class settings : AppCompatActivity() {
                 var url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/settings.php"
                 val postRequest =object: StringRequest(Request.Method.POST,url, Response.Listener {
                         response ->
-                    Toast.makeText(applicationContext,response.toString(),Toast.LENGTH_SHORT).show()
+                    val result  = response.toString().split(":").toTypedArray()
+                    val yesORno = result[1].substring(1,result[1].length - 2)
+                    Log.d("piq",yesORno)
+                    if(yesORno.equals("YES")){
+                        progress_edit.dismissDialog()
+                        val intent = Intent(this@settings, UserNavigation::class.java)
+                        intent.putExtra("phone",phone)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        startActivity(intent)
+                        this@settings.finish()
+                    }else{
+                        progress_edit.dismissDialog()
+                        Toast.makeText(applicationContext,"Try Again",Toast.LENGTH_SHORT).show()
+                    }
                 },Response.ErrorListener {error ->
+                    progress_edit.dismissDialog()
                     Log.d("Error",error.toString())
                     Toast.makeText(applicationContext,error.toString(),Toast.LENGTH_LONG).show()
                 }){

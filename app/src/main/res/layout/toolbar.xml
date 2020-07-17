@@ -13,7 +13,7 @@
             android:layout_width="match_parent"
             android:text="Settings"
             android:textSize="23sp"
-            android:textColor="#000000"
+            android:textColor="#ffffff"
             >
 
         </TextView>

@@ -35,9 +35,8 @@ class personal_data : AppCompatActivity() {
         val nextButton : Button = findViewById(R.id.button_next)
         nextButton.setOnClickListener(){
             v ->
-            Log.d("test",phone)
-            Log.d("test",passEditText.text.toString())
-            Log.d("test",repassEditText.text.toString())
+            val progress = ProgressBar(this@personal_data)
+            progress.startLoading(true,"Please wait - while we set your profile")
             if(nameEditText.text.toString().equals(null)|| passEditText.text.equals(null) || repassEditText.text.equals(null)){
                 Toast.makeText(applicationContext,"Fill all Fields",Toast.LENGTH_SHORT).show()
             }
@@ -46,8 +45,10 @@ class personal_data : AppCompatActivity() {
                 val url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/updatePasswordName.php"
                 val postRequest =object: StringRequest(Request.Method.POST,url, Response.Listener {
                         response ->
+                    progress.dismissDialog()
                     val intent = Intent(this@personal_data,UserNavigation::class.java)
                     intent.putExtra("phone",phone)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
 
                 },Response.ErrorListener {error ->

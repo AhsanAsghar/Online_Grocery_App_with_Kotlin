@@ -107,11 +107,14 @@ class biodata_of_store : AppCompatActivity() {
                 Toast.makeText(this, "Please Selet Image", Toast.LENGTH_SHORT).show()
             }
             if(checkEmail(store_email) && !(store_name.isEmpty()) && !(store_type_spinner.isEmpty()) && !(image.drawable==null)){
+                val progress = ProgressBar(this)
+                progress.startLoading(true,"Making your profile. Please wait!")
                 val queu = Volley.newRequestQueue(applicationContext)
-                var url: String =
+                val url: String =
                     "https://grocerymedicineapp.000webhostapp.com/PHPfiles/biodata_of_store.php"
                 val postRequest =
                     object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                        progress.dismissDialog()
                         Log.d("response", response.toString())
                         val result  = response.toString().split(":").toTypedArray()
                         val yesORno = result[1].substring(1,result[1].length - 2)
@@ -119,7 +122,9 @@ class biodata_of_store : AppCompatActivity() {
                         if(yesORno.equals("YES")){
                             val intent = Intent(this@biodata_of_store,itemsInStoreProfile::class.java)
                             intent.putExtra("phone",phone)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)
+                            this@biodata_of_store.finish()
                         }else{
                             Toast.makeText(this,yesORno,Toast.LENGTH_SHORT).show()
                         }

@@ -18,21 +18,19 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import android.view.Menu
 import android.view.View
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
 import pub.devrel.easypermissions.EasyPermissions
 import org.json.JSONArray
 import org.json.JSONObject
-import java.math.RoundingMode
-import java.text.DecimalFormat
 
 class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -50,9 +48,42 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         phone = intent.getStringExtra("phone")
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationTask()
-
         val users = ArrayList<DataClassForNearbyStores> ()
+        val navigation : NavigationView = findViewById(R.id.nav_view)
+        val view : View = navigation.getHeaderView(0)
+        val nav_profile_photo: de.hdodenhof.circleimageview.CircleImageView =
+            view.findViewById(R.id.user_Navigation_profile_image)
+        val name = view.findViewById<TextView>(R.id.name_of_user_text)
+        //Get image
+        val queue1 = Volley.newRequestQueue(this)
+        val url_img = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/settings_img.php?phone=$phone"
+        val request_img : ImageRequest = ImageRequest(url_img, Response.Listener {
+                response ->
+            nav_profile_photo.setImageBitmap(response)
 
+        },0,0,null,Response.ErrorListener {
+                error ->
+            Log.d("photo",error.toString())
+
+        } )
+        queue1.add(request_img)
+        //End getting Image
+        //Get name
+        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/settings_get.php?phone=$phone"
+        val request : StringRequest = StringRequest(url_get,Response.Listener {
+                response ->
+            val jObject : JSONObject = JSONObject(response.toString())
+            val jsonArray :JSONArray= jObject?.getJSONArray("response")!!
+            val jsonObject : JSONObject = jsonArray.getJSONObject(0);
+            val namejson : String = jsonObject.getString("name")
+            name.setText(namejson)
+        },Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@UserNavigation,error.toString(),Toast.LENGTH_SHORT).show()
+        })
+        queue1.add((request))
+        //End Getting name
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar2)
         setSupportActionBar(mToolbar)
         val spinner = findViewById<Spinner>(R.id.spinner)
@@ -199,6 +230,11 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        this@UserNavigation.finish()
+        startActivity(intent)
+    }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         // Forward results to EasyPermissions
@@ -383,9 +419,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
             }
             R.id.store_drawer_requests -> {
                 Toast.makeText(this@UserNavigation,"Store drawer request",Toast.LENGTH_SHORT).show()
-            }
-            R.id.store_drawer_settings -> {
-                Toast.makeText(this@UserNavigation,"Store drawer settings",Toast.LENGTH_SHORT).show()
             }
             R.id.store_drawer_cart -> {
                 val intent = Intent(this@UserNavigation,StoreNameInCart::class.java)

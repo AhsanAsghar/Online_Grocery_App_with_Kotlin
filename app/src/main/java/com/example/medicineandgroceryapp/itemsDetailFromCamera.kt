@@ -119,10 +119,13 @@ class itemsDetailFromCamera : AppCompatActivity() {
 
                 }
             } else{
+                val progress = ProgressBar(this@itemsDetailFromCamera)
+                progress.startLoading(true,"Storing Items - Please Wait")
                 val queu = Volley.newRequestQueue(applicationContext)
                 val url: String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsDetailFromCamera.php"
                 val postRequest =
                     object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                        progress.dismissDialog()
                         Log.d("response", response.toString())
                         val result  = response.toString().split(":").toTypedArray()
                         val yesORno = result[1].substring(1,result[1].length - 2)
@@ -130,9 +133,11 @@ class itemsDetailFromCamera : AppCompatActivity() {
                         if(yesORno.equals("YES")){
                             val intent = Intent(this@itemsDetailFromCamera,itemsInStoreProfile::class.java)
                             intent.putExtra("phone",phone)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)
+                            this@itemsDetailFromCamera.finish()
                         }else{
-                            Toast.makeText(this,yesORno,Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this,"Unable to store - Please Try again",Toast.LENGTH_SHORT).show()
                         }
                     }, Response.ErrorListener { error ->
                         Log.d("Error", error.toString())

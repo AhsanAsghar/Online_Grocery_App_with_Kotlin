@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".categories">
+    tools:context=".RequestDetail">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_request_details"
@@ -87,6 +87,7 @@
         android:id="@+id/recyclerView_request_detail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/customer_intro" />
@@ -130,7 +131,7 @@
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="20dp"
                 android:layout_weight="1"
-                android:text="100 Rs"
+                android:text="-----"
                 android:textColor="#000000"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -156,7 +157,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:text="400 Rs"
+        android:text="-----"
         android:textColor="#000000"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -166,43 +167,48 @@
     <Button
         android:id="@+id/accept_request_detail"
         android:layout_width="wrap_content"
-        android:layout_height="38dp"
+        android:layout_height="48dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/add_to_cart_green_button"
-        android:elevation="4dp"
         android:text="Accept"
-        android:textColor="#000000"
-        app:layout_constraintRight_toLeftOf="@+id/decline_request_details"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/decline_request_details"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/find_delivery_person_request_details"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/find_delivery_person_request_details"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/add_to_cart_green_button"
+        android:text="Hire Delivery Person"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/total_price_request_detail_label" />
 
     <Button
-        android:id="@+id/find_delivery_person_request_details"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/add_to_cart_green_button"
-        android:elevation="4dp"
-        android:padding="10dp"
-        android:text="Find Delivery Person"
-        android:textColor="#000000"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/decline_request_details"
-        app:layout_constraintTop_toBottomOf="@+id/total_price_request_detail" />
-
-    <Button
         android:id="@+id/decline_request_details"
         android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/white_rounded"
-        android:elevation="4dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/cardview_light_background"
         android:text="Decline"
-        android:textColor="#000000"
-        app:layout_constraintLeft_toRightOf="@+id/accept_request_detail"
-        app:layout_constraintRight_toLeftOf="@+id/find_delivery_person_request_details"
-        app:layout_constraintTop_toBottomOf="@+id/total_price_request_detail_label" />
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/accept_request_detail"
+        app:layout_constraintTop_toBottomOf="@+id/find_delivery_person_request_details"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

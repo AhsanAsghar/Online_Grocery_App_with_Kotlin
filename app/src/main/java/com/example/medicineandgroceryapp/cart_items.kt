@@ -9,6 +9,8 @@ import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
+import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -37,8 +39,9 @@ class cart_items : AppCompatActivity() {
         val store_id = intent.getStringExtra("id")
         val store_image = intent.getParcelableExtra<Bitmap>("image")
         val store_name = intent.getStringExtra("name")
-        var status = "Request not yet send"
+        val trackButton : Button = findViewById(R.id.track_delivery_person)
         val queue = Volley.newRequestQueue(this)
+        val requestButton : Button = findViewById(R.id.send_request)
         val url_get_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStatusOfRequest.php?storeid=$store_id&phone=$customerPhone"
         val request_status : StringRequest = StringRequest(url_get_status, Response.Listener {
                 response ->
@@ -46,17 +49,28 @@ class cart_items : AppCompatActivity() {
             val result  = response.toString().split(":").toTypedArray()
             val yesORno = result[1].substring(1,result[1].length - 2)
             Log.d("piq1",yesORno)
-            if(!yesORno.equals("NULL")&&!yesORno.equals("NO")){
-                findViewById<ImageView>(R.id.storeImageCartItem).setImageBitmap(store_image)
-                findViewById<TextView>(R.id.store_name_cart_items).setText(store_name)
-                findViewById<TextView>(R.id.request_status_cart_items).setText(yesORno)
-                //users.add(DataClassForCartItems(store_image,store_name, yesORno))
+            findViewById<ImageView>(R.id.storeImageCartItem).setImageBitmap(store_image)
+            findViewById<TextView>(R.id.store_name_cart_items).setText(store_name)
+            if(yesORno.equals("NO")){
+                Log.d("problem",yesORno)
             }else if(yesORno.equals("NULL")){
-                findViewById<ImageView>(R.id.storeImageCartItem).setImageBitmap(store_image)
-                findViewById<TextView>(R.id.store_name_cart_items).setText(store_name)
-                findViewById<TextView>(R.id.request_status_cart_items).setText("Send request")
-            }else{
-                Toast.makeText(this,yesORno,Toast.LENGTH_SHORT).show()
+                findViewById<TextView>(R.id.request_status_cart_items).setText("Please Send request")
+            }else if(yesORno.equals("send")){
+                requestButton.visibility = View.GONE
+                findViewById<TextView>(R.id.request_status_cart_items).setText("Pending")
+            }
+            else if(yesORno.equals("d_send") || yesORno.equals("d_accept")){
+                requestButton.visibility = View.GONE
+                findViewById<TextView>(R.id.request_status_cart_items).setText("Delivery person is being hired")
+            }else if(yesORno.equals("accept")){
+                requestButton.visibility = View.GONE
+                trackButton.visibility = View.VISIBLE
+                findViewById<TextView>(R.id.request_status_cart_items).setText("On the way")
+            }
+            else if(yesORno.equals("reject")) {
+                findViewById<TextView>(R.id.request_status_cart_items).setText("Order Canceled")
+            } else{
+                Toast.makeText(this@cart_items, yesORno,Toast.LENGTH_SHORT).show()
             }
             val adapter = CustomAdapterClassForCartItems(users)
             recycleOfCategory.adapter = adapter

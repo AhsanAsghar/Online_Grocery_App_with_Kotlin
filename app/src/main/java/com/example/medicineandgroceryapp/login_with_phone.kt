@@ -37,7 +37,7 @@ class login_with_phone : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_with_phone)
         auth = FirebaseAuth.getInstance()
-        var textView: TextView = findViewById(R.id.phone_number_customer)
+        val textView: TextView = findViewById(R.id.phone_number_customer)
         val mVerificationField: EditText = findViewById(R.id.verfication_field)
         val mVerifyButton : Button = findViewById(R.id.verify)
         mVerificationField.visibility = View.GONE
@@ -185,7 +185,9 @@ class login_with_phone : AppCompatActivity() {
                         if(result.equals("NO")){
                             val intent = Intent(applicationContext,UserNavigation::class.java)
                             intent.putExtra("phone", phone)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)
+                            this@login_with_phone.finish()
                         }else{
                             val intent = Intent(applicationContext,personal_data::class.java)
                             intent.putExtra("phone", phone)
