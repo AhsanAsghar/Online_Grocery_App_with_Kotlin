@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".categories">
+    tools:context=".StoreNameInCart">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_store_name_in_cart"
@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Cart Store"
-                android:textColor="#000000"
+                android:textColor="#ffffff"
                 android:textSize="23sp">
 
             </TextView>
