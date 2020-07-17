@@ -1,5 +1,6 @@
 package com.example.medicineandgroceryapp
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Address
@@ -7,10 +8,12 @@ import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Base64
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.android.volley.Response
+import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,6 +25,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 class DeliveryPersonDetailAndDetection : AppCompatActivity() {
@@ -34,15 +38,29 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_detail_and_detection)
-        if (intent.getStringExtra("phone") != null && intent.getStringExtra("name") != null) {
+        if (intent.getStringExtra("phone") != null ) {
 
         } else {
             phone = "+923167617639"
         }
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_detail_and_detection) as SupportMapFragment
 
+
         gettingStoreAddress()
         gettingCustomerAddress()
+        gettingDpName()
+        gettingDpImage()
+        val infoButton = findViewById(R.id.info) as Button
+        infoButton.setOnClickListener{
+            val dialog = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.map_dialogue,null)
+            val phoneNumber = dialogView.findViewById<TextView>(R.id.phone_no)
+            gettingDpPhoneNumber(phoneNumber = phoneNumber)
+            dialog.setView(dialogView)
+            dialogView.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.setCancelable(true)
+            dialog.show()
+        }
 
 
 
@@ -100,21 +118,6 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
             }
         }, 3000)
 
-
-
-
-
-        val infoButton = findViewById(R.id.info) as Button
-        infoButton.setOnClickListener{
-            val dialog = AlertDialog.Builder(this)
-            val dialogView = layoutInflater.inflate(R.layout.map_dialogue,null)
-            val cnic = dialogView.findViewById<TextView>(R.id.cnic)
-            val phoneNumber = dialogView.findViewById<TextView>(R.id.phone_no)
-            dialog.setView(dialogView)
-            dialogView.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog.setCancelable(true)
-            dialog.show()
-        }
        /* mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_detail_and_detection) as SupportMapFragment
         mapFragment.getMapAsync(OnMapReadyCallback {
             googleMap = it
@@ -223,6 +226,64 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
         queue.add((request))
         //To change body of created functions use File | Settings | File Templates.
     }
+    fun gettingDpName(){
+        //Get Name of Delivery person
+        val queue = Volley.newRequestQueue(this)
+        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/DpNameGet2.php?phone=$phone"
+        val request_name : StringRequest = StringRequest(url_get_name, Response.Listener {
+                response ->
+            //val dp  = response.toString().split(":").toTypedArray()
+            //val dpName = dp[1].substring(1,dp[1].length - 2)
+            val jObject: JSONObject = JSONObject(response.toString())
+            val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+            val jsonObject: JSONObject = jsonArray.getJSONObject(0);
+            val dpName = jsonObject.getString("name")
+            val deliveryPersonName : TextView = findViewById(R.id.name_of_delivery_person)
+            deliveryPersonName.setText(dpName)
+
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@DeliveryPersonDetailAndDetection,error.toString(),Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_name))
+    }
+    fun gettingDpImage(){
+
+        val dpimage : ImageView = findViewById(R.id.photo_of_delivery_personn)
+        val queue = Volley.newRequestQueue(this)
+        val url_img =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingDpImage.php?phone=$phone"
+        val request_img: ImageRequest = ImageRequest(url_img, Response.Listener { response ->
+            dpimage.setImageBitmap(response)
+
+        }, 0, 0, null, Response.ErrorListener { error ->
+            Log.d("photo", error.toString())
+
+        })
+        queue.add(request_img)
+
+    }
+    fun gettingDpPhoneNumber(phoneNumber:TextView){
+        val queue = Volley.newRequestQueue(this)
+        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingDpPhoneNumber.php?phone=$phone"
+        val request_name : StringRequest = StringRequest(url_get_name, Response.Listener {
+                response ->
+            //val dp  = response.toString().split(":").toTypedArray()
+            //val dpName = dp[1].substring(1,dp[1].length - 2)
+            val jObject: JSONObject = JSONObject(response.toString())
+            val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+            val jsonObject: JSONObject = jsonArray.getJSONObject(0);
+            val dpPhoneNumber1 = jsonObject.getString("phone_number")
+            phoneNumber.setText(dpPhoneNumber1)
+
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@DeliveryPersonDetailAndDetection,error.toString(),Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_name))
+    }
 
     protected fun createMarker(latitude : Double, longitude:Double,  title:String, snippets: String): Marker {
         var map = googleMap.addMarker(
@@ -232,6 +293,13 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
         )
         map.showInfoWindow()
         return map
+    }
+    private fun bitmapToString(bitmap: Bitmap) : String {
+        var outputStream : ByteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        var imageBytes = outputStream.toByteArray()
+        var encodedImage : String = Base64.encodeToString(imageBytes, Base64.DEFAULT)
+        return encodedImage
     }
 
 
