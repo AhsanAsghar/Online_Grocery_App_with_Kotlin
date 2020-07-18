@@ -61,7 +61,10 @@ class RequestsOfCustomer : AppCompatActivity() {
                 val customer_name = jsonArray.getJSONObject(y).getString("name")
                 val customer_phone = jsonArray.getJSONObject(y).getString("customer_mobile_number")
                 val pimageString = jsonArray.getJSONObject(y).getString("profile_pic")
-                val customer_img = stringToBitmap(pimageString)
+                var customer_img : Bitmap? = null
+                if(pimageString != "null") {
+                    customer_img = stringToBitmap(pimageString)
+                }
                 if(idOfStore != null){
                     users.add(DataClassForRequestsOfCustomer(customer_img,customer_name,customer_phone,this,phone,
                         idOfStore!!
