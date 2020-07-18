@@ -27,10 +27,24 @@ class RequestsOfCustomer : AppCompatActivity() {
         setSupportActionBar(mToolbar)
         val recycleOfCategory = findViewById<RecyclerView>(R.id.recyclerView_requests_of_customers)
         recycleOfCategory.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        val resid = R.id.customer_photo
+        var idOfStore: String? = null
         val users = ArrayList<DataClassForRequestsOfCustomer>()
-        val phone = "+923004579023"
+        val phone = intent.getStringExtra("phone")
+        //get Store ID
         val queue = Volley.newRequestQueue(this)
+        val url_id_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStoreID.php?phone=$phone"
+        val request_id_get : StringRequest = StringRequest(url_id_get, Response.Listener {
+                response ->
+            val result  = response.toString().split(":").toTypedArray()
+            val yesORno = result[1].substring(1,result[1].length - 2)
+            idOfStore = yesORno
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@RequestsOfCustomer,error.toString(), Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_id_get))
+        //End getting Store ID
         val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getRequestsForStoreOwner.php?phone=$phone"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
                 response ->
@@ -42,13 +56,17 @@ class RequestsOfCustomer : AppCompatActivity() {
             Log.d("json",jsonArray.toString())
             val a = jsonArray.length()
             Log.d("json",a.toString())
-            for(y in 0..a-1){
+            for(y in 1..a-1){
                 Log.d("list", "in")
                 val customer_name = jsonArray.getJSONObject(y).getString("name")
                 val customer_phone = jsonArray.getJSONObject(y).getString("customer_mobile_number")
                 val pimageString = jsonArray.getJSONObject(y).getString("profile_pic")
                 val customer_img = stringToBitmap(pimageString)
-                users.add(DataClassForRequestsOfCustomer(customer_img,customer_name,customer_phone,this,phone))
+                if(idOfStore != null){
+                    users.add(DataClassForRequestsOfCustomer(customer_img,customer_name,customer_phone,this,phone,
+                        idOfStore!!
+                    ))
+                }
             }
             val adapter = CustomAdapterClassForRequestsOfCustomer(users)
             recycleOfCategory.adapter = adapter
@@ -58,12 +76,9 @@ class RequestsOfCustomer : AppCompatActivity() {
             Toast.makeText(this@RequestsOfCustomer,error.toString(), Toast.LENGTH_SHORT).show()
         })
         queue.add((request))
+
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_nearest_stores,menu)
-        return super.onCreateOptionsMenu(menu)
-    }
     fun stringToBitmap(imageInString : String) : Bitmap {
         val imageBytes = Base64.decode(imageInString,0)
         val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)

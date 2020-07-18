@@ -101,11 +101,14 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                id: Long
            ) {
                if(position == 1){
-                   val store_type = "Grocery Store"
+                   val store_type = "Grocery+Store"
                    Toast.makeText(applicationContext , "Grocery", Toast.LENGTH_SHORT).show()
                    val queue = Volley.newRequestQueue(applicationContext)
-                   val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
-                   val request : StringRequest = StringRequest(url_get, Response.Listener {
+                   val lati = latitude.toDouble()
+                   val longi = longitude.toDouble()
+                   val url_get1 : String =
+                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$lati&source_longitude=$longi"
+                   val request1 : StringRequest = StringRequest(url_get1, Response.Listener {
                            response ->
                        Log.d("json",response.toString())
                        val jObject : JSONObject = JSONObject(response.toString())
@@ -135,12 +138,12 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                        Log.d("json", error.toString())
                        Toast.makeText(this@UserNavigation,error.toString(), Toast.LENGTH_SHORT).show()
                    })
-                   queue.add((request))
+                   queue.add((request1))
                }
 
                else if(position == 3){
                    Toast.makeText(applicationContext , "Medical", Toast.LENGTH_SHORT).show()
-                   val store_type = "Medical Store"
+                   val store_type = "Medical+Store"
                    val queue = Volley.newRequestQueue(applicationContext)
                    val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
                    val request : StringRequest = StringRequest(url_get, Response.Listener {
@@ -418,6 +421,9 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 Toast.makeText(this@UserNavigation,"Store drawer name",Toast.LENGTH_SHORT).show()
             }
             R.id.store_drawer_requests -> {
+                val intent =  Intent(this@UserNavigation,RequestsOfCustomer::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Store drawer request",Toast.LENGTH_SHORT).show()
             }
             R.id.store_drawer_cart -> {
