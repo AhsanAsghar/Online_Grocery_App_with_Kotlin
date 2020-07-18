@@ -21,6 +21,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.medicineandgroceryapp.R.drawable.white_rounded
+import com.google.firebase.firestore.FirebaseFirestore
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -188,7 +189,7 @@ class cart_items : AppCompatActivity() {
                             //Notification should go like that: customerPhone -> phoneOfStore : names of varriables
                             //This notification should be shown to store owner and when store owner clicks on it RequestDetail.kt should open.
                             // RequestDetail.kt intent require customerPhone and store_id owner to open
-
+                            sendNotificationToOwner(phoneOfStore.toString(),customerPhone,store_id)
                             //End notification coding
                         }else{
 
@@ -209,5 +210,19 @@ class cart_items : AppCompatActivity() {
         val imageBytes = Base64.decode(imageInString,0)
         val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)
         return image
+    }
+    fun sendNotificationToOwner(phoneOfStore:String,customerPhone:String,storeId:String){
+        val db = FirebaseFirestore.getInstance()
+        val data = hashMapOf(
+            "cid" to customerPhone,
+            "stid" to storeId
+        )
+        db.collection("BuyRq").document(phoneOfStore)
+            .set(data)
+            .addOnSuccessListener { documentReference ->
+                Toast.makeText(this@cart_items,"Product requested", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+            }
     }
 }

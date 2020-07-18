@@ -29,6 +29,8 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import pub.devrel.easypermissions.EasyPermissions
 import org.json.JSONArray
 import org.json.JSONObject
@@ -47,6 +49,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         val recycle = findViewById(R.id.recyclerView) as RecyclerView
         recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
         phone = intent.getStringExtra("phone")
+        writeTokenToDb(phone.toString())
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationTask()
         val users = ArrayList<DataClassForNearbyStores> ()
@@ -482,4 +485,22 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         menuInflater.inflate(R.menu.menu_nearest_stores,menu)
         return super.onCreateOptionsMenu(menu)
     }*/
+    fun writeTokenToDb(phone:String){
+        val refreshedToken: String =
+            FirebaseInstanceId.getInstance().getToken().toString()
+        val db = FirebaseFirestore.getInstance()
+        val data = hashMapOf(
+            "token" to refreshedToken
+        )
+        db.collection("Tokens").document(phone)
+            .set(data)
+            .addOnSuccessListener { documentReference ->
+                val intent = Intent(applicationContext,UserNavigation::class.java)
+                intent.putExtra("phone", phone)
+                startActivity(intent)
+            }
+            .addOnFailureListener { e ->
+
+            }
+    }
 }
