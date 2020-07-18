@@ -2,11 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/search_items_in_category"
+        android:id="@+id/search_items_in_store_profile"
         android:icon="@drawable/search"
-        android:title="cart"
-        app:showAsAction="withText|ifRoom"
-        app:actionViewClass="android.widget.SearchView">
+        android:title="Search"
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView">
     </item>
-
+    <item
+        android:id="@+id/add_items_store_profile"
+        android:icon="@drawable/plus"
+        android:title="add"
+        app:showAsAction="withText|ifRoom">
+    </item>
 </menu>

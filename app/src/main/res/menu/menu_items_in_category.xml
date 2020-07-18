@@ -4,9 +4,9 @@
     <item
         android:id="@+id/search_items_in_category"
         android:icon="@drawable/search"
-        android:title="cart"
-        app:showAsAction="withText|ifRoom"
-        app:actionViewClass="android.widget.SearchView">
+        android:title="Search"
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView">
     </item>
     <item
         android:id="@+id/cart_items_in_category"

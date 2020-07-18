@@ -28,6 +28,7 @@ import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
+import com.google.firebase.auth.FirebaseAuth
 import pub.devrel.easypermissions.EasyPermissions
 import org.json.JSONArray
 import org.json.JSONObject
@@ -104,10 +105,8 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                    val store_type = "Grocery+Store"
                    Toast.makeText(applicationContext , "Grocery", Toast.LENGTH_SHORT).show()
                    val queue = Volley.newRequestQueue(applicationContext)
-                   val lati = latitude.toDouble()
-                   val longi = longitude.toDouble()
                    val url_get1 : String =
-                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$lati&source_longitude=$longi"
+                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
                    val request1 : StringRequest = StringRequest(url_get1, Response.Listener {
                            response ->
                        Log.d("json",response.toString())
@@ -452,6 +451,21 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 intent.putExtra("phone",phone)
                 startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Dilivery person Cart",Toast.LENGTH_SHORT).show()
+            }
+            R.id.user_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this@UserNavigation,MainActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.store_onwer_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this@UserNavigation,MainActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.delivery_person_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this@UserNavigation,MainActivity::class.java)
+                startActivity(intent)
             }
         }
         //end code to change or copy

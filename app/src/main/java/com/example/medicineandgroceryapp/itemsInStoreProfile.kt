@@ -16,6 +16,9 @@ import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
 import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
@@ -37,6 +40,9 @@ class itemsInStoreProfile : AppCompatActivity() {
     val CAMERA_CODE : Int = 0
     val REQUEST_CODE_FOR_GALLERY : Int = 1
     var phone: String? = null
+    var displayUsers = ArrayList<DataItemsInStoreProfileAbstract>()
+    var searchUser = ArrayList<DataItemsInStoreProfileAbstract>()
+    var adapter:CustomAdapterForItemsInStoreProfile? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_items_in_store_profile)
@@ -64,13 +70,7 @@ class itemsInStoreProfile : AppCompatActivity() {
         //End getting name of store
         val recycleViewOfItemsInCategory = findViewById(R.id.recycler_store_profile_items) as RecyclerView
         recycleViewOfItemsInCategory.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
-        val users = ArrayList<DataItemsInStoreProfileAbstract>()
         val storeProfileImage: de.hdodenhof.circleimageview.CircleImageView = findViewById(R.id.store_profile_image)
-        val floatingButton : FloatingActionButton = findViewById(R.id.floatingActionButtonStoreProfile)
-        floatingButton.setOnClickListener(){
-            v ->
-            getAlertBar()
-        }
         val url_img = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/itemsInStoreProfileImageGet.php?phone=$phone"
         val request_img : ImageRequest = ImageRequest(url_img, Response.Listener {
                 response ->
@@ -96,7 +96,7 @@ class itemsInStoreProfile : AppCompatActivity() {
                 val pxcategory = jsonArray.getJSONObject(x).getString("product_category")
                 Log.d("list", "x" + x.toString())
                 if(!listOfCategoryAdded.contains(pxcategory)) {
-                    users.add(DataClassForItemsInStoreProfileLabel(pxcategory))
+                    displayUsers.add(DataClassForItemsInStoreProfileLabel(pxcategory))
                     for(y in 1..a-1){
                         Log.d("list", "y" + y.toString())
                         val pycategory = jsonArray.getJSONObject(y).getString("product_category")
@@ -108,14 +108,15 @@ class itemsInStoreProfile : AppCompatActivity() {
                             val pimage = stringToBitmap(pimageString)
                             val pid = jsonArray.getJSONObject(y).getString("product_id")
                             Log.d("id",pid)
-                            users.add(DataClassForItemsInStoreProfile(pimage,pname, pprice,pid,this))
+                            displayUsers.add(DataClassForItemsInStoreProfile(pimage,pname, pprice,pid,this))
                         }
                     }
                     listOfCategoryAdded.add(pxcategory)
                     Log.d("list", listOfCategoryAdded.toString())
                 }
             }
-            val adapter = CustomAdapterForItemsInStoreProfile(users)
+            searchUser.addAll(displayUsers)
+            adapter = CustomAdapterForItemsInStoreProfile(displayUsers)
             recycleViewOfItemsInCategory.adapter = adapter
             progress.dismissDialog()
         }, Response.ErrorListener {
@@ -209,26 +210,62 @@ class itemsInStoreProfile : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.add_items_store_profile -> {
+                getAlertBar()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_items_in_store_profile,menu)
-        val manager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchItem = menu?.findItem(R.id.search_items_in_category)
-        val searchView = searchItem?.actionView as SearchView
-        searchView.setSearchableInfo(manager.getSearchableInfo(componentName))
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                searchView.clearFocus()
-                searchView.setQuery("",false)
-                searchView.isIconified = true
-                Toast.makeText(applicationContext,"looking for $query", Toast.LENGTH_SHORT).show()
-                return true
-            }
+        val searchItem = menu?.findItem(R.id.search_items_in_store_profile)
+        if(searchItem != null){
+            val searchView = searchItem.actionView as androidx.appcompat.widget.SearchView
+            val edittext = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+            edittext.setHint("Search for items")
+            searchView.setOnQueryTextListener( object: androidx.appcompat.widget.SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return true
+                }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                Toast.makeText(applicationContext,"looking fotr $newText", Toast.LENGTH_SHORT).show()
-                return true
-            }
-        })
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    if(newText!!.isNotEmpty()){
+                        findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.store_profile_image).visibility = View.GONE
+                        findViewById<TextView>(R.id.name_of_store).visibility = View.GONE
+                        displayUsers.clear()
+                        val search = newText.toLowerCase()
+                        searchUser.forEach{
+                            if(it is DataClassForItemsInStoreProfile){
+                                val item = it as DataClassForItemsInStoreProfile
+                                Log.d("search",search)
+                                if(item.nameOfStoreProfileItem.toString().toLowerCase().contains(search)){
+                                    displayUsers.add(it)
+                                }
+                            }else{
+                                val item = it as DataClassForItemsInStoreProfileLabel
+                            }
+
+
+                        }
+                        adapter?.notifyDataSetChanged()
+                    }else{
+                        findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.store_profile_image).visibility = View.VISIBLE
+                        findViewById<TextView>(R.id.name_of_store).visibility = View.VISIBLE
+                        displayUsers.clear()
+                        displayUsers.addAll(searchUser)
+                        adapter?.notifyDataSetChanged()
+                    }
+                    return true
+                }
+
+            })
+        }
         return super.onCreateOptionsMenu(menu)
     }
     fun bitmapToString(bitmap: Bitmap) : String {
