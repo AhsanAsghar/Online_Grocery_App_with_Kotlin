@@ -47,7 +47,7 @@ class CustomAdapterClassForStoreNameInCart(val userList: ArrayList<DataClassStor
             intent.putExtra("phone",user.phone)
             intent.putExtra("id",user.id_of_store)
             intent.putExtra("name",user.nameOfStore)
-            val image = Bitmap.createScaledBitmap(user.idOfPhoto, 70, 70, true);
+            val image = Bitmap.createScaledBitmap(user.idOfPhoto, 70, 70, true)
             intent.putExtra("image", image)
             user.context.startActivity(intent)
         }

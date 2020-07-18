@@ -8,6 +8,9 @@ import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
+import android.view.View
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -28,32 +31,72 @@ class RequestDetail : AppCompatActivity() {
         setSupportActionBar(mToolbar)
         val recycleOfCategory = findViewById<RecyclerView>(R.id.recyclerView_request_detail)
         recycleOfCategory.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
-        val resid = R.id.cart_item_photo_request_detail
-        val status_field: TextView = findViewById(R.id.status_request_detail)
-        val priceOfDelivery: TextView = findViewById(R.id.price_of_delivery_charges_request_detail)
         val users = ArrayList<DataClassForRequestDetails>()
-
-        //get status
-        val customer_phone = "+923450694449"
-        val store_id = 8
-        var status = "Request not yet send"
+        val customerPhone = intent.getStringExtra("phone")
+        val store_id = intent.getStringExtra("store_id")
+        var nameOfCustomer : String? = null
+        var photoOfCustomer: Bitmap? = null
+        findViewById<TextView>(R.id.customer_name_request_detail).setText(nameOfCustomer)
+        findViewById<ImageView>(R.id.request_detail_photo_customer).setImageBitmap(photoOfCustomer)
+        val acceptButton : Button = findViewById(R.id.accept_request_detail)
+        acceptButton.isEnabled = false
+        var phoneOfStore: String? = null
+        //Get customer Image and name
         val queue = Volley.newRequestQueue(this)
-        val url_get_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStatusOfRequest.php?storeid=$store_id&phone=$customer_phone"
+        val url_get_image_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getImageAndNameOfCustomer.php?phone=$customerPhone"
+        val request_image_name : StringRequest = StringRequest(url_get_image_name, Response.Listener {
+                response ->
+            val result  = response.toString().split(":").toTypedArray()
+            val yesORno = result[1].substring(1,result[1].length - 2)
+            if(yesORno.equals("NO")){
+                Toast.makeText(this@RequestDetail,yesORno,Toast.LENGTH_SHORT).show()
+            }else{
+                Log.d("json",response.toString())
+                val jObject : JSONObject = JSONObject(response.toString())
+                val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+                Log.d("json",jsonArray.toString())
+                nameOfCustomer = jsonArray.getJSONObject(0).getString("name")
+                findViewById<TextView>(R.id.customer_name_request_detail).setText(nameOfCustomer)
+                val image = jsonArray.getJSONObject(0).getString("profile_pic")
+                photoOfCustomer = stringToBitmap(image)
+                findViewById<ImageView>(R.id.request_detail_photo_customer).setImageBitmap(photoOfCustomer)
+            }
+
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@RequestDetail,error.toString(), Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_image_name))
+        //End getting customer Image and name
+        //get status
+        val progress = ProgressBar(this@RequestDetail)
+        progress.startLoading(true,"Getting data from server")
+        val url_get_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStatusOfRequest.php?storeid=$store_id&phone=$customerPhone"
         val request_status : StringRequest = StringRequest(url_get_status, Response.Listener {
                 response ->
             Log.d("json",response.toString())
-            val jObject : JSONObject = JSONObject(response.toString())
-            val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
-            Log.d("json",jsonArray.toString())
-            val a = jsonArray.length()
-            Log.d("json",a.toString())
-            for(y in 0..a-1){
-                status  = jsonArray.getJSONObject(y).getString("status")
-                Log.d("status", status)
-                if(status.equals("send")){
-                    status = "Requested"
-                }
-                status_field.setText(status)
+            val result  = response.toString().split(":").toTypedArray()
+            val yesORno = result[1].substring(1,result[1].length - 2)
+            Log.d("piq1",yesORno)
+            if(yesORno.equals("NO") || yesORno.equals("NULL")){
+                Log.d("problem",yesORno)
+            }else if(yesORno.equals("send")){
+                findViewById<TextView>(R.id.status_request_detail).setText("Requested - Hire Delivery Person")
+            }
+            else if(yesORno.equals("dsend")){
+                findViewById<TextView>(R.id.status_request_detail).setText("Waiting - Delivery Person Response")
+            }else if(yesORno.equals("daccept")){
+                acceptButton.isEnabled = true
+                findViewById<TextView>(R.id.status_request_detail).setText("Delivery Person Accepted Request")
+            }
+            else if(yesORno.equals("accept")){
+                findViewById<TextView>(R.id.status_request_detail).setText("You Have accepted the offer")
+            }
+            else if(yesORno.equals("reject")) {
+                findViewById<TextView>(R.id.status_request_detail).setText("Offer declined")
+            } else{
+                Toast.makeText(this@RequestDetail,yesORno, Toast.LENGTH_SHORT).show()
             }
         }, Response.ErrorListener {
                 error ->
@@ -61,10 +104,10 @@ class RequestDetail : AppCompatActivity() {
             Toast.makeText(this@RequestDetail,error.toString(), Toast.LENGTH_SHORT).show()
         })
         queue.add((request_status))
-        //End getting Status
+        // end getting status
 
         //Get products
-        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/cartItemsGet.php?storeid=$store_id&phone=$customer_phone"
+        val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/cartItemsGet.php?storeid=$store_id&phone=$customerPhone"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
                 response ->
             Log.d("json",response.toString())
@@ -84,6 +127,7 @@ class RequestDetail : AppCompatActivity() {
             }
             val adapter = CustomAdapterClassForRequestDetail(users)
             recycleOfCategory.adapter = adapter
+            progress.dismissDialog()
         }, Response.ErrorListener {
                 error ->
             Log.d("json", error.toString())
@@ -92,7 +136,7 @@ class RequestDetail : AppCompatActivity() {
         queue.add((request))
         //end getting products
         //get hiring status of store owner
-        val url_get_hiring_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkHiringStatusOfStoreOwner.php?storeid=$store_id&phone=$customer_phone"
+        /*val url_get_hiring_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkHiringStatusOfStoreOwner.php?storeid=$store_id&phone=$customerPhone"
         val request_hiring_status : StringRequest = StringRequest(url_get_hiring_status, Response.Listener {
                 response ->
             var statusOfHiring  = response.toString().split(":").toTypedArray()
@@ -107,14 +151,59 @@ class RequestDetail : AppCompatActivity() {
             Log.d("json", error.toString())
             Toast.makeText(this@RequestDetail,error.toString(), Toast.LENGTH_SHORT).show()
         })
-        queue.add((request_hiring_status))
+        queue.add((request_hiring_status))*/
         //end getting hiring status of store owner
+
+        //Get store number
+        val url_store_number : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStoreNumberThroughStoreId.php?store_id=$store_id"
+        val request_store_number : StringRequest = StringRequest(url_store_number, Response.Listener {
+                response ->
+            val result  = response.toString().split(":").toTypedArray()
+            val yesORno = result[1].substring(1,result[1].length - 2)
+            if(yesORno.equals("NO")){
+                Toast.makeText(this@RequestDetail,"Problem in Query",Toast.LENGTH_SHORT).show()
+            } else if (yesORno.equals("NRF")){
+                Toast.makeText(this@RequestDetail,"Problem in Query",Toast.LENGTH_SHORT).show()
+            } else{
+                phoneOfStore = yesORno
+            }
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@RequestDetail,error.toString(), Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_store_number))
+        //End getting store number
+        //onClicks
+        acceptButton.setOnClickListener {
+                v ->
+            val url_change_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/changeStatus.php?storeid=$store_id&phone=$customerPhone&status=accept"
+            val request_change_status : StringRequest = StringRequest(url_change_status, Response.Listener {
+                    response ->
+                val result  = response.toString().split(":").toTypedArray()
+                val yesORno = result[1].substring(1,result[1].length - 2)
+                if(yesORno.equals("YES")){
+                    //Here send the notification
+                    //Both numbers are here
+                    //Notification should go like this: phoneOfStore-> customerPhone : these are varriables names
+                    //Customer should receive this notification. When customer click on notification cart_items.kt should open.
+                    //cart_items.kt require customerPhone and store_id in intent to get open
+
+                    //End sending Notification
+                    Toast.makeText(this@RequestDetail,"Request Accepted",Toast.LENGTH_SHORT).show()
+                    this.finish()
+                    startActivity(intent)
+                }
+            }, Response.ErrorListener {
+                    error ->
+                Log.d("json", error.toString())
+                Toast.makeText(this@RequestDetail,error.toString(), Toast.LENGTH_SHORT).show()
+            })
+            queue.add((request_change_status))
+        }
+        //End onClicks
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_nearest_stores,menu)
-        return super.onCreateOptionsMenu(menu)
-    }
     fun stringToBitmap(imageInString : String) : Bitmap {
         val imageBytes = Base64.decode(imageInString,0)
         val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)

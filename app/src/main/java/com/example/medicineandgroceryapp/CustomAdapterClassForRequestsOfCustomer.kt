@@ -1,5 +1,7 @@
 package com.example.medicineandgroceryapp
 
+import android.content.Intent
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +29,16 @@ class CustomAdapterClassForRequestsOfCustomer(val userList: ArrayList<DataClassF
         val user: DataClassForRequestsOfCustomer = userList[position]
         holder.customerPhoto.setImageBitmap(user.photoBitmap)
         holder.nameOfCustomer.text = user.nameOfCustomer
+        holder.itemView.setOnClickListener {
+                v ->
+            val intent = Intent(user.context,RequestDetail::class.java)
+            intent.putExtra("phone",user.customer_phone)
+            intent.putExtra("store_id",user.storeId)
+            val b = Bitmap.createScaledBitmap(user.photoBitmap, 140, 140, true)
+            intent.putExtra("name",user.nameOfCustomer)
+            intent.putExtra("image",b)
+            user.context.startActivity(intent)
+        }
     }
 
 }

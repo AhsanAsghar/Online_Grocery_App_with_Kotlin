@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.medicineandgroceryapp.R.drawable.white_rounded
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -33,15 +34,45 @@ class cart_items : AppCompatActivity() {
         val recycleOfCategory = findViewById<RecyclerView>(R.id.recyclerView_cart_items)
         recycleOfCategory.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
         val users = ArrayList<DataClassForCartItems>()
-
-        //get status
+        val progress = ProgressBar(this@cart_items)
+        progress.startLoading(true,"Please wait! - Storedeck is getting data")
         val customerPhone = intent.getStringExtra("phone")
         val store_id = intent.getStringExtra("id")
-        val store_image = intent.getParcelableExtra<Bitmap>("image")
-        val store_name = intent.getStringExtra("name")
+        var store_image: Bitmap? = null
+        var store_name: String? = null
         val trackButton : Button = findViewById(R.id.track_delivery_person)
-        val queue = Volley.newRequestQueue(this)
         val requestButton : Button = findViewById(R.id.send_request)
+
+        //Get store Image and name
+        val queue = Volley.newRequestQueue(this)
+        val url_get_image_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getImageAndRequestOfStores.php?store_id=$store_id"
+        val request_image_name : StringRequest = StringRequest(url_get_image_name, Response.Listener {
+                response ->
+            val result  = response.toString().split(":").toTypedArray()
+            val yesORno = result[1].substring(1,result[1].length - 2)
+            if(yesORno.equals("NO")){
+                Toast.makeText(this@cart_items,yesORno,Toast.LENGTH_SHORT).show()
+            }else{
+                Log.d("json",response.toString())
+                val jObject : JSONObject = JSONObject(response.toString())
+                val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
+                Log.d("json",jsonArray.toString())
+                store_name = jsonArray.getJSONObject(0).getString("store_name")
+                findViewById<TextView>(R.id.store_name_cart_items).setText(store_name)
+                val image = jsonArray.getJSONObject(0).getString("store_image")
+                store_image = stringToBitmap(image)
+                findViewById<ImageView>(R.id.storeImageCartItem).setImageBitmap(store_image)
+            }
+
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_image_name))
+        //End getting store Image and name
+        var phoneOfStore: String? = null
+        //get status
         val url_get_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStatusOfRequest.php?storeid=$store_id&phone=$customerPhone"
         val request_status : StringRequest = StringRequest(url_get_status, Response.Listener {
                 response ->
@@ -49,17 +80,17 @@ class cart_items : AppCompatActivity() {
             val result  = response.toString().split(":").toTypedArray()
             val yesORno = result[1].substring(1,result[1].length - 2)
             Log.d("piq1",yesORno)
-            findViewById<ImageView>(R.id.storeImageCartItem).setImageBitmap(store_image)
-            findViewById<TextView>(R.id.store_name_cart_items).setText(store_name)
             if(yesORno.equals("NO")){
                 Log.d("problem",yesORno)
             }else if(yesORno.equals("NULL")){
                 findViewById<TextView>(R.id.request_status_cart_items).setText("Please Send request")
             }else if(yesORno.equals("send")){
-                requestButton.visibility = View.GONE
+                requestButton.setText("Request forward")
+                requestButton.setTextColor(resources.getColor(R.color.quantum_black_100))
+                requestButton.background = resources.getDrawable(R.drawable.white_rounded)
                 findViewById<TextView>(R.id.request_status_cart_items).setText("Pending")
             }
-            else if(yesORno.equals("d_send") || yesORno.equals("d_accept")){
+            else if(yesORno.equals("dsend") || yesORno.equals("daccept")){
                 requestButton.visibility = View.GONE
                 findViewById<TextView>(R.id.request_status_cart_items).setText("Delivery person is being hired")
             }else if(yesORno.equals("accept")){
@@ -109,6 +140,7 @@ class cart_items : AppCompatActivity() {
                 val adapter = CustomAdapterClassForCartItems(users)
                 recycleOfCategory.adapter = adapter
             }
+            progress.dismissDialog()
 
         }, Response.ErrorListener {
                 error ->
@@ -116,6 +148,61 @@ class cart_items : AppCompatActivity() {
             Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_SHORT).show()
         })
         queue.add((request))
+
+        //Get store number
+        val url_store_number : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getStoreNumberThroughStoreId.php?store_id=$store_id"
+        val request_store_number : StringRequest = StringRequest(url_store_number, Response.Listener {
+                response ->
+            val result  = response.toString().split(":").toTypedArray()
+            val yesORno = result[1].substring(1,result[1].length - 2)
+            if(yesORno.equals("NO")){
+                Toast.makeText(this@cart_items,"Problem in Query",Toast.LENGTH_SHORT).show()
+            } else if (yesORno.equals("NRF")){
+                Toast.makeText(this@cart_items,"Problem in Query",Toast.LENGTH_SHORT).show()
+            } else{
+                phoneOfStore = yesORno
+            }
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_store_number))
+        //End getting store number
+        //Place Order in Order Table
+        requestButton.setOnClickListener {
+                v ->
+                if(requestButton.text.toString().equals("Send Request")){
+                    val url_order : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/placeOrder.php?storeid=$store_id&phone=$customerPhone"
+                    val request_order : StringRequest = StringRequest(url_order, Response.Listener {
+                            response ->
+                        val result  = response.toString().split(":").toTypedArray()
+                        val yesORno = result[1].substring(1,result[1].length - 2)
+                        Log.d("piq",yesORno)
+                        if(yesORno.equals("YES")){
+                            Toast.makeText(this@cart_items,"Request send",Toast.LENGTH_SHORT).show()
+                            requestButton.setText("Request forward")
+                            requestButton.setTextColor(resources.getColor(R.color.quantum_black_100))
+                            requestButton.background = resources.getDrawable(R.drawable.white_rounded)
+                            //Notification coding
+                            //Notification should go like that: customerPhone -> phoneOfStore : names of varriables
+                            //This notification should be shown to store owner and when store owner clicks on it RequestDetail.kt should open.
+                            // RequestDetail.kt intent require customerPhone and store_id owner to open
+
+                            //End notification coding
+                        }else{
+
+                        }
+
+                    }, Response.ErrorListener {
+                            error ->
+                        Log.d("json", error.toString())
+                        Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_SHORT).show()
+                    })
+                    queue.add((request_order))
+                }
+        }
+        //End Placing Order in Order Table
     }
 
     fun stringToBitmap(imageInString : String) : Bitmap {
