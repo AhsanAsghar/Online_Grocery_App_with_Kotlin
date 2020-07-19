@@ -69,6 +69,7 @@ class CustomAdapterClassForStoreNameInCart(val userList: ArrayList<DataClassStor
                     override fun getParams() : Map<String,String>{
                         val params = HashMap<String,String>()
                         params.put("store_id",user.id_of_store)
+                        params.put("phone",user.phone)
                         return params
                     }
                 }

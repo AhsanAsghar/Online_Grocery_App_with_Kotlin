@@ -15,7 +15,7 @@
             android:id="@+id/customer_photo"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            app:srcCompat="@drawable/engine" />
+            app:srcCompat="@drawable/nophoto" />
 
         <TextView
             android:id="@+id/customer_name"

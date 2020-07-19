@@ -495,9 +495,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         db.collection("Tokens").document(phone)
             .set(data)
             .addOnSuccessListener { documentReference ->
-                val intent = Intent(applicationContext,UserNavigation::class.java)
-                intent.putExtra("phone", phone)
-                startActivity(intent)
             }
             .addOnFailureListener { e ->
 

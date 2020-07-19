@@ -55,7 +55,7 @@
                     android:id="@+id/request_detail_photo_customer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/engine" />
+                    app:srcCompat="@drawable/nophoto" />
 
             </androidx.cardview.widget.CardView>
 

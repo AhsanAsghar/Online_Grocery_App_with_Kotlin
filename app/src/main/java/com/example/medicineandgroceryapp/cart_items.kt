@@ -136,7 +136,7 @@ class cart_items : AppCompatActivity() {
                     val pimageString = jsonArray.getJSONObject(y).getString("product_image")
                     val product_img = stringToBitmap(pimageString)
                     val productPrice = jsonArray.getJSONObject(y).getString("product_price")
-                    users.add(DataClassForCartItems(product_img,product_name, productPrice,cart_id,this))
+                    users.add(DataClassForCartItems(product_img,product_name, productPrice,cart_id,this,store_id,customerPhone))
                 }
                 val adapter = CustomAdapterClassForCartItems(users)
                 recycleOfCategory.adapter = adapter
