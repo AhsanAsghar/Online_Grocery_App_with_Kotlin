@@ -16,6 +16,7 @@ import com.android.volley.toolbox.Volley
 import com.example.medicineandgroceryapp.R
 import com.example.medicineandgroceryapp.RequestDetail
 import com.example.medicineandgroceryapp.UserNavigation
+import com.example.medicineandgroceryapp.cart_items
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -28,7 +29,12 @@ class Notifications : FirebaseMessagingService() {
     }
     fun sendNotification(rm: RemoteMessage) {
         val data = rm.data
-        getCustomerName(data["cid"].toString(),data)
+        if(data.containsKey("flag")){
+            throwVerficationNotification(data["flag"]!!.toInt(),data["cid"].toString(),data["stid"].toString())
+        }
+        else {
+            getCustomerName(data["cid"].toString(), data)
+        }
     }
     fun getCustomerName(phoneNumber:String,data:Map<String,String> ){
         val queue = Volley.newRequestQueue(applicationContext)
@@ -80,5 +86,49 @@ class Notifications : FirebaseMessagingService() {
             Toast.makeText(applicationContext,error.toString(), Toast.LENGTH_SHORT).show()
         })
         queue.add((request_status))
+    }
+    fun throwVerficationNotification(flag:Int,customerPhone:String,store_id:String){
+        var status:String=""
+        if(flag==0){
+            status="declined"
+        }
+        else{
+            status="accepted"
+        }
+        val intent = Intent(application, cart_items::class.java)
+        intent.putExtra("phone",customerPhone)
+        intent.putExtra("id",store_id)
+        val contentIntent = PendingIntent.getActivity(
+            application,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val NOTIFICATION_CHANNEL_ID =
+            "com.example.medicineandgroceryapp" //your app package name
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID, "Notification",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationChannel.description = "My Channel"
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.BLUE
+            notificationChannel.vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+        val notificationBuilder =
+            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        notificationBuilder.setAutoCancel(true)
+            .setDefaults(Notification.DEFAULT_ALL)
+            .setWhen(System.currentTimeMillis())
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle("Your product request has been "+status)
+            .setContentIntent(contentIntent)
+            .setContentText("Click here to see")
+            .setContentInfo("Info")
+        notificationManager.notify(Random().nextInt(), notificationBuilder.build())
     }
 }

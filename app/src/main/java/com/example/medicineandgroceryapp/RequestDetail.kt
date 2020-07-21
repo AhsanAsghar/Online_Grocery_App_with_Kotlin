@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.firebase.firestore.FirebaseFirestore
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -194,7 +195,7 @@ class RequestDetail : AppCompatActivity() {
                     //Notification should go like this: phoneOfStore-> customerPhone : these are varriables names
                     //Customer should receive this notification. When customer click on notification cart_items.kt should open.
                     //cart_items.kt require customerPhone and store_id in intent to get open
-
+                    sendVerficatonToCustomer(customerPhone,store_id,phoneOfStore.toString(),1)
                     //End sending Notification
                     Toast.makeText(this@RequestDetail,"Request Accepted",Toast.LENGTH_SHORT).show()
                     this.finish()
@@ -219,7 +220,7 @@ class RequestDetail : AppCompatActivity() {
                     //Notification should go like this: phoneOfStore-> customerPhone : these are varriables names
                     //Customer should receive this notification. When customer click on notification cart_items.kt should open.
                     //cart_items.kt require customerPhone and store_id in intent to get open
-
+                    sendVerficatonToCustomer(customerPhone,store_id,phoneOfStore.toString(),0)
                     //End sending Notification
                     Toast.makeText(this@RequestDetail,customerPhone + " " + store_id,Toast.LENGTH_SHORT).show()
                     val intent = Intent(this@RequestDetail,RequestsOfCustomer::class.java)
@@ -245,5 +246,26 @@ class RequestDetail : AppCompatActivity() {
         val imageBytes = Base64.decode(imageInString,0)
         val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)
         return image
+    }
+    fun sendVerficatonToCustomer(phoneOfStore:String,customerPhone:String,storeId:String,flag:Int){
+        val db = FirebaseFirestore.getInstance()
+        val data = hashMapOf(
+           "owner_id" to phoneOfStore,
+            "store_id" to storeId,
+            "flag" to flag
+        )
+        db.collection("OwnerResponse").document(customerPhone)
+            .set(data)
+            .addOnSuccessListener { documentReference ->
+                if(flag==0){
+                    Toast.makeText(this,"Product declined", Toast.LENGTH_SHORT).show()
+                }
+                else{
+                    Toast.makeText(this,"Product accepted", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+            .addOnFailureListener { e ->
+            }
     }
 }
