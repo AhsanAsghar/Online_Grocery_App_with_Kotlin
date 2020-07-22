@@ -17,11 +17,16 @@
             android:icon="@drawable/ic_action_user"
             android:title="Requests"
     />
-        <item
+    <item
             android:id="@+id/store_drawer_cart"
             android:icon="@drawable/ic_action_cart"
             android:title="Cart"
-            />
+    />
+    <item
+            android:id="@+id/store_onwer_logout"
+            android:icon="@drawable/logout"
+            android:title="Logout"
+    />
     </group>
 
 </menu>

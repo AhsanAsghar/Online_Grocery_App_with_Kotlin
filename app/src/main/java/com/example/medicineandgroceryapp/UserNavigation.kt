@@ -28,6 +28,9 @@ import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import pub.devrel.easypermissions.EasyPermissions
 import org.json.JSONArray
 import org.json.JSONObject
@@ -46,6 +49,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         val recycle = findViewById(R.id.recyclerView) as RecyclerView
         recycle.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL,false)
         phone = intent.getStringExtra("phone")
+        writeTokenToDb(phone.toString())
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationTask()
         val users = ArrayList<DataClassForNearbyStores> ()
@@ -104,10 +108,8 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                    val store_type = "Grocery+Store"
                    Toast.makeText(applicationContext , "Grocery", Toast.LENGTH_SHORT).show()
                    val queue = Volley.newRequestQueue(applicationContext)
-                   val lati = latitude.toDouble()
-                   val longi = longitude.toDouble()
                    val url_get1 : String =
-                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$lati&source_longitude=$longi"
+                       "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
                    val request1 : StringRequest = StringRequest(url_get1, Response.Listener {
                            response ->
                        Log.d("json",response.toString())
@@ -453,6 +455,21 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Dilivery person Cart",Toast.LENGTH_SHORT).show()
             }
+            R.id.user_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this@UserNavigation,MainActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.store_onwer_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this@UserNavigation,MainActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.delivery_person_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this@UserNavigation,MainActivity::class.java)
+                startActivity(intent)
+            }
         }
         //end code to change or copy
         val drawerLayout: DrawerLayout = findViewById(R.id.user_drawer_layout)
@@ -468,4 +485,19 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         menuInflater.inflate(R.menu.menu_nearest_stores,menu)
         return super.onCreateOptionsMenu(menu)
     }*/
+    fun writeTokenToDb(phone:String){
+        val refreshedToken: String =
+            FirebaseInstanceId.getInstance().getToken().toString()
+        val db = FirebaseFirestore.getInstance()
+        val data = hashMapOf(
+            "token" to refreshedToken
+        )
+        db.collection("Tokens").document(phone)
+            .set(data)
+            .addOnSuccessListener { documentReference ->
+            }
+            .addOnFailureListener { e ->
+
+            }
+    }
 }

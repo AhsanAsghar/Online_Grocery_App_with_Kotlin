@@ -55,11 +55,11 @@ class CustomAdapterClassForStoreNameInCart(val userList: ArrayList<DataClassStor
             v ->
             val queue = Volley.newRequestQueue(user.context)
                 val queu = Volley.newRequestQueue(user.context)
-                var url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deleteStoreFromCart.php"
+                val url : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deleteStoreFromCart.php"
                 val postRequest =object: StringRequest(Request.Method.POST,url, Response.Listener {
                         response ->
                     Toast.makeText(user.context,response.toString(), Toast.LENGTH_SHORT).show()
-                    var pos : Int = userList.indexOf(user)
+                    val pos : Int = userList.indexOf(user)
                     userList.removeAt(pos)
                     notifyItemRemoved(pos)
                 }, Response.ErrorListener { error ->
@@ -69,6 +69,7 @@ class CustomAdapterClassForStoreNameInCart(val userList: ArrayList<DataClassStor
                     override fun getParams() : Map<String,String>{
                         val params = HashMap<String,String>()
                         params.put("store_id",user.id_of_store)
+                        params.put("phone",user.phone)
                         return params
                     }
                 }

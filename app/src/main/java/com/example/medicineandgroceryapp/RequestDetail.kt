@@ -1,5 +1,6 @@
 package com.example.medicineandgroceryapp
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.firebase.firestore.FirebaseFirestore
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -39,10 +41,12 @@ class RequestDetail : AppCompatActivity() {
         findViewById<TextView>(R.id.customer_name_request_detail).setText(nameOfCustomer)
         findViewById<ImageView>(R.id.request_detail_photo_customer).setImageBitmap(photoOfCustomer)
         val acceptButton : Button = findViewById(R.id.accept_request_detail)
-        acceptButton.isEnabled = false
+        acceptButton.isEnabled = true
         var phoneOfStore: String? = null
-        //Get customer Image and name
+        val findDeliveryPerson: Button = findViewById(R.id.find_delivery_person_request_details)
+        val declineRequest = findViewById<Button>(R.id.decline_request_details)
         val queue = Volley.newRequestQueue(this)
+        //Get customer Image and name
         val url_get_image_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getImageAndNameOfCustomer.php?phone=$customerPhone"
         val request_image_name : StringRequest = StringRequest(url_get_image_name, Response.Listener {
                 response ->
@@ -58,8 +62,11 @@ class RequestDetail : AppCompatActivity() {
                 nameOfCustomer = jsonArray.getJSONObject(0).getString("name")
                 findViewById<TextView>(R.id.customer_name_request_detail).setText(nameOfCustomer)
                 val image = jsonArray.getJSONObject(0).getString("profile_pic")
-                photoOfCustomer = stringToBitmap(image)
-                findViewById<ImageView>(R.id.request_detail_photo_customer).setImageBitmap(photoOfCustomer)
+                if(image != "null"){
+                    photoOfCustomer = stringToBitmap(image)
+                    findViewById<ImageView>(R.id.request_detail_photo_customer).setImageBitmap(photoOfCustomer)
+                }
+
             }
 
         }, Response.ErrorListener {
@@ -188,7 +195,7 @@ class RequestDetail : AppCompatActivity() {
                     //Notification should go like this: phoneOfStore-> customerPhone : these are varriables names
                     //Customer should receive this notification. When customer click on notification cart_items.kt should open.
                     //cart_items.kt require customerPhone and store_id in intent to get open
-
+                    sendVerficatonToCustomer(phoneOfStore.toString(),customerPhone,store_id,1)
                     //End sending Notification
                     Toast.makeText(this@RequestDetail,"Request Accepted",Toast.LENGTH_SHORT).show()
                     this.finish()
@@ -201,6 +208,37 @@ class RequestDetail : AppCompatActivity() {
             })
             queue.add((request_change_status))
         }
+        declineRequest.setOnClickListener { v ->
+            val url_reject : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/requestReject.php?storeid=$store_id&phone=$customerPhone"
+            val request_rejected : StringRequest = StringRequest(url_reject, Response.Listener {
+                    response ->
+                val result  = response.toString().split(":").toTypedArray()
+                val yesORno = result[1].substring(1,result[1].length - 2)
+                if(yesORno.equals("YES")){
+                    //Here send the notification
+                    //Both numbers are here
+                    //Notification should go like this: phoneOfStore-> customerPhone : these are varriables names
+                    //Customer should receive this notification. When customer click on notification cart_items.kt should open.
+                    //cart_items.kt require customerPhone and store_id in intent to get open
+                    sendVerficatonToCustomer(phoneOfStore.toString(),customerPhone,store_id,0)
+                    //End sending Notification
+                    Toast.makeText(this@RequestDetail,customerPhone + " " + store_id,Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this@RequestDetail,RequestsOfCustomer::class.java)
+                    intent.putExtra("phone",customerPhone)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                    this.finish()
+                }
+            }, Response.ErrorListener {
+                    error ->
+                Log.d("json", error.toString())
+                Toast.makeText(this@RequestDetail,error.toString(), Toast.LENGTH_SHORT).show()
+            })
+            queue.add((request_rejected))
+        }
+        findDeliveryPerson.setOnClickListener { v ->
+
+        }
         //End onClicks
     }
 
@@ -208,5 +246,28 @@ class RequestDetail : AppCompatActivity() {
         val imageBytes = Base64.decode(imageInString,0)
         val image = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.size)
         return image
+    }
+    fun sendVerficatonToCustomer(phoneOfStore:String,customerPhone:String,storeId:String,flag:Int){
+        val db = FirebaseFirestore.getInstance()
+        val data = hashMapOf(
+            "cid" to customerPhone,
+           "owner_id" to phoneOfStore,
+            "store_id" to storeId,
+            "flag" to flag
+        )
+        db.collection("OwnerResponse").document(customerPhone)
+            .set(data)
+            .addOnSuccessListener { documentReference ->
+                if(flag==0){
+                    Toast.makeText(this,"Product declined", Toast.LENGTH_SHORT).show()
+                }
+                else{
+                    Toast.makeText(this,"Product accepted", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this,"Notification Failed",Toast.LENGTH_SHORT).show()
+            }
     }
 }

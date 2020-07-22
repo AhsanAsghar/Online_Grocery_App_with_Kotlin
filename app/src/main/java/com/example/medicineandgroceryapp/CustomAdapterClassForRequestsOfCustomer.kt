@@ -27,16 +27,15 @@ class CustomAdapterClassForRequestsOfCustomer(val userList: ArrayList<DataClassF
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user: DataClassForRequestsOfCustomer = userList[position]
-        holder.customerPhoto.setImageBitmap(user.photoBitmap)
+        if(user.photoBitmap != null){
+            holder.customerPhoto.setImageBitmap(user.photoBitmap)
+        }
         holder.nameOfCustomer.text = user.nameOfCustomer
         holder.itemView.setOnClickListener {
                 v ->
             val intent = Intent(user.context,RequestDetail::class.java)
             intent.putExtra("phone",user.customer_phone)
             intent.putExtra("store_id",user.storeId)
-            val b = Bitmap.createScaledBitmap(user.photoBitmap, 140, 140, true)
-            intent.putExtra("name",user.nameOfCustomer)
-            intent.putExtra("image",b)
             user.context.startActivity(intent)
         }
     }

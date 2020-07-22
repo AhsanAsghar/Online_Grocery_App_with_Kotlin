@@ -22,12 +22,15 @@
                 android:title="@string/menu_become_delivery_person"
         />
         <item
-        android:id="@+id/user_cart"
-        android:icon="@drawable/ic_action_cart"
-        android:title="@string/user_cart"
-        >
-
-        </item>
+                android:id="@+id/user_cart"
+                android:icon="@drawable/ic_action_cart"
+                android:title="@string/user_cart"
+        />
+        <item
+            android:id="@+id/user_logout"
+            android:icon="@drawable/logout"
+            android:title="Logout"
+        />
     </group>
 
 </menu>
