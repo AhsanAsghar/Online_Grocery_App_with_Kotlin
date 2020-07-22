@@ -250,6 +250,7 @@ class RequestDetail : AppCompatActivity() {
     fun sendVerficatonToCustomer(phoneOfStore:String,customerPhone:String,storeId:String,flag:Int){
         val db = FirebaseFirestore.getInstance()
         val data = hashMapOf(
+            "cid" to customerPhone,
            "owner_id" to phoneOfStore,
             "store_id" to storeId,
             "flag" to flag
