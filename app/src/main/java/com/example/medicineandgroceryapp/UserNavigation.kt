@@ -31,6 +31,7 @@ import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
+import kotlinx.android.synthetic.main.progress_bar.*
 import pub.devrel.easypermissions.EasyPermissions
 import org.json.JSONArray
 import org.json.JSONObject
@@ -88,10 +89,11 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         })
         queue1.add((request))
         //End Getting name
+        var adapterGet :CustomAdapterForNearbyStores? = null
         val mToolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar2)
         setSupportActionBar(mToolbar)
         val spinner = findViewById<Spinner>(R.id.spinner)
-        val grocormedic = arrayOf("Please Select Store Category","Grocery Store", "Medical Store")
+        val grocormedic = arrayOf("Please Select Store Category","Grocery Store", "Bakery Store")
         spinner.adapter = ArrayAdapter<String> (this, android.R.layout.simple_expandable_list_item_1,grocormedic)
        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
            override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -104,7 +106,11 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                position: Int,
                id: Long
            ) {
+               val progress = ProgressBar(this@UserNavigation)
                if(position == 1){
+                   users.clear()
+                   adapterGet?.notifyDataSetChanged()
+                   progress.startLoading(true,"Getting stores from server")
                    val store_type = "Grocery+Store"
                    Toast.makeText(applicationContext , "Grocery", Toast.LENGTH_SHORT).show()
                    val queue = Volley.newRequestQueue(applicationContext)
@@ -112,29 +118,41 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                        "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
                    val request1 : StringRequest = StringRequest(url_get1, Response.Listener {
                            response ->
-                       Log.d("json",response.toString())
-                       val jObject : JSONObject = JSONObject(response.toString())
-                       val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
-                       Log.d("json",jsonArray.toString())
-                       val a :Int = jsonArray.length()
-                       Log.d("json",a.toString())
-                       for(y in 1..a-1){
-                           Log.d("Nearest", "Stores")
-                           val store_id = jsonArray.getJSONObject(y).getString("store_id")
-                           val pimageString = jsonArray.getJSONObject(y).getString("store_image")
-                           val store_image = stringToBitmap(pimageString)
-                           val store_name = jsonArray.getJSONObject(y).getString("store_name")
-                           val distance = jsonArray.getJSONObject(y).getString("distance")
-                           val distance1 = distance.toDouble()
-                           val distance2 = "%.2f".format(distance1)
-                           if(phone != null){
-                               users.add(DataClassForNearbyStores(store_image,store_name, distance2+"KM",
-                                   phone!!, this@UserNavigation,store_id))
+                       val result  = response.toString().split(":").toTypedArray()
+                       val yesORno = result[1].substring(1,result[1].length - 2)
+                       Log.d("piq1",yesORno)
+                       if(!yesORno.equals("NO")) {
+                           Log.d("json", response.toString())
+                           val jObject: JSONObject = JSONObject(response.toString())
+                           val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+                           Log.d("json", jsonArray.toString())
+                           val a: Int = jsonArray.length()
+                           Log.d("json", a.toString())
+                           for (y in 1..a - 1) {
+                               Log.d("Nearest", "Stores")
+                               val store_id = jsonArray.getJSONObject(y).getString("store_id")
+                               val pimageString =
+                                   jsonArray.getJSONObject(y).getString("store_image")
+                               val store_image = stringToBitmap(pimageString)
+                               val store_name = jsonArray.getJSONObject(y).getString("store_name")
+                               val distance = jsonArray.getJSONObject(y).getString("distance")
+                               val distance1 = distance.toDouble()
+                               val distance2 = "%.2f".format(distance1)
+                               if (phone != null) {
+                                   users.add(
+                                       DataClassForNearbyStores(
+                                           store_image, store_name, distance2 + "KM",
+                                           phone!!, this@UserNavigation, store_id
+                                       )
+                                   )
+                               }
                            }
-
+                           adapterGet = CustomAdapterForNearbyStores(users)
+                           recycle.adapter = adapterGet
+                       }else{
+                           Toast.makeText(this@UserNavigation,"No Such Sotre",Toast.LENGTH_SHORT).show()
                        }
-                       val adapter = CustomAdapterForNearbyStores(users)
-                       recycle.adapter = adapter
+                       progress.dismissDialog()
                    }, Response.ErrorListener {
                            error ->
                        Log.d("json", error.toString())
@@ -143,39 +161,66 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                    queue.add((request1))
                }
 
-               else if(position == 3){
-                   Toast.makeText(applicationContext , "Medical", Toast.LENGTH_SHORT).show()
-                   val store_type = "Medical+Store"
+
+               else if(position == 2){
+                   users.clear()
+                   adapterGet?.notifyDataSetChanged()
+                   progress.startLoading(true,"Please wait - Getting stores from server")
+                   Toast.makeText(applicationContext , "Bakery", Toast.LENGTH_SHORT).show()
+                   val store_type = "Bakery+Store"
                    val queue = Volley.newRequestQueue(applicationContext)
                    val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestStoresFinding.php?store_type=$store_type&source_latitude=$latitude&source_longitude=$longitude"
                    val request : StringRequest = StringRequest(url_get, Response.Listener {
                            response ->
-                       Log.d("json",response.toString())
-                       val jObject : JSONObject = JSONObject(response.toString())
-                       val jsonArray : JSONArray = jObject?.getJSONArray("response")!!
-                       Log.d("json",jsonArray.toString())
-                       val a = jsonArray.length()
-                       Log.d("json",a.toString())
-                       for(y in 1..a-1){
-                           Log.d("Nearest", "Stores")
-                           val store_id = jsonArray.getJSONObject(y).getString("store_id")
-                           val pimageString = jsonArray.getJSONObject(y).getString("store_image")
-                           val store_image = stringToBitmap(pimageString)
-                           val store_name = jsonArray.getJSONObject(y).getString("store_name")
-                           val distance = jsonArray.getJSONObject(y).getString("distance")
-                          // val distance1 = distance.toDouble()
-                           //val distance2 = Math.round(distance1 * 100.0) / 100.0
-                           //val distance1 = DecimalFormat("#.###")
-                           //distance1.roundingMode = RoundingMode.CEILING
-                           //val distance2 = distance1.format(distance)
-                           val distance1 = distance.toDouble()
-                           val distance2 = "%.2f".format(distance1)
-                           Toast.makeText(this@UserNavigation,"Distance:"+distance2,Toast.LENGTH_LONG).show()
-                           if(phone != null)
-                           users.add(DataClassForNearbyStores(store_image,store_name, distance2.toString() + "KM",phone!!,this@UserNavigation,store_id))
+                       Toast.makeText(this@UserNavigation,response.toString(), Toast.LENGTH_SHORT).show()
+                       val result  = response.toString().split(":").toTypedArray()
+                       val yesORno = result[1].substring(1,result[1].length - 2)
+                       Log.d("piq1",yesORno)
+                       if(!yesORno.equals("NO")) {
+                           Log.d("json", response.toString())
+                           val jObject: JSONObject = JSONObject(response.toString())
+                           val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+                           Log.d("json", jsonArray.toString())
+                           val a = jsonArray.length()
+                           Log.d("json", a.toString())
+                           for (y in 1..a - 1) {
+                               Log.d("Nearest", "Stores")
+                               val store_id = jsonArray.getJSONObject(y).getString("store_id")
+                               val pimageString =
+                                   jsonArray.getJSONObject(y).getString("store_image")
+                               val store_image = stringToBitmap(pimageString)
+                               val store_name = jsonArray.getJSONObject(y).getString("store_name")
+                               val distance = jsonArray.getJSONObject(y).getString("distance")
+                               // val distance1 = distance.toDouble()
+                               //val distance2 = Math.round(distance1 * 100.0) / 100.0
+                               //val distance1 = DecimalFormat("#.###")
+                               //distance1.roundingMode = RoundingMode.CEILING
+                               //val distance2 = distance1.format(distance)
+                               val distance1 = distance.toDouble()
+                               val distance2 = "%.2f".format(distance1)
+                               Toast.makeText(
+                                   this@UserNavigation,
+                                   "Distance:" + distance2,
+                                   Toast.LENGTH_LONG
+                               ).show()
+                               if (phone != null)
+                                   users.add(
+                                       DataClassForNearbyStores(
+                                           store_image,
+                                           store_name,
+                                           distance2.toString() + "KM",
+                                           phone!!,
+                                           this@UserNavigation,
+                                           store_id
+                                       )
+                                   )
+                           }
+                           adapterGet = CustomAdapterForNearbyStores(users)
+                           recycle.adapter = adapterGet
+                       }else{
+                           Toast.makeText(this@UserNavigation,"No Such Sotre",Toast.LENGTH_SHORT).show()
                        }
-                       val adapter = CustomAdapterForNearbyStores(users)
-                       recycle.adapter = adapter
+                       progress.dismissDialog()
                    }, Response.ErrorListener {
                            error ->
                        Log.d("json", error.toString())
