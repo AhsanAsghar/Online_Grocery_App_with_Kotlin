@@ -195,7 +195,7 @@ class RequestDetail : AppCompatActivity() {
                     //Notification should go like this: phoneOfStore-> customerPhone : these are varriables names
                     //Customer should receive this notification. When customer click on notification cart_items.kt should open.
                     //cart_items.kt require customerPhone and store_id in intent to get open
-                    sendVerficatonToCustomer(customerPhone,store_id,phoneOfStore.toString(),1)
+                    sendVerficatonToCustomer(phoneOfStore.toString(),customerPhone,store_id,1)
                     //End sending Notification
                     Toast.makeText(this@RequestDetail,"Request Accepted",Toast.LENGTH_SHORT).show()
                     this.finish()
@@ -220,7 +220,7 @@ class RequestDetail : AppCompatActivity() {
                     //Notification should go like this: phoneOfStore-> customerPhone : these are varriables names
                     //Customer should receive this notification. When customer click on notification cart_items.kt should open.
                     //cart_items.kt require customerPhone and store_id in intent to get open
-                    sendVerficatonToCustomer(customerPhone,store_id,phoneOfStore.toString(),0)
+                    sendVerficatonToCustomer(phoneOfStore.toString(),customerPhone,store_id,0)
                     //End sending Notification
                     Toast.makeText(this@RequestDetail,customerPhone + " " + store_id,Toast.LENGTH_SHORT).show()
                     val intent = Intent(this@RequestDetail,RequestsOfCustomer::class.java)
