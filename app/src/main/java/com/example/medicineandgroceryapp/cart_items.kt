@@ -17,11 +17,13 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.medicineandgroceryapp.R.drawable.white_rounded
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_login_with_phone.*
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -43,6 +45,7 @@ class cart_items : AppCompatActivity() {
         var store_name: String? = null
         val trackButton : Button = findViewById(R.id.track_delivery_person)
         val requestButton : Button = findViewById(R.id.send_request)
+        requestButton.setText("Verify Item Delivered")
 
         //Get store Image and name
         val queue = Volley.newRequestQueue(this)
@@ -95,7 +98,8 @@ class cart_items : AppCompatActivity() {
                 requestButton.visibility = View.GONE
                 findViewById<TextView>(R.id.request_status_cart_items).setText("Delivery person is being hired")
             }else if(yesORno.equals("accept")){
-                requestButton.visibility = View.GONE
+                requestButton.setText("Verify Order Delivered")
+                requestButton.visibility = View.VISIBLE
                 trackButton.visibility = View.VISIBLE
                 findViewById<TextView>(R.id.request_status_cart_items).setText("On the way")
             }
@@ -191,8 +195,6 @@ class cart_items : AppCompatActivity() {
                             // RequestDetail.kt intent require customerPhone and store_id owner to open
                             sendNotificationToOwner(phoneOfStore.toString(),customerPhone,store_id)
                             //End notification coding
-                        }else{
-
                         }
 
                     }, Response.ErrorListener {
@@ -201,10 +203,32 @@ class cart_items : AppCompatActivity() {
                         Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_SHORT).show()
                     })
                     queue.add((request_order))
+                } else {
+                    val url_delivered : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deleteStoreFromCart.php"
+                    val postRequest_delivered =object: StringRequest(Request.Method.POST,url_delivered, Response.Listener {
+                            response ->
+                        Toast.makeText(this@cart_items,"Product Deliver", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@cart_items,UserNavigation::class.java)
+                        intent.putExtra("phone",customerPhone)
+                        startActivity(intent)
+                    }, Response.ErrorListener { error ->
+                        Log.d("Error",error.toString())
+                        Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_LONG).show()
+                    }){
+                        override fun getParams() : Map<String,String>{
+                            val params = HashMap<String,String>()
+                            params.put("store_id",store_id)
+                            params.put("phone",customerPhone)
+                            return params
+                        }
+                    }
+                    queue.add(postRequest_delivered)
                 }
+
+                    }
         }
         //End Placing Order in Order Table
-    }
+
 
     fun stringToBitmap(imageInString : String) : Bitmap {
         val imageBytes = Base64.decode(imageInString,0)
@@ -220,7 +244,6 @@ class cart_items : AppCompatActivity() {
         db.collection("BuyRq").document(phoneOfStore)
             .set(data)
             .addOnSuccessListener { documentReference ->
-                Toast.makeText(this@cart_items,"Product requested", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
             }
