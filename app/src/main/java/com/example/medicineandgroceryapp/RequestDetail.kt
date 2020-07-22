@@ -41,7 +41,7 @@ class RequestDetail : AppCompatActivity() {
         findViewById<TextView>(R.id.customer_name_request_detail).setText(nameOfCustomer)
         findViewById<ImageView>(R.id.request_detail_photo_customer).setImageBitmap(photoOfCustomer)
         val acceptButton : Button = findViewById(R.id.accept_request_detail)
-        acceptButton.isEnabled = false
+        acceptButton.isEnabled = true
         var phoneOfStore: String? = null
         val findDeliveryPerson: Button = findViewById(R.id.find_delivery_person_request_details)
         val declineRequest = findViewById<Button>(R.id.decline_request_details)
@@ -266,6 +266,7 @@ class RequestDetail : AppCompatActivity() {
 
             }
             .addOnFailureListener { e ->
+                Toast.makeText(this,"Notification Failed",Toast.LENGTH_SHORT).show()
             }
     }
 }
