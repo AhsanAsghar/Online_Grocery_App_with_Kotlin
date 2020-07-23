@@ -6,9 +6,15 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 
+
 class DeliveryPersonAcceptReject : AppCompatActivity() {
     lateinit var mapFragment : SupportMapFragment
     lateinit var googleMap: GoogleMap
+    var phone:String? = null
+    var store_latitude:String = ""
+    var store_longitude:String = ""
+    var customer_latitude:String = ""
+    var customer_longitude:String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

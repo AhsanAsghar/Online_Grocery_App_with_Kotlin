@@ -31,23 +31,31 @@ import org.json.JSONObject
 import pub.devrel.easypermissions.EasyPermissions
 import java.util.*
 
-class MapForHiringDeliveryPerson : AppCompatActivity() {
+class MapForHiringDeliveryPerson : AppCompatActivity(), GoogleMap.OnInfoWindowClickListener,
+OnMapReadyCallback {
 
     var phone:String? = null
     lateinit var mapFragment : SupportMapFragment
     private val RC_LOCATION_PERM = 124
     lateinit var mFusedLocationClient: FusedLocationProviderClient
     lateinit var googleMap : GoogleMap
-
-    val store_id = "8"
-    var latitude:String = ""
-    var longitude:String = ""
+    var store_latitude:String = ""
+    var store_longitude:String = ""
+    var customer_latitude:String = ""
+    var customer_longitude:String = ""
+    var store_id2 : String = ""
     var list1 = mutableListOf<HiringModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_for_hiring_delivery_person)
-        gettingStoreAddress()
-        gettingCustomerAddress()
+        if (intent.getStringExtra("phone") != null ) {
+
+        } else {
+            phone = "+923450694449"
+        }
+        gettingStoreId()
+        gettingStoreAddress(store_id2)
+        gettingCustomerAddress(store_id2)
 
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_map_for_hiring_delivery_person) as SupportMapFragment
 
@@ -59,7 +67,7 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
             override fun run() {
                     val queue = Volley.newRequestQueue(applicationContext)
                     val url_get: String =
-                        "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestDeliveryPersonFinding.php?source_latitude=$latitude&source_longitude=$longitude"
+                        "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestDeliveryPersonFinding.php?source_latitude=$store_latitude&source_longitude=$store_longitude"
                     var request: StringRequest =
                         StringRequest(url_get, Response.Listener { response ->
                             Log.d("json", response.toString())
@@ -72,23 +80,24 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
                             for (y in 1..a - 1) {
                                 Log.d("list", "in")
                                 val dp_id = jsonArray.getJSONObject(y).getString("dp_id")
+                                val dp_phone = jsonArray.getJSONObject(y).getString("phone_number")
                                 val dp_latitude = jsonArray.getJSONObject(y).getString("latitude")
                                 val dp_longitude = jsonArray.getJSONObject(y).getString("longitude")
-                                val dp_name = jsonArray.getJSONObject(y).getString("dp_name")
+                                //val dp_name = jsonArray.getJSONObject(y).getString("dp_name")
                                 val distance = jsonArray.getJSONObject(y).getString("distance")
                                 var location1 =
                                     LatLng(dp_latitude.toDouble(), dp_longitude.toDouble())
-                                Log.d("data", dp_id + " " + dp_name + " " + distance)
+                                Log.d("data", dp_id + " " + " " + distance)
 
 
                                 val distance1 = distance.toDouble()
                                 val distance2 = "%.2f".format(distance1)
                                 //distance.toDouble() =".%4f".format(distance.toDouble())
-                                if (dp_id != null && dp_latitude!=null && dp_longitude !=null && dp_name !=null && distance !=null) {
+                                if (dp_id != null && dp_latitude!=null && dp_longitude !=null  && distance !=null) {
                                     createMarker(
                                         dp_latitude.toDouble(),
                                         dp_longitude.toDouble(),
-                                        dp_name,
+                                        "",
                                         "Distance:" + distance2.toString() + "KM"
                                     )
                                     val hiringModel = HiringModel()
@@ -124,14 +133,28 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
         }, 10000)
 
     }
+    override fun onMapReady(map: GoogleMap) {
+        this.googleMap = map
+        map?.setOnInfoWindowClickListener(this)
+    }
+
+    override fun  onInfoWindowClick(marker: Marker) {
+        //let find marker from the list that have same lat long as one that has been clicked then we'll send found marker which also clicked marker dp id to GCM for notifications
+        var  found=HiringModel()
+        for(item in list1) {
+            if (item.latitude == marker.position.latitude.toString() && item.longitude == marker.position.longitude.toString()) {
+                found = item
+            }
+        }
+        Toast.makeText(this, "dp id clicked = "+found.dp_id, Toast.LENGTH_SHORT).show()
+    }
 
 
 
-     fun gettingStoreAddress() {
-        val store_location:EditText =findViewById(R.id.store_location)
+   protected fun gettingStoreId(): String {
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/StoreAddressGetting.php?store_id=$store_id"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreId.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -139,16 +162,45 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
             val jObject: JSONObject = JSONObject(response.toString())
             val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
             val jsonObject: JSONObject = jsonArray.getJSONObject(0);
-            latitude = jsonObject.getString("latitude")
-            longitude = jsonObject.getString("longitude")
+            store_id2 = jsonObject.getString("store_id")
+            Toast.makeText(this@MapForHiringDeliveryPerson, "store id:"+store_id2, Toast.LENGTH_LONG).show()
+
+
+        }, Response.ErrorListener { error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@MapForHiringDeliveryPerson, error.toString(), Toast.LENGTH_SHORT)
+                .show()
+        })
+        queue.add((request))
+       return store_id2
+    }
+
+
+
+
+     fun gettingStoreAddress(store_id:String)  {
+         this.store_id2 = store_id
+        val store_location:EditText =findViewById(R.id.store_location)
+        val queue = Volley.newRequestQueue(applicationContext)
+        val url_get: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/StoreAddressGetting.php?store_id=$store_id2"
+        var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
+            Log.d("json", response.toString())
+            //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
+            //var json : JSONArray = response.getJSONArray(0)
+            val jObject: JSONObject = JSONObject(response.toString())
+            val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+            val jsonObject: JSONObject = jsonArray.getJSONObject(0);
+            store_latitude = jsonObject.getString("latitude")
+            store_longitude = jsonObject.getString("longitude")
             //latitude = "32.1474"
             //longitude = "74.21"
 
-            val location2 = LatLng(latitude.toDouble(),longitude.toDouble())
+            val location2 = LatLng(store_latitude.toDouble(),store_longitude.toDouble())
             //Map Marker Working
             mapFragment.getMapAsync(OnMapReadyCallback {
                 googleMap = it
-                createMarker(latitude.toDouble(), longitude.toDouble(), "My Store Location", "")
+                createMarker(store_latitude.toDouble(), store_longitude.toDouble(), "My Store Location", "")
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(location2))
                 //googleMap.animateCamera(CameraUpdateFactory.zoomTo(16f))
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location2,13f))
@@ -160,7 +212,7 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
             val geocoder:Geocoder
             val addresses: List<Address>
             geocoder = Geocoder(this, Locale.getDefault())
-            addresses = geocoder.getFromLocation(latitude.toDouble(),longitude.toDouble(),1)
+            addresses = geocoder.getFromLocation(store_latitude.toDouble(),store_longitude.toDouble(),1)
             val address:String= addresses.get(0).getAddressLine(0)
             val city:String = addresses.get(0).locality
             val state: String  = addresses.get(0).getAdminArea();
@@ -177,11 +229,12 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
         queue.add((request))
         //To change body of created functions use File | Settings | File Templates.
     }
-    fun gettingCustomerAddress(){
+    fun gettingCustomerAddress(store_id: String){
+        this.store_id2 = store_id
         val customer_location:EditText =findViewById(R.id.customer_location)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?store_id=$store_id"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?store_id=$store_id2"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -189,15 +242,15 @@ class MapForHiringDeliveryPerson : AppCompatActivity() {
             val jObject: JSONObject = JSONObject(response.toString())
             val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
             val jsonObject: JSONObject = jsonArray.getJSONObject(0);
-            latitude = jsonObject.getString("latitude")
-            longitude = jsonObject.getString("longitude")
+            customer_latitude = jsonObject.getString("latitude")
+            customer_longitude = jsonObject.getString("longitude")
             //latitude = "32.1474"
             //longitude = "74.21"
 
             val geocoder:Geocoder
             val addresses: List<Address>
             geocoder = Geocoder(this, Locale.getDefault())
-            addresses = geocoder.getFromLocation(latitude.toDouble(),longitude.toDouble(),1)
+            addresses = geocoder.getFromLocation(customer_latitude.toDouble(),customer_longitude.toDouble(),1)
             val address:String= addresses.get(0).getAddressLine(0)
             val city:String = addresses.get(0).locality
             val state: String  = addresses.get(0).getAdminArea();
