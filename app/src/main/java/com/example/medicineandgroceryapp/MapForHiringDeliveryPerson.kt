@@ -43,7 +43,7 @@ OnMapReadyCallback {
     var store_longitude:String = ""
     var customer_latitude:String = ""
     var customer_longitude:String = ""
-    val store_id : String = "40"
+    var store_id2 : String = ""
     var list1 = mutableListOf<HiringModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +54,8 @@ OnMapReadyCallback {
             phone = "+923450694449"
         }
         gettingStoreId()
-        gettingStoreAddress()
-        gettingCustomerAddress()
+        gettingStoreAddress(store_id2)
+        gettingCustomerAddress(store_id2)
 
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_map_for_hiring_delivery_person) as SupportMapFragment
 
@@ -80,6 +80,7 @@ OnMapReadyCallback {
                             for (y in 1..a - 1) {
                                 Log.d("list", "in")
                                 val dp_id = jsonArray.getJSONObject(y).getString("dp_id")
+                                val dp_phone = jsonArray.getJSONObject(y).getString("phone_number")
                                 val dp_latitude = jsonArray.getJSONObject(y).getString("latitude")
                                 val dp_longitude = jsonArray.getJSONObject(y).getString("longitude")
                                 //val dp_name = jsonArray.getJSONObject(y).getString("dp_name")
@@ -150,7 +151,7 @@ OnMapReadyCallback {
 
 
 
-    fun gettingStoreId(){
+   protected fun gettingStoreId(): String {
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
             "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreId.php?phone=$phone"
@@ -161,7 +162,9 @@ OnMapReadyCallback {
             val jObject: JSONObject = JSONObject(response.toString())
             val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
             val jsonObject: JSONObject = jsonArray.getJSONObject(0);
-            val store_id1 = jsonObject.getString("store_id")
+            store_id2 = jsonObject.getString("store_id")
+            Toast.makeText(this@MapForHiringDeliveryPerson, "store id:"+store_id2, Toast.LENGTH_LONG).show()
+
 
         }, Response.ErrorListener { error ->
             Log.d("json", error.toString())
@@ -169,16 +172,18 @@ OnMapReadyCallback {
                 .show()
         })
         queue.add((request))
+       return store_id2
     }
 
 
 
 
-     fun gettingStoreAddress() {
+     fun gettingStoreAddress(store_id:String)  {
+         this.store_id2 = store_id
         val store_location:EditText =findViewById(R.id.store_location)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/StoreAddressGetting.php?store_id=$store_id"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/StoreAddressGetting.php?store_id=$store_id2"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -224,11 +229,12 @@ OnMapReadyCallback {
         queue.add((request))
         //To change body of created functions use File | Settings | File Templates.
     }
-    fun gettingCustomerAddress(){
+    fun gettingCustomerAddress(store_id: String){
+        this.store_id2 = store_id
         val customer_location:EditText =findViewById(R.id.customer_location)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?store_id=$store_id"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?store_id=$store_id2"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
