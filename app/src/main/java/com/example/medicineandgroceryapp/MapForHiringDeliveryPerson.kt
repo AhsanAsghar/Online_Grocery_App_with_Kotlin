@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.ContactsContract
 import android.util.Log
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -53,9 +54,11 @@ OnMapReadyCallback {
         } else {
             phone = "+923450694449"
         }
-        gettingStoreId()
-        gettingStoreAddress(store_id2)
-        gettingCustomerAddress(store_id2)
+        val hireButton = findViewById<Button>(R.id.hire_delivery_person)
+        hireButton.isEnabled = false
+
+        gettingStoreAddress()
+        gettingCustomerAddress()
 
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_map_for_hiring_delivery_person) as SupportMapFragment
 
@@ -97,13 +100,14 @@ OnMapReadyCallback {
                                     createMarker(
                                         dp_latitude.toDouble(),
                                         dp_longitude.toDouble(),
-                                        "",
-                                        "Distance:" + distance2.toString() + "KM"
+                                        "Delivery Person",
+                                        "Distance:" + distance2 + "KM"
                                     )
                                     val hiringModel = HiringModel()
                                     hiringModel.latitude=dp_latitude
                                     hiringModel.longitude=dp_longitude
                                     hiringModel.dp_id=dp_id.toInt()
+                                    hiringModel.phone=dp_phone
                                     list1.add(hiringModel)
 
                                     Toast.makeText(
@@ -151,7 +155,7 @@ OnMapReadyCallback {
 
 
 
-   protected fun gettingStoreId(): String {
+   protected fun gettingStoreId() {
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
             "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreId.php?phone=$phone"
@@ -163,7 +167,7 @@ OnMapReadyCallback {
             val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
             val jsonObject: JSONObject = jsonArray.getJSONObject(0);
             store_id2 = jsonObject.getString("store_id")
-            Toast.makeText(this@MapForHiringDeliveryPerson, "store id:"+store_id2, Toast.LENGTH_LONG).show()
+            //Toast.makeText(this@MapForHiringDeliveryPerson, "store id:"+store_id2, Toast.LENGTH_LONG).show()
 
 
         }, Response.ErrorListener { error ->
@@ -172,18 +176,16 @@ OnMapReadyCallback {
                 .show()
         })
         queue.add((request))
-       return store_id2
     }
 
 
 
 
-     fun gettingStoreAddress(store_id:String)  {
-         this.store_id2 = store_id
+     fun gettingStoreAddress() {
         val store_location:EditText =findViewById(R.id.store_location)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/StoreAddressGetting.php?store_id=$store_id2"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/StoreAddressGetting.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -229,12 +231,11 @@ OnMapReadyCallback {
         queue.add((request))
         //To change body of created functions use File | Settings | File Templates.
     }
-    fun gettingCustomerAddress(store_id: String){
-        this.store_id2 = store_id
+    fun gettingCustomerAddress(){
         val customer_location:EditText =findViewById(R.id.customer_location)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?store_id=$store_id2"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
