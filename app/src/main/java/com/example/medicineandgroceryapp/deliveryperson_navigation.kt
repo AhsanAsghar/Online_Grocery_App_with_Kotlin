@@ -64,9 +64,6 @@ class deliveryperson_navigation : AppCompatActivity(), NavigationView.OnNavigati
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.deliveryperson_drawer_notifications -> {
-                // Handle the camera action
-            }
             R.id.deliveryperson_drawer_profile -> {
 
             }

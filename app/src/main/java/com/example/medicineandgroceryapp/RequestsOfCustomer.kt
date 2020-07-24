@@ -6,10 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
@@ -45,6 +42,7 @@ class RequestsOfCustomer : AppCompatActivity() {
         })
         queue.add((request_id_get))
         //End getting Store ID
+        //Getting request to Store owner
         val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getRequestsForStoreOwner.php?phone=$phone"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
                 response ->
@@ -79,6 +77,7 @@ class RequestsOfCustomer : AppCompatActivity() {
             Toast.makeText(this@RequestsOfCustomer,error.toString(), Toast.LENGTH_SHORT).show()
         })
         queue.add((request))
+        //End getting request to store onwer
 
     }
 

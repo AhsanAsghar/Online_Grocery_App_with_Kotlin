@@ -33,7 +33,7 @@
             android:name=".user_name"
             android:exported="true" />
         <activity
-            android:name=".Notifications"
+            android:name=".RequestsForDP"
             android:exported="true" />
         <activity
             android:name=".RequestDetail"

@@ -227,9 +227,6 @@ class store_navigation_bar : AppCompatActivity(), NavigationView.OnNavigationIte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.store_drawer_notifications -> {
-                // Handle the camera action
-            }
 
             R.id.store_drawer_name -> {
 

@@ -31,7 +31,6 @@ import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
-import kotlinx.android.synthetic.main.progress_bar.*
 import pub.devrel.easypermissions.EasyPermissions
 import org.json.JSONArray
 import org.json.JSONObject
@@ -424,13 +423,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         // Handle navigation view item clicks here.
         //Code to change or copy
         when (item.itemId) {
-            R.id.user_notifications-> {
-                // Handle the camera action
-                val intent = Intent(this@UserNavigation,Notifications::class.java)
-                intent.putExtra("phone",phone)
-                startActivity(intent)
-                Toast.makeText(this@UserNavigation,"User Notification",Toast.LENGTH_SHORT).show()
-            }
             R.id.user_settings -> {
                 val intent = Intent(this@UserNavigation,settings::class.java)
                 intent.putExtra("phone",phone)
@@ -455,12 +447,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 startActivity(intent)
                 Toast.makeText(this@UserNavigation,"User Cart",Toast.LENGTH_SHORT).show()
             }
-            R.id.store_drawer_notifications -> {
-                val intent = Intent(this@UserNavigation,Notifications::class.java)
-                intent.putExtra("phone",phone)
-                startActivity(intent)
-                Toast.makeText(this@UserNavigation,"Store drawer notification",Toast.LENGTH_SHORT).show()
-            }
             R.id.store_drawer_name -> {
                 val intent = Intent(this@UserNavigation,itemsInStoreProfile::class.java)
                 intent.putExtra("phone",phone)
@@ -479,12 +465,6 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 startActivity(intent)
                 Toast.makeText(this@UserNavigation,"Store Cart",Toast.LENGTH_SHORT).show()
             }
-            R.id.deliveryperson_drawer_notifications -> {
-                val intent = Intent(this@UserNavigation,Notifications::class.java)
-                intent.putExtra("phone",phone)
-                startActivity(intent)
-                Toast.makeText(this@UserNavigation,"Delivery person drawer notification",Toast.LENGTH_SHORT).show()
-            }
             R.id.deliveryperson_drawer_profile  -> {
                 val intent = Intent(this@UserNavigation,delivery_person_profile::class.java)
                 intent.putExtra("phone",phone)
@@ -493,6 +473,9 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
             }
             R.id.deliveryperson_drawer_requests -> {
                 Toast.makeText(this@UserNavigation,"Delivery person drawer requests",Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@UserNavigation,RequestsForDP::class.java)
+                intent.putExtra("phone",phone)
+                startActivity(intent)
             }
             R.id.deliveryperson_drawer_cart ->{
                 val intent = Intent(this@UserNavigation,StoreNameInCart::class.java)
