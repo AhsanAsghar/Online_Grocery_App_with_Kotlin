@@ -1,5 +1,6 @@
 package com.example.medicineandgroceryapp
 
+import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
@@ -31,7 +32,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     var store_longitude:String = ""
     var customer_latitude:String = ""
     var customer_longitude:String = ""
-    var store_phone : String = ""
+    var store_phone : String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,18 +48,68 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         gettingStoreAddress()
         gettingCustomerAddress()
         gettingStorePhone()
-        acceptButton.setOnClickListener(){
 
+        acceptButton.setOnClickListener { v ->
+            availabilityoff()
+            val queue = Volley.newRequestQueue(this)
+            val url_change_status: String =
+                "https://grocerymedicineapp.000webhostapp.com/PHPfiles/changeStatusDpAccept.php?phone=$phone&store_phone=$store_phone&status=daccept"
+            val request_change_status: StringRequest =
+                StringRequest(url_change_status, Response.Listener { response ->
+                    val result = response.toString().split(":").toTypedArray()
+                    val yesORno = result[1].substring(1, result[1].length - 2)
+                    if (yesORno.equals("YES")) {
+                    }
+                }, Response.ErrorListener { error ->
+                    Log.d("json", error.toString())
+                    Toast.makeText(this@DeliveryPersonAcceptReject, error.toString(), Toast.LENGTH_SHORT).show()
+                })
+            queue.add((request_change_status))
 
+            val intent = Intent(this@DeliveryPersonAcceptReject,FinalActivityForDeliveryPerson::class.java)
+            intent.putExtra("phone",phone)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            this.finish()
 
         }
-        rejectButton.setOnClickListener(){
-
-
-
-
+        rejectButton.setOnClickListener { v->
+            val queue = Volley.newRequestQueue(this)
+            val url_change_status: String =
+                "https://grocerymedicineapp.000webhostapp.com/PHPfiles/changeStatusDpReject.php?phone=$phone&store_phone=$store_phone&status=send"
+            val request_change_status: StringRequest =
+                StringRequest(url_change_status, Response.Listener { response ->
+                    val result = response.toString().split(":").toTypedArray()
+                    val yesORno = result[1].substring(1, result[1].length - 2)
+                    if (yesORno.equals("YES")) {
+                    }
+                }, Response.ErrorListener { error ->
+                    Log.d("json", error.toString())
+                    Toast.makeText(this@DeliveryPersonAcceptReject, error.toString(), Toast.LENGTH_SHORT).show()
+                })
+            queue.add((request_change_status))
         }
+        }
+
+    fun availabilityoff(){
+
+        val queue = Volley.newRequestQueue(this)
+        val url_change_status: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/writeAvailabilityoff.php?phone=$phone"
+        val request_change_status: StringRequest =
+            StringRequest(url_change_status, Response.Listener { response ->
+                val result = response.toString().split(":").toTypedArray()
+                val yesORno = result[1].substring(1, result[1].length - 2)
+                if (yesORno.equals("YES")) {
+                    Toast.makeText(this@DeliveryPersonAcceptReject,"Availability Off", Toast.LENGTH_LONG).show()
+                }
+            }, Response.ErrorListener { error ->
+                Log.d("json", error.toString())
+                Toast.makeText(this@DeliveryPersonAcceptReject, error.toString(), Toast.LENGTH_SHORT).show()
+            })
+        queue.add((request_change_status))
     }
+
     fun gettingStoreAddress(){
         val store_location =  findViewById<EditText>(R.id.coming_towards)
         val queue = Volley.newRequestQueue(applicationContext)
