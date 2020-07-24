@@ -93,10 +93,9 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
                             var marker: Marker? = null
                             if (marker == null) {
                                 val options = MarkerOptions().position(location)
-                                    .title("Marker Title")
+                                    .title("Delivery Person")
                                 marker = googleMap.addMarker(options)
                             } else {
-                                location = LatLng(10.0,24.7)
                                 marker.setPosition(location)
                             }
                             googleMap.moveCamera(CameraUpdateFactory.newLatLng(location))

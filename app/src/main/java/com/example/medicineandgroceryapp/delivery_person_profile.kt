@@ -146,7 +146,7 @@ class delivery_person_profile : AppCompatActivity() {
                 }, 6000)
             }
             else{
-                //stoplocationUpdates()
+                stoplocationUpdates()
             }
         }
         dp_image.setOnClickListener() {
