@@ -29,7 +29,6 @@ open class settings : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         phone = intent.getStringExtra("phone")
-        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val card_setting : CardView = findViewById(R.id.cardView_setting)
         val imageForBitmap : de.hdodenhof.circleimageview.CircleImageView = findViewById(R.id.profilePic)
         val imageBitmap : Bitmap = (imageForBitmap.drawable as BitmapDrawable).bitmap

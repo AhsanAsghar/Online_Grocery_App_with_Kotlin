@@ -1,5 +1,7 @@
 package com.example.medicineandgroceryapp
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,10 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,7 +37,6 @@ class RequestDetail : AppCompatActivity() {
         val store_id = intent.getStringExtra("store_id")
         var nameOfCustomer : String? = null
         var photoOfCustomer: Bitmap? = null
-        findViewById<TextView>(R.id.customer_name_request_detail).setText(nameOfCustomer)
         findViewById<ImageView>(R.id.request_detail_photo_customer).setImageBitmap(photoOfCustomer)
         val acceptButton : Button = findViewById(R.id.accept_request_detail)
         acceptButton.isEnabled = true
@@ -46,6 +44,7 @@ class RequestDetail : AppCompatActivity() {
         val findDeliveryPerson: Button = findViewById(R.id.find_delivery_person_request_details)
         val declineRequest = findViewById<Button>(R.id.decline_request_details)
         val queue = Volley.newRequestQueue(this)
+        val checkCustomerName: TextView = findViewById(R.id.customer_name_request_detail)
         //Get customer Image and name
         val url_get_image_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getImageAndNameOfCustomer.php?phone=$customerPhone"
         val request_image_name : StringRequest = StringRequest(url_get_image_name, Response.Listener {
@@ -238,6 +237,17 @@ class RequestDetail : AppCompatActivity() {
         }
         findDeliveryPerson.setOnClickListener { v ->
 
+        }
+        checkCustomerName.setOnClickListener { v ->
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            val inflater =
+                getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val view : View = inflater.inflate(R.layout.show_customer_phone,null)
+            view.findViewById<TextView>(R.id.customer_name_dialog).setText(nameOfCustomer)
+            view.findViewById<TextView>(R.id.customer_phone_dialog).setText(customerPhone)
+            builder.setView(view)
+            builder.setCancelable(true)
+            builder.create().show()
         }
         //End onClicks
     }
