@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +16,6 @@ import android.view.View
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -64,14 +62,13 @@ class itemsDetailFromCamera : AppCompatActivity() {
         }
         val phone : String = intent.getStringExtra("phone")
         val typeSpinner: Spinner = findViewById(R.id.itemTypeSpinner)
-        val options = arrayOf("Category of Item",
+        val options_bakery = arrayOf("Breads","Doughnuts","Bagels","Cakes and Pies","Pastries",
+        "Biscuits","Brownie","Cookies", "Snacks & Candy", "Dairy, Eggs & Cheese")
+        val category_grocery = arrayOf("Category of Item",
 
             "Bread & Bakery",
                 "Breakfast & Cereal",
         "Canned Goods & Soups",
-                "Condiments/Spices & Bake",
-        "Cookies, Snacks & Candy",
-        "Dairy, Eggs & Cheese",
         "Deli & Signature Cafe",
         "Flowers",
         "Frozen Foods",
@@ -86,12 +83,31 @@ class itemsDetailFromCamera : AppCompatActivity() {
         "Pet Care",
                 "Pharmacy",
         "Tobacco"
-
-
-
         )
-        typeSpinner.adapter =
-            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, options)
+        //Get type of store
+        val queue = Volley.newRequestQueue(this)
+        val url_store_number : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getTypeOfStore.php?phone=$phone"
+        val request_store_number : StringRequest = StringRequest(url_store_number, Response.Listener {
+                response ->
+            val result  = response.toString().split(":").toTypedArray()
+            val store_type = result[1].substring(1,result[1].length - 2)
+            if(store_type.equals("NO")){
+                Toast.makeText(this@itemsDetailFromCamera,"Problem in Query",Toast.LENGTH_SHORT).show()
+            } else if (store_type.equals("Grocery Store")){
+                typeSpinner.adapter =
+                    ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, category_grocery)
+            } else if (store_type.equals("Bakery Store")){
+                typeSpinner.adapter =
+                    ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, options_bakery)
+            }
+        }, Response.ErrorListener {
+                error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@itemsDetailFromCamera,error.toString(), Toast.LENGTH_SHORT).show()
+        })
+        queue.add((request_store_number))
+        //End getting type of store
+
         val floatingbuttonCameraActivity: FloatingActionButton =
             findViewById(R.id.floatingActionButtonAccept)
         floatingbuttonCameraActivity.setOnClickListener() { v ->

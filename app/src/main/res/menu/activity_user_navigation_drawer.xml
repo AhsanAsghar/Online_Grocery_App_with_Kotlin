@@ -5,10 +5,6 @@
 
     <group android:checkableBehavior="single">
         <item
-                android:id="@+id/user_notifications"
-                android:icon="@drawable/ic_action_bellicon"
-                android:title="@string/menu_notifications"/>
-        <item
                 android:id="@+id/user_settings"
                 android:icon="@drawable/ic_action_settings"
                 android:title="@string/menu_settings"/>

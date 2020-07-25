@@ -174,9 +174,10 @@ class cart_items : AppCompatActivity() {
         })
         queue.add((request_store_number))
         //End getting store number
-        //Place Order in Order Table
+        requestButton.setText("Verify Order Delivered")
         requestButton.setOnClickListener {
                 v ->
+                //Place Order in Order Table
                 if(requestButton.text.toString().equals("Send Request")){
                     val url_order : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/placeOrder.php?storeid=$store_id&phone=$customerPhone"
                     val request_order : StringRequest = StringRequest(url_order, Response.Listener {
@@ -203,31 +204,23 @@ class cart_items : AppCompatActivity() {
                         Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_SHORT).show()
                     })
                     queue.add((request_order))
+                //End Placing Order in Order Table
                 } else {
-                    val url_delivered : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/deleteStoreFromCart.php"
-                    val postRequest_delivered =object: StringRequest(Request.Method.POST,url_delivered, Response.Listener {
+                    val url_delivered : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/delivered.php?store_id=$store_id&phone=$customerPhone"
+                    val request_delivered : StringRequest = StringRequest(url_delivered, Response.Listener {
                             response ->
-                        Toast.makeText(this@cart_items,"Product Deliver", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this@cart_items,UserNavigation::class.java)
-                        intent.putExtra("phone",customerPhone)
-                        startActivity(intent)
-                    }, Response.ErrorListener { error ->
-                        Log.d("Error",error.toString())
-                        Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_LONG).show()
-                    }){
-                        override fun getParams() : Map<String,String>{
-                            val params = HashMap<String,String>()
-                            params.put("store_id",store_id)
-                            params.put("phone",customerPhone)
-                            return params
-                        }
+                        Toast.makeText(this,response.toString(),Toast.LENGTH_SHORT).show()
+                    }, Response.ErrorListener {
+                            error ->
+                        Log.d("json", error.toString())
+                        Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_SHORT).show()
+                    })
+                    queue.add((request_delivered))
                     }
-                    queue.add(postRequest_delivered)
-                }
 
-                    }
+                }
         }
-        //End Placing Order in Order Table
+
 
 
     fun stringToBitmap(imageInString : String) : Bitmap {

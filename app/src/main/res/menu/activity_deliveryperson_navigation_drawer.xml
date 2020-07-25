@@ -5,10 +5,6 @@
 
     <group android:checkableBehavior="single">
     <item
-            android:id="@+id/deliveryperson_drawer_notifications"
-            android:icon="@drawable/ic_action_bellicon"
-            android:title="Notifications"/>
-    <item
             android:id="@+id/deliveryperson_drawer_profile"
             android:icon="@drawable/ic_action_motorcycle"
             android:title="Profile"/>

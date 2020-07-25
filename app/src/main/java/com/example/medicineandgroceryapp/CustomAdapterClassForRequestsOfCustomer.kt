@@ -1,13 +1,11 @@
 package com.example.medicineandgroceryapp
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.recyclerview.widget.RecyclerView
 
 class CustomAdapterClassForRequestsOfCustomer(val userList: ArrayList<DataClassForRequestsOfCustomer>) : RecyclerView.Adapter<CustomAdapterClassForRequestsOfCustomer.ViewHolder>() {
