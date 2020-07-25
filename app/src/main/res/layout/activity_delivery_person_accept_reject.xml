@@ -38,8 +38,10 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_delivery_person_accept_reject" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_delivery_person_accept_reject"
+        app:layout_constraintVertical_bias="0.0" />
 
     <EditText
         android:id="@+id/coming_towards"
@@ -77,7 +79,8 @@
         android:id="@+id/accept"
         android:layout_width="100dp"
         android:layout_height="48dp"
-        android:layout_marginStart="64dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="64dp"
         android:background="@drawable/add_to_cart_green_button"
         android:text="Accept"
@@ -89,12 +92,26 @@
         android:id="@+id/reject"
         android:layout_width="100dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="64dp"
         android:background="@drawable/white_rounded"
         android:text="Reject"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/TrackOrder"
+        app:layout_constraintStart_toEndOf="@+id/accept" />
+
+    <Button
+        android:id="@+id/TrackOrder"
+        android:layout_width="100dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/add_to_cart_green_button"
+        android:text="Track Order"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/accept" />
+        app:layout_constraintLeft_toRightOf="@+id/reject" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

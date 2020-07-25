@@ -9,6 +9,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.view.isVisible
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.activity_delivery_person_accept_reject.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
@@ -39,12 +41,45 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         setContentView(R.layout.activity_delivery_person_accept_reject)
         val acceptButton = findViewById<Button>(R.id.accept)
         val rejectButton = findViewById<Button>(R.id.reject)
+        val trackButton = findViewById<Button>(R.id.TrackOrder)
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_accept_reject) as SupportMapFragment
         if (intent.getStringExtra("phone") != null ) {
 
         } else {
             phone = "+923004579023"
         }
+
+
+        val queue = Volley.newRequestQueue(applicationContext)
+        val url_get: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkstatus.php?phone=$phone"
+        var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
+            Log.d("json", response.toString())
+            //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
+            //var json : JSONArray = response.getJSONArray(0)
+            val jObject: JSONObject = JSONObject(response.toString())
+            val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+            val jsonObject: JSONObject = jsonArray.getJSONObject(0);
+            val status = jsonObject.getString("status")
+            if(status.equals("accept")){
+                trackButton.isEnabled = true
+                acceptButton.isEnabled = false
+                rejectButton.isEnabled = false
+            }
+            else{
+                trackButton.isEnabled = false
+                acceptButton.isEnabled = true
+                rejectButton.isEnabled = true
+            }
+
+
+        }, Response.ErrorListener { error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@DeliveryPersonAcceptReject, error.toString(), Toast.LENGTH_SHORT)
+                .show()
+        })
+        queue.add((request))
+
         gettingStoreAddress()
         gettingCustomerAddress()
         gettingStorePhone()
@@ -88,6 +123,13 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                     Toast.makeText(this@DeliveryPersonAcceptReject, error.toString(), Toast.LENGTH_SHORT).show()
                 })
             queue.add((request_change_status))
+        }
+        trackButton.setOnClickListener { v->
+            val intent = Intent(this@DeliveryPersonAcceptReject,FinalActivityForDeliveryPerson::class.java)
+            intent.putExtra("phone",phone)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            this.finish()
         }
         }
 

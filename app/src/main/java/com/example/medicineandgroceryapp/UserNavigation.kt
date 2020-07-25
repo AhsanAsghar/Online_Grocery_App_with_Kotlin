@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.util.Base64
 import android.util.Log
@@ -266,6 +267,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 Log.d("WHOin", "in")
                 navView.menu.clear()
                 navView.inflateMenu(R.menu.activity_deliveryperson_navigation_drawer)
+
             }else if(whoIsUser.equals("C")){
 
             }
@@ -285,12 +287,15 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         this@UserNavigation.finish()
         startActivity(intent)
     }
+
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
         Toast.makeText(this, "Location given !", Toast.LENGTH_LONG).show()
     }
+
     fun locationTask() {
         if (hasLocationPermissions())
         {
