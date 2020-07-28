@@ -92,17 +92,16 @@ OnMapReadyCallback {
                     if (yesORno.equals("YES")) {
                         sendNotificaitonForDp(found.phone.toString())
                     }
+                    val intent = Intent(this@MapForHiringDeliveryPerson,UserNavigation::class.java)
+                    intent.putExtra("phone",phone)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                    this.finish()
                 }, Response.ErrorListener { error ->
                     Log.d("json", error.toString())
                     Toast.makeText(this@MapForHiringDeliveryPerson, error.toString(), Toast.LENGTH_SHORT).show()
                 })
             queue.add((request_change_status))
-
-            val intent = Intent(this@MapForHiringDeliveryPerson,UserNavigation::class.java)
-            intent.putExtra("phone",phone)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-            this.finish()
         }
     }
     fun getNearstPersons(){
@@ -188,6 +187,10 @@ OnMapReadyCallback {
         db.collection("DpHiring").document(dp_phone)
             .set(data)
             .addOnSuccessListener { documentReference ->
+                Toast.makeText(
+                    this@MapForHiringDeliveryPerson,
+                    "Hiring request sent !",
+                    Toast.LENGTH_SHORT)
             }
             .addOnFailureListener { e -> }
     }
