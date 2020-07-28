@@ -44,17 +44,18 @@ OnMapReadyCallback {
     var store_longitude:String = ""
     var customer_latitude:String = ""
     var customer_longitude:String = ""
-    var store_id2 : String = ""
+    val hireButton  = findViewById<Button>(R.id.hire_delivery_person)
+   // var store_id2 : String = ""
     var list1 = mutableListOf<HiringModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_for_hiring_delivery_person)
         if (intent.getStringExtra("phone") != null ) {
+            phone = intent.getStringExtra("phone")
 
         } else {
             phone = "+923450694449"
         }
-        val hireButton = findViewById<Button>(R.id.hire_delivery_person)
         hireButton.isEnabled = false
 
         gettingStoreAddress()
@@ -151,11 +152,36 @@ OnMapReadyCallback {
             }
         }
         Toast.makeText(this, "dp id clicked = "+found.dp_id, Toast.LENGTH_SHORT).show()
+       /* hireButton.isEnabled = true
+        hireButton.setOnClickListener {
+            v ->
+            val queue = Volley.newRequestQueue(this)
+            val url_change_status: String =
+                "https://grocerymedicineapp.000webhostapp.com/PHPfiles/changeStatusStoreSend.php?phone=$phone&dp_phone=${found.phone}&status=dsend"
+            val request_change_status: StringRequest =
+                StringRequest(url_change_status, Response.Listener { response ->
+                    val result = response.toString().split(":").toTypedArray()
+                    val yesORno = result[1].substring(1, result[1].length - 2)
+                    if (yesORno.equals("YES")) {
+
+                    }
+                }, Response.ErrorListener { error ->
+                    Log.d("json", error.toString())
+                    Toast.makeText(this@MapForHiringDeliveryPerson, error.toString(), Toast.LENGTH_SHORT).show()
+                })
+            queue.add((request_change_status))
+
+            val intent = Intent(this@MapForHiringDeliveryPerson,UserNavigation::class.java)
+            intent.putExtra("phone",phone)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            this.finish()
+        }*/
     }
 
 
 
-   protected fun gettingStoreId() {
+  /* protected fun gettingStoreId() {
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
             "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreId.php?phone=$phone"
@@ -176,7 +202,7 @@ OnMapReadyCallback {
                 .show()
         })
         queue.add((request))
-    }
+    }*/
 
 
 

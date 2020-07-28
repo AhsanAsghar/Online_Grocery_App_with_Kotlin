@@ -45,6 +45,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_accept_reject) as SupportMapFragment
         if (intent.getStringExtra("phone") != null ) {
 
+            phone = intent.getStringExtra("phone")
         } else {
             phone = "+923004579023"
         }

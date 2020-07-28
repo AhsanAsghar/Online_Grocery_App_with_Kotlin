@@ -45,7 +45,6 @@ class cart_items : AppCompatActivity() {
         var store_name: String? = null
         val trackButton : Button = findViewById(R.id.track_delivery_person)
         val requestButton : Button = findViewById(R.id.send_request)
-        requestButton.setText("Verify Item Delivered")
 
         //Get store Image and name
         val queue = Volley.newRequestQueue(this)
@@ -174,7 +173,7 @@ class cart_items : AppCompatActivity() {
         })
         queue.add((request_store_number))
         //End getting store number
-        requestButton.setText("Verify Order Delivered")
+
         requestButton.setOnClickListener {
                 v ->
                 //Place Order in Order Table
