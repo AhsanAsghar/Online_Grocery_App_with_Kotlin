@@ -169,4 +169,47 @@ class Notifications : FirebaseMessagingService() {
             .setContentInfo("Info")
         notificationManager.notify(Random().nextInt(), notificationBuilder.build())
     }
+    fun throwNotificationForDpAcceptAndReject(flag:Int,store_owner_phone:String){
+        var status:String=""
+        if(flag==0){
+            status="declined"
+        }
+        else{
+            status="accepted"
+        }
+        val intent = Intent(application, cart_items::class.java)
+        intent.putExtra("phone",store_owner_phone)
+        val contentIntent = PendingIntent.getActivity(
+            application,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val NOTIFICATION_CHANNEL_ID =
+            "com.example.medicineandgroceryapp" //your app package name
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID, "Notification",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationChannel.description = "My Channel"
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.BLUE
+            notificationChannel.vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+        val notificationBuilder =
+            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        notificationBuilder.setAutoCancel(true)
+            .setDefaults(Notification.DEFAULT_ALL)
+            .setWhen(System.currentTimeMillis())
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle("Your delivery person hiring request has been "+status)
+            .setContentIntent(contentIntent)
+            .setContentText("Click here to see")
+            .setContentInfo("Info")
+        notificationManager.notify(Random().nextInt(), notificationBuilder.build())
+    }
 }

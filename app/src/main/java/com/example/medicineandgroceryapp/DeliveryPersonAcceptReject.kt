@@ -98,6 +98,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                     val yesORno = result[1].substring(1, result[1].length - 2)
                     if (yesORno.equals("YES")) {
                         //  notify accepted
+                        sendAcceptRejectNotificationToOwnerFromDp(store_phone.toString(),1)
                     }
                 }, Response.ErrorListener { error ->
                     Log.d("json", error.toString())
@@ -121,6 +122,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                     val result = response.toString().split(":").toTypedArray()
                     val yesORno = result[1].substring(1, result[1].length - 2)
                     if (yesORno.equals("YES")) {
+                        sendAcceptRejectNotificationToOwnerFromDp(store_phone.toString(),0)
                     }
                 }, Response.ErrorListener { error ->
                     Log.d("json", error.toString())
@@ -291,10 +293,11 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         return map
 
     }
-    fun sendAcceptRejectNotificationToOwnerFromDp(owner_id:String,flag:String){
+    fun sendAcceptRejectNotificationToOwnerFromDp(owner_id:String,flag:Int){
         val db = FirebaseFirestore.getInstance()
         val data = hashMapOf(
-            "oid" to owner_id
+            "oid" to owner_id,
+            "flag" to flag
         )
         db.collection("ReplyToOwnerByDp").document(owner_id)
             .set(data)
