@@ -20,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_delivery_person_accept_reject.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -289,5 +290,16 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         map.showInfoWindow()
         return map
 
-}
+    }
+    fun sendAcceptRejectNotificationToOwnerFromDp(owner_id:String,flag:String){
+        val db = FirebaseFirestore.getInstance()
+        val data = hashMapOf(
+            "oid" to owner_id
+        )
+        db.collection("ReplyToOwnerByDp").document(owner_id)
+            .set(data)
+            .addOnSuccessListener { documentReference ->
+            }
+            .addOnFailureListener { e -> }
+    }
 }

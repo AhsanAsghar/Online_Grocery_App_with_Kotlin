@@ -30,7 +30,7 @@ class Notifications : FirebaseMessagingService() {
             throwVerficationNotification(data["flag"]!!.toInt(),data["cid"].toString(),data["stid"].toString())
         }
         else if(data.containsKey("fstat")){
-            throwRqForDpNotification(data["oid"].toString(),data["stid"].toString())
+            throwRqForDpNotification(data["dpid"].toString(),data["stid"].toString())
         }
         else {
             getCustomerName(data["cid"].toString(), data)
