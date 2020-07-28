@@ -50,7 +50,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                 phone = intent.getStringExtra("phone")
                 store_id = intent.getStringExtra("id")
             } else {
-            phone = "+923167617639"
+            phone = "+923004579023"
             store_id="40"
         }
 
@@ -163,7 +163,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val store_location =  findViewById<EditText>(R.id.coming_towards)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDpUpdated.php?store_id = $store_id"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDpUpdated.php?store_id=$store_id"
         //val url_get: String =
           //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDp.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
@@ -270,7 +270,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         //val url_get: String =
           //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhone.php?phone=$phone & store_id = $store_id"
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhoneUpdated.php?store_id = $store_id"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhoneUpdated.php?store_id=$store_id"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
