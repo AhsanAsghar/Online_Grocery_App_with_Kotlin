@@ -236,7 +236,9 @@ class RequestDetail : AppCompatActivity() {
             queue.add((request_rejected))
         }
         findDeliveryPerson.setOnClickListener { v ->
-
+        val intent = Intent(this@RequestDetail,MapForHiringDeliveryPerson::class.java)
+            intent.putExtra("phone",phoneOfStore)
+            startActivity(intent)
         }
         checkCustomerName.setOnClickListener { v ->
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)

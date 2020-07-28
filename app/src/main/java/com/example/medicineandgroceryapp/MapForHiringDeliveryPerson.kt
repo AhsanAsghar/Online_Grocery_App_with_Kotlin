@@ -49,11 +49,7 @@ OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_for_hiring_delivery_person)
-        if (intent.getStringExtra("phone") != null ) {
-
-        } else {
-            phone = "+923450694449"
-        }
+        phone = intent.getStringExtra("phone")
         val hireButton = findViewById<Button>(R.id.hire_delivery_person)
         hireButton.isEnabled = false
 
