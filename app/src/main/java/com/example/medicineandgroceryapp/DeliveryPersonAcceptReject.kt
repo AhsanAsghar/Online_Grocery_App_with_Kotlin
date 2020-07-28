@@ -44,10 +44,11 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val rejectButton = findViewById<Button>(R.id.reject)
         val trackButton = findViewById<Button>(R.id.TrackOrder)
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_accept_reject) as SupportMapFragment
-        if (intent.getStringExtra("phone") != null ) {
+        if (intent.getStringExtra("phone") != null && intent.getStringExtra("id") !=null)  {
 
-            phone = intent.getStringExtra("phone")
-        } else {
+                phone = intent.getStringExtra("phone")
+                store_id = intent.getStringExtra("id")
+            } else {
             phone = "+923167617639"
             store_id="40"
         }
