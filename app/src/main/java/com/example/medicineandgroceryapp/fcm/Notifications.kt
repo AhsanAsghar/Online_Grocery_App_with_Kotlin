@@ -30,10 +30,12 @@ class Notifications : FirebaseMessagingService() {
             throwVerficationNotification(data["flag"]!!.toInt(),data["cid"].toString(),data["stid"].toString())
         }
         else if(data.containsKey("fstat")){
-            throwRqForDpNotification(data["dpid"].toString(),data["oid"].toString())
+            // dp has received hiring request
+            throwRqForDpNotification(data["dpid"].toString(),data["stid"].toString())
         }
         else if(data.containsKey("dstat")){
-            throwNotificationForDpAcceptAndReject(data["dstat"]!!.toInt(),data["stid"].toString())
+            // notify owner about dp answer
+            throwNotificationForDpAcceptAndReject(data["dstat"]!!.toInt(),data["oid"].toString())
         }
         else {
             getCustomerName(data["cid"].toString(), data)
@@ -180,7 +182,7 @@ class Notifications : FirebaseMessagingService() {
         else{
             status="accepted"
         }
-        val intent = Intent(application, MainActivity::class.java)
+        val intent = Intent(application, cart_items::class.java)
         intent.putExtra("phone",store_owner_phone)
         val contentIntent = PendingIntent.getActivity(
             application,
