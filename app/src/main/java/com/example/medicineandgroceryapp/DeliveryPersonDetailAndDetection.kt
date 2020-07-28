@@ -39,6 +39,7 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_detail_and_detection)
         if (intent.getStringExtra("phone") != null ) {
+            phone = intent.getStringExtra("phone")
 
         } else {
             phone = "+923167617639"

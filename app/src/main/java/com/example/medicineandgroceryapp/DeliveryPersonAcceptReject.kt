@@ -36,6 +36,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     var customer_longitude:String = ""
     var store_phone : String? = null
 
+    var store_id : String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_accept_reject)
@@ -47,13 +48,16 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
 
             phone = intent.getStringExtra("phone")
         } else {
-            phone = "+923004579023"
+            phone = "+923167617639"
+            store_id="40"
         }
 
 
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkstatus.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkstatusUpdated.php?phone=$phone&store_id=$store_id"
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkstatus.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -157,7 +161,9 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val store_location =  findViewById<EditText>(R.id.coming_towards)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDp.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDpUpdated.php?store_id = $store_id"
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDp.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -207,8 +213,10 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     fun gettingCustomerAddress(){
         val customer_location = findViewById<EditText>(R.id.customer_destination)
         val queue = Volley.newRequestQueue(applicationContext)
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingustomerAddressForDp.php?phone=$phone"
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingustomerAddressForDp.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingustomerAddressForDpUpdated.php?phone=$phone&store_id=$store_id"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -257,8 +265,10 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     }
     fun gettingStorePhone(){
         val queue = Volley.newRequestQueue(applicationContext)
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhone.php?phone=$phone & store_id = $store_id"
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhone.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhoneUpdated.php?store_id = $store_id"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()

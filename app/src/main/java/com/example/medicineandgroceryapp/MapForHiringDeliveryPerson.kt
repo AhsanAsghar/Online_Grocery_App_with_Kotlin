@@ -44,7 +44,7 @@ OnMapReadyCallback {
     var store_longitude:String = ""
     var customer_latitude:String = ""
     var customer_longitude:String = ""
-    val hireButton  = findViewById<Button>(R.id.hire_delivery_person)
+    lateinit var hireButton  : Button
    // var store_id2 : String = ""
     var list1 = mutableListOf<HiringModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
