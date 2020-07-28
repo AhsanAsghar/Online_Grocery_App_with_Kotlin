@@ -181,6 +181,30 @@ class RequestDetail : AppCompatActivity() {
         queue.add((request_store_number))
         //End getting store number
         //onClicks
+
+
+        //Getting Distance from Store Owner to Customer
+        /*val url_getDistance: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GetDistanceFromStoreToCustomer.php?phone=$customerPhone"
+        var requestOfDistance: StringRequest = StringRequest(url_getDistance, Response.Listener { response ->
+            Log.d("json", response.toString())
+            //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
+            //var json : JSONArray = response.getJSONArray(0)
+            val jObject: JSONObject = JSONObject(response.toString())
+            val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+            val jsonObject: JSONObject = jsonArray.getJSONObject(0);
+            val status = jsonObject.getString("status")
+
+        }, Response.ErrorListener { error ->
+            Log.d("json", error.toString())
+            Toast.makeText(this@RequestDetail, error.toString(), Toast.LENGTH_SHORT)
+                .show()
+        })
+        queue.add((request))
+*/
+
+
+
         acceptButton.setOnClickListener {
                 v ->
             val url_change_status : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/changeStatus.php?storeid=$store_id&phone=$customerPhone&status=accept"

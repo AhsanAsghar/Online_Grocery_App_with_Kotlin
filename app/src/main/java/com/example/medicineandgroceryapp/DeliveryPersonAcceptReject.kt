@@ -36,7 +36,8 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     var customer_latitude:String = ""
     var customer_longitude:String = ""
     var store_phone : String? = null
-    var store_id:String = ""
+
+    var store_id : String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_accept_reject)
@@ -44,18 +45,21 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val rejectButton = findViewById<Button>(R.id.reject)
         val trackButton = findViewById<Button>(R.id.TrackOrder)
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_accept_reject) as SupportMapFragment
-        if (intent.getStringExtra("phone") != null ) {
+        if (intent.getStringExtra("phone") != null && intent.getStringExtra("id") !=null)  {
 
-            phone = intent.getStringExtra("phone")
-            store_id=intent.getStringExtra("id")
-        } else {
+                phone = intent.getStringExtra("phone")
+                store_id = intent.getStringExtra("id")
+            } else {
             phone = "+923004579023"
+            store_id="40"
         }
 
 
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkstatus.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkstatusUpdated.php?phone=$phone&store_id=$store_id"
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/checkstatus.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -97,8 +101,6 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                     val result = response.toString().split(":").toTypedArray()
                     val yesORno = result[1].substring(1, result[1].length - 2)
                     if (yesORno.equals("YES")) {
-                        //  notify accepted
-                        sendAcceptRejectNotificationToOwnerFromDp(store_phone.toString(),1)
                     }
                 }, Response.ErrorListener { error ->
                     Log.d("json", error.toString())
@@ -122,7 +124,6 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                     val result = response.toString().split(":").toTypedArray()
                     val yesORno = result[1].substring(1, result[1].length - 2)
                     if (yesORno.equals("YES")) {
-                        sendAcceptRejectNotificationToOwnerFromDp(store_phone.toString(),0)
                     }
                 }, Response.ErrorListener { error ->
                     Log.d("json", error.toString())
@@ -149,8 +150,6 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                 val result = response.toString().split(":").toTypedArray()
                 val yesORno = result[1].substring(1, result[1].length - 2)
                 if (yesORno.equals("YES")) {
-                    // notify unavilable
-
                     Toast.makeText(this@DeliveryPersonAcceptReject,"Availability Off", Toast.LENGTH_LONG).show()
                 }
             }, Response.ErrorListener { error ->
@@ -164,7 +163,9 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val store_location =  findViewById<EditText>(R.id.coming_towards)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDp.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDpUpdated.php?store_id=$store_id"
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreAddressForDp.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -214,8 +215,10 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     fun gettingCustomerAddress(){
         val customer_location = findViewById<EditText>(R.id.customer_destination)
         val queue = Volley.newRequestQueue(applicationContext)
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingustomerAddressForDp.php?phone=$phone"
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingustomerAddressForDp.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingustomerAddressForDpUpdated.php?phone=$phone&store_id=$store_id"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -264,8 +267,10 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     }
     fun gettingStorePhone(){
         val queue = Volley.newRequestQueue(applicationContext)
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhone.php?phone=$phone & store_id = $store_id"
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhone.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStorePhoneUpdated.php?store_id=$store_id"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -293,11 +298,10 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         return map
 
     }
-    fun sendAcceptRejectNotificationToOwnerFromDp(owner_id:String,flag:Int){
+    fun sendAcceptRejectNotificationToOwnerFromDp(owner_id:String,flag:String){
         val db = FirebaseFirestore.getInstance()
         val data = hashMapOf(
-            "oid" to owner_id,
-            "flag" to flag
+            "oid" to owner_id
         )
         db.collection("ReplyToOwnerByDp").document(owner_id)
             .set(data)
