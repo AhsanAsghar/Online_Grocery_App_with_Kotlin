@@ -44,6 +44,7 @@ OnMapReadyCallback {
     var store_latitude:String = ""
     var store_longitude:String = ""
     var customer_latitude:String = ""
+    var customer_phone:String? = null
     var customer_longitude:String = ""
     var store_id:String = ""
     lateinit var hireButton:Button
@@ -53,12 +54,15 @@ OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_for_hiring_delivery_person)
         hireButton  = findViewById<Button>(R.id.hire_delivery_person)
-        if (intent.getStringExtra("phone") != null ) {
+        if (intent.getStringExtra("phone") != null && intent.getStringExtra("customer_phone")!=null) {
             phone = intent.getStringExtra("phone")
+            customer_phone = intent.getStringExtra("customer_phone")
 
         } else {
             phone = "+923450694449"
+            customer_phone = "+923167617639"
         }
+        gettingStoreId()
         hireButton.isEnabled = false
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_map_for_hiring_delivery_person) as SupportMapFragment
         mapFragment.getMapAsync(this);
@@ -195,7 +199,7 @@ OnMapReadyCallback {
             .addOnFailureListener { e -> }
     }
 
-  /* protected fun gettingStoreId() {
+   protected fun gettingStoreId() {
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
             "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingStoreId.php?phone=$phone"
@@ -206,8 +210,8 @@ OnMapReadyCallback {
             val jObject: JSONObject = JSONObject(response.toString())
             val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
             val jsonObject: JSONObject = jsonArray.getJSONObject(0);
-            store_id2 = jsonObject.getString("store_id")
-            //Toast.makeText(this@MapForHiringDeliveryPerson, "store id:"+store_id2, Toast.LENGTH_LONG).show()
+            store_id = jsonObject.getString("store_id")
+            Toast.makeText(this@MapForHiringDeliveryPerson, "store id:"+store_id, Toast.LENGTH_LONG).show()
 
 
         }, Response.ErrorListener { error ->
@@ -216,7 +220,7 @@ OnMapReadyCallback {
                 .show()
         })
         queue.add((request))
-    }*/
+    }
 
 
 
@@ -274,7 +278,9 @@ OnMapReadyCallback {
         val customer_location:EditText =findViewById(R.id.customer_location)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddressUpdated.php?customer_phone=$customer_phone"
+        //val url_get: String =
+          //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingCustomerAddress.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
