@@ -27,6 +27,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.FirebaseFirestore
 import org.json.JSONArray
 import org.json.JSONObject
 import pub.devrel.easypermissions.EasyPermissions
@@ -44,12 +45,14 @@ OnMapReadyCallback {
     var store_longitude:String = ""
     var customer_latitude:String = ""
     var customer_longitude:String = ""
-    val hireButton  = findViewById<Button>(R.id.hire_delivery_person)
+    var store_id:String = ""
+    lateinit var hireButton:Button
    // var store_id2 : String = ""
     var list1 = mutableListOf<HiringModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_for_hiring_delivery_person)
+        hireButton  = findViewById<Button>(R.id.hire_delivery_person)
         if (intent.getStringExtra("phone") != null ) {
             phone = intent.getStringExtra("phone")
 
@@ -57,90 +60,15 @@ OnMapReadyCallback {
             phone = "+923450694449"
         }
         hireButton.isEnabled = false
-
-        gettingStoreAddress()
-        gettingCustomerAddress()
-
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_map_for_hiring_delivery_person) as SupportMapFragment
-
-
-       // mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        mapFragment.getMapAsync(this);
+        // mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
        // locationTask()
-        val handler:Handler=Handler()
-        handler.postDelayed(object : Runnable {
-            override fun run() {
-                    val queue = Volley.newRequestQueue(applicationContext)
-                    val url_get: String =
-                        "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestDeliveryPersonFinding.php?source_latitude=$store_latitude&source_longitude=$store_longitude"
-                    var request: StringRequest =
-                        StringRequest(url_get, Response.Listener { response ->
-                            Log.d("json", response.toString())
-                            //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
-                            //var json : JSONArray = response.getJSONArray(0)
-                            val jObject: JSONObject = JSONObject(response.toString())
-                            val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
-                            Log.d("json", jsonArray.toString())
-                            val a: Int = jsonArray.length()
-                            for (y in 1..a - 1) {
-                                Log.d("list", "in")
-                                val dp_id = jsonArray.getJSONObject(y).getString("dp_id")
-                                val dp_phone = jsonArray.getJSONObject(y).getString("phone_number")
-                                val dp_latitude = jsonArray.getJSONObject(y).getString("latitude")
-                                val dp_longitude = jsonArray.getJSONObject(y).getString("longitude")
-                                //val dp_name = jsonArray.getJSONObject(y).getString("dp_name")
-                                val distance = jsonArray.getJSONObject(y).getString("distance")
-                                var location1 =
-                                    LatLng(dp_latitude.toDouble(), dp_longitude.toDouble())
-                                Log.d("data", dp_id + " " + " " + distance)
-
-
-                                val distance1 = distance.toDouble()
-                                val distance2 = "%.2f".format(distance1)
-                                //distance.toDouble() =".%4f".format(distance.toDouble())
-                                if (dp_id != null && dp_latitude!=null && dp_longitude !=null  && distance !=null) {
-                                    createMarker(
-                                        dp_latitude.toDouble(),
-                                        dp_longitude.toDouble(),
-                                        "Delivery Person",
-                                        "Distance:" + distance2 + "KM"
-                                    )
-                                    val hiringModel = HiringModel()
-                                    hiringModel.latitude=dp_latitude
-                                    hiringModel.longitude=dp_longitude
-                                    hiringModel.dp_id=dp_id.toInt()
-                                    hiringModel.phone=dp_phone
-                                    list1.add(hiringModel)
-
-                                    Toast.makeText(
-                                        this@MapForHiringDeliveryPerson,
-                                        "Distance:" + distance2 + "KM",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                                else{
-                                    Toast.makeText(this@MapForHiringDeliveryPerson,"Delivery Person is not Available in your Area at this time.!", Toast.LENGTH_LONG).show()
-                                }
-                            }
-                            Log.d("list", "out")
-                        }, Response.ErrorListener { error ->
-                            Log.d("json", error.toString())
-                            Toast.makeText(
-                                this@MapForHiringDeliveryPerson,
-                                error.toString(),
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
-                        })
-                    queue.add((request))
-
-                handler.postDelayed(this,10000)
-            }
-        }, 10000)
-
     }
     override fun onMapReady(map: GoogleMap) {
         this.googleMap = map
-        map?.setOnInfoWindowClickListener(this)
+        gettingStoreAddress()
+        gettingCustomerAddress()
     }
 
     override fun  onInfoWindowClick(marker: Marker) {
@@ -151,8 +79,7 @@ OnMapReadyCallback {
                 found = item
             }
         }
-        Toast.makeText(this, "dp id clicked = "+found.dp_id, Toast.LENGTH_SHORT).show()
-       /* hireButton.isEnabled = true
+        hireButton.isEnabled = true
         hireButton.setOnClickListener {
             v ->
             val queue = Volley.newRequestQueue(this)
@@ -163,7 +90,7 @@ OnMapReadyCallback {
                     val result = response.toString().split(":").toTypedArray()
                     val yesORno = result[1].substring(1, result[1].length - 2)
                     if (yesORno.equals("YES")) {
-
+                        sendNotificaitonForDp(found.phone.toString())
                     }
                 }, Response.ErrorListener { error ->
                     Log.d("json", error.toString())
@@ -176,10 +103,94 @@ OnMapReadyCallback {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
             this.finish()
-        }*/
+        }
     }
+    fun getNearstPersons(){
+        val handler:Handler=Handler()
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                val queue = Volley.newRequestQueue(applicationContext)
+                val url_get: String =
+                    "https://grocerymedicineapp.000webhostapp.com/PHPfiles/NearestDeliveryPersonFinding.php?source_latitude=$store_latitude&source_longitude=$store_longitude"
+                var request: StringRequest =
+                    StringRequest(url_get, Response.Listener { response ->
+                        Log.d("json", response.toString())
+                        //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
+                        //var json : JSONArray = response.getJSONArray(0)
+                        val jObject: JSONObject = JSONObject(response.toString())
+                        val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+                        Log.d("json", jsonArray.toString())
+                        val a: Int = jsonArray.length()
+                        for (y in 1..a - 1) {
+                            Log.d("list", "in")
+                            val dp_id = jsonArray.getJSONObject(y).getString("dp_id")
+                            val dp_phone = jsonArray.getJSONObject(y).getString("phone_number")
+                            val dp_latitude = jsonArray.getJSONObject(y).getString("latitude")
+                            val dp_longitude = jsonArray.getJSONObject(y).getString("longitude")
+                            //val dp_name = jsonArray.getJSONObject(y).getString("dp_name")
+                            val distance = jsonArray.getJSONObject(y).getString("distance")
+                            var location1 =
+                                LatLng(dp_latitude.toDouble(), dp_longitude.toDouble())
+                            Log.d("data", dp_id + " " + " " + distance)
 
 
+                            val distance1 = distance.toDouble()
+                            val distance2 = "%.2f".format(distance1)
+                            //distance.toDouble() =".%4f".format(distance.toDouble())
+                            if (dp_id != null && dp_latitude!=null && dp_longitude !=null  && distance !=null) {
+                                createMarker(
+                                    dp_latitude.toDouble(),
+                                    dp_longitude.toDouble(),
+                                    "Delivery Person",
+                                    "Distance:" + distance2 + "KM"
+                                )
+                                val hiringModel = HiringModel()
+                                hiringModel.latitude=dp_latitude
+                                hiringModel.longitude=dp_longitude
+                                hiringModel.dp_id=dp_id.toInt()
+                                hiringModel.phone=dp_phone
+                                list1.add(hiringModel)
+
+                                Toast.makeText(
+                                    this@MapForHiringDeliveryPerson,
+                                    "Distance:" + distance2 + "KM",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            else{
+                                Toast.makeText(this@MapForHiringDeliveryPerson,"Delivery Person is not Available in your Area at this time.!", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                        googleMap?.setOnInfoWindowClickListener(this@MapForHiringDeliveryPerson)
+                        Log.d("list", "out")
+                    }, Response.ErrorListener { error ->
+                        Log.d("json", error.toString())
+                        Toast.makeText(
+                            this@MapForHiringDeliveryPerson,
+                            error.toString(),
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    })
+                queue.add((request))
+
+                handler.postDelayed(this,10000)
+            }
+        }, 10000)
+    }
+    fun sendNotificaitonForDp(dp_phone:String){
+        val db = FirebaseFirestore.getInstance()
+        val data = hashMapOf(
+            "dpid" to dp_phone,
+            "store_id" to store_id,
+            "owner_id" to phone
+        )
+        db.collection("DpHiring").document(dp_phone)
+            .set(data)
+            .addOnSuccessListener { documentReference ->
+            }
+            .addOnFailureListener { e -> }
+    }
 
   /* protected fun gettingStoreId() {
         val queue = Volley.newRequestQueue(applicationContext)
@@ -247,8 +258,7 @@ OnMapReadyCallback {
             val country: String = addresses.get(0).getCountryName();
 
             store_location.setText(address+","+city)
-
-
+            getNearstPersons()
         }, Response.ErrorListener { error ->
             Log.d("json", error.toString())
             Toast.makeText(this@MapForHiringDeliveryPerson, error.toString(), Toast.LENGTH_SHORT)

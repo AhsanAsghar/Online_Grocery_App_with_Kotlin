@@ -35,7 +35,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     var customer_latitude:String = ""
     var customer_longitude:String = ""
     var store_phone : String? = null
-
+    var store_id:String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_accept_reject)
@@ -46,6 +46,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         if (intent.getStringExtra("phone") != null ) {
 
             phone = intent.getStringExtra("phone")
+            store_id=intent.getStringExtra("id")
         } else {
             phone = "+923004579023"
         }
@@ -95,6 +96,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                     val result = response.toString().split(":").toTypedArray()
                     val yesORno = result[1].substring(1, result[1].length - 2)
                     if (yesORno.equals("YES")) {
+                        //  notify accepted
                     }
                 }, Response.ErrorListener { error ->
                     Log.d("json", error.toString())
@@ -144,6 +146,8 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                 val result = response.toString().split(":").toTypedArray()
                 val yesORno = result[1].substring(1, result[1].length - 2)
                 if (yesORno.equals("YES")) {
+                    // notify unavilable
+
                     Toast.makeText(this@DeliveryPersonAcceptReject,"Availability Off", Toast.LENGTH_LONG).show()
                 }
             }, Response.ErrorListener { error ->
