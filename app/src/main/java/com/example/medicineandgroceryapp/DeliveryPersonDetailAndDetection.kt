@@ -34,15 +34,18 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
     var phone : String? = null
     var latitude:String = ""
     var longitude:String = ""
+    var store_id :String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_detail_and_detection)
-        if (intent.getStringExtra("phone") != null ) {
+        if (intent.getStringExtra("phone") != null && intent.getStringExtra("dp_id") != null ) {
             phone = intent.getStringExtra("phone")
+            store_id = intent.getStringExtra("dp_id")
 
         } else {
             phone = "+923167617639"
+            store_id = "40"
         }
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_detail_and_detection) as SupportMapFragment
 
@@ -56,7 +59,8 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
             val dialog = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.map_dialogue,null)
             val phoneNumber = dialogView.findViewById<TextView>(R.id.phone_no)
-            gettingDpPhoneNumber(phoneNumber = phoneNumber)
+            val bikeNumber = dialogView.findViewById<TextView>(R.id.BikeNumber)
+            gettingDpPhoneNumberAndBikeNumber(phoneNumber = phoneNumber,bikeNumber = bikeNumber )
             dialog.setView(dialogView)
             dialogView.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.setCancelable(true)
@@ -70,7 +74,9 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
             override fun run() {
                 val queue = Volley.newRequestQueue(applicationContext)
                 val url_get: String =
-                    "https://grocerymedicineapp.000webhostapp.com/PHPfiles/TrackDPGet.php?phone=$phone"
+                    "https://grocerymedicineapp.000webhostapp.com/PHPfiles/TrackDpGetUpdated.php?phone=$phone&store_id=$store_id"
+                //val url_get: String =
+                  //  "https://grocerymedicineapp.000webhostapp.com/PHPfiles/TrackDPGet.php?phone=$phone"
                 val request: StringRequest = StringRequest(url_get, Response.Listener { response ->
                     Log.d("json", response.toString())
                     //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -129,7 +135,9 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
         val store_location: EditText = findViewById(R.id.coming_towards)
         val queue = Volley.newRequestQueue(applicationContext)
         val url_get: String =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingStoreAddressForTrackingActivity.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingStoreAddressForTrackingActivityUpdated.php?store_id=$store_id"
+//        val url_get: String =
+  //          "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingStoreAddressForTrackingActivity.php?phone=$phone"
         var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
             Log.d("json", response.toString())
             //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
@@ -229,7 +237,8 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
     fun gettingDpName(){
         //Get Name of Delivery person
         val queue = Volley.newRequestQueue(this)
-        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/DpNameGet2.php?phone=$phone"
+        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/DpNameGet2Updated.php?phone=$phone&store_id=$store_id"
+//        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/DpNameGet2.php?phone=$phone"
         val request_name : StringRequest = StringRequest(url_get_name, Response.Listener {
                 response ->
             //val dp  = response.toString().split(":").toTypedArray()
@@ -253,7 +262,9 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
         val dpimage : ImageView = findViewById(R.id.photo_of_delivery_personn)
         val queue = Volley.newRequestQueue(this)
         val url_img =
-            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingDpImage.php?phone=$phone"
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingDpImageUpdated.php?phone=$phone&store_id=$store_id"
+  //      val url_img =
+    //        "https://grocerymedicineapp.000webhostapp.com/PHPfiles/GettingDpImage.php?phone=$phone"
         val request_img: ImageRequest = ImageRequest(url_img, Response.Listener { response ->
             dpimage.setImageBitmap(response)
 
@@ -264,9 +275,10 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
         queue.add(request_img)
 
     }
-    fun gettingDpPhoneNumber(phoneNumber:TextView){
+    fun gettingDpPhoneNumberAndBikeNumber(phoneNumber:TextView, bikeNumber:TextView){
         val queue = Volley.newRequestQueue(this)
-        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingDpPhoneNumber.php?phone=$phone"
+        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingDpPhoneNumberUpdated.php?phone=$phone&store_id=$store_id"
+//        val url_get_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingDpPhoneNumber.php?phone=$phone"
         val request_name : StringRequest = StringRequest(url_get_name, Response.Listener {
                 response ->
             //val dp  = response.toString().split(":").toTypedArray()
@@ -275,7 +287,10 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
             val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
             val jsonObject: JSONObject = jsonArray.getJSONObject(0);
             val dpPhoneNumber1 = jsonObject.getString("phone_number")
+            val bikeNumber1 = jsonObject.getString("bike_number")
             phoneNumber.setText(dpPhoneNumber1)
+            bikeNumber.setText(bikeNumber1)
+
 
         }, Response.ErrorListener {
                 error ->

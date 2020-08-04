@@ -36,6 +36,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
     var customer_latitude:String = ""
     var customer_longitude:String = ""
     var store_phone : String? = null
+    var customer_phone : String? = null
 
     var store_id : String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,6 +75,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                 rejectButton.isEnabled = false
             }
             else{
+                gettingCustomerPhone()
                 trackButton.isEnabled = false
                 acceptButton.isEnabled = true
                 rejectButton.isEnabled = true
@@ -304,7 +306,9 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
         val data = hashMapOf(
             "oid" to owner_id,
-            "flag" to flag
+            "flag" to flag,
+            "cid" to customer_phone,
+            "stid" to store_id
         )
         db.collection("ReplyToOwnerByDp").document(owner_id)
             .set(data)
@@ -312,4 +316,28 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
             }
             .addOnFailureListener { e -> }
     }
+   fun gettingCustomerPhone(){
+
+       val queue = Volley.newRequestQueue(applicationContext)
+       val url_get: String =
+           "https://grocerymedicineapp.000webhostapp.com/PHPfiles/gettingCustomerPhone.php?phone=$phone&store_id=$store_id"
+       var request: StringRequest = StringRequest(url_get, Response.Listener { response ->
+           Log.d("json", response.toString())
+           //Toast.makeText(this@settings,response.toString(),Toast.LENGTH_SHORT).show()
+           //var json : JSONArray = response.getJSONArray(0)
+           val jObject: JSONObject = JSONObject(response.toString())
+           val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
+           val jsonObject: JSONObject = jsonArray.getJSONObject(0);
+           customer_phone = jsonObject.getString("customer_phone")
+
+           Toast.makeText(this@DeliveryPersonAcceptReject, "Customer Phone:"+customer_phone, Toast.LENGTH_LONG ).show()
+
+       }, Response.ErrorListener { error ->
+           Log.d("json", error.toString())
+           Toast.makeText(this@DeliveryPersonAcceptReject, error.toString(), Toast.LENGTH_SHORT)
+               .show()
+       })
+       queue.add((request))
+
+   }
 }

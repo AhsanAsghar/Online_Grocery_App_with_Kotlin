@@ -35,6 +35,16 @@
                 android:drawablePadding="33dp"
                 android:text="0333-1234567"
                 android:textSize="20sp" />
+            <TextView
+                android:id="@+id/BikeNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="25dp"
+                android:drawableLeft="@drawable/ic_action_motorcycle"
+                android:drawablePadding="33dp"
+                android:text="Bike-Number"
+                android:textSize="20sp" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
