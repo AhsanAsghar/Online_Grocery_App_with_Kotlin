@@ -54,14 +54,10 @@ OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_for_hiring_delivery_person)
         hireButton  = findViewById<Button>(R.id.hire_delivery_person)
-        if (intent.getStringExtra("phone") != null && intent.getStringExtra("customer_phone")!=null) {
             phone = intent.getStringExtra("phone")
             customer_phone = intent.getStringExtra("customer_phone")
 
-        } else {
-            phone = "+923450694449"
-            customer_phone = "+923167617639"
-        }
+
         gettingStoreId()
         hireButton.isEnabled = false
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_map_for_hiring_delivery_person) as SupportMapFragment
