@@ -127,9 +127,12 @@ class RequestDetail : AppCompatActivity() {
                 val product_id = jsonArray.getJSONObject(y).getString("product_id")
                 val product_name = jsonArray.getJSONObject(y).getString("product_name")
                 val pimageString = jsonArray.getJSONObject(y).getString("product_image")
+                val product_quantity = jsonArray.getJSONObject(y).getString("quantity")
                 val product_img = stringToBitmap(pimageString)
                 val productPrice = jsonArray.getJSONObject(y).getString("product_price")
-                users.add(DataClassForRequestDetails(product_img,product_name, productPrice))
+                //innerLoppMulitiplicatoin = productPrice.toInt() * product_quantity.toInt()
+                //total_of_items = total_of_items +  innerLoppMulitiplicatoin
+                users.add(DataClassForRequestDetails(product_img,product_name, productPrice + " x " + product_quantity))
             }
             val adapter = CustomAdapterClassForRequestDetail(users)
             recycleOfCategory.adapter = adapter
