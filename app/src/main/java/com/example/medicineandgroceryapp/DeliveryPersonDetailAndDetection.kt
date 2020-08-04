@@ -39,9 +39,9 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_detail_and_detection)
-        if (intent.getStringExtra("phone") != null && intent.getStringExtra("dp_id") != null ) {
+        if (intent.getStringExtra("phone") != null && intent.getStringExtra("store_id") != null ) {
             phone = intent.getStringExtra("phone")
-            store_id = intent.getStringExtra("dp_id")
+            store_id = intent.getStringExtra("store_id")
 
         } else {
             phone = "+923167617639"
