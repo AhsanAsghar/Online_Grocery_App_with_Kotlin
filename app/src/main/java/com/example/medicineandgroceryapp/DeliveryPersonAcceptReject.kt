@@ -306,7 +306,9 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
         val data = hashMapOf(
             "oid" to owner_id,
-            "flag" to flag
+            "flag" to flag,
+            "cid" to customer_phone,
+            "stid" to store_id
         )
         db.collection("ReplyToOwnerByDp").document(owner_id)
             .set(data)

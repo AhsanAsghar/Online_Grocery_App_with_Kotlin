@@ -35,7 +35,7 @@ class Notifications : FirebaseMessagingService() {
         }
         else if(data.containsKey("dstat")){
             // notify owner about dp answer
-            throwNotificationForDpAcceptAndReject(data["dstat"]!!.toInt(),data["oid"].toString())
+            throwNotificationForDpAcceptAndReject(data["dstat"]!!.toInt(),data["oid"].toString(),data["cid"].toString(),data["stid"].toString())
         }
         else {
             getCustomerName(data["cid"].toString(), data)
@@ -174,7 +174,7 @@ class Notifications : FirebaseMessagingService() {
             .setContentInfo("Info")
         notificationManager.notify(Random().nextInt(), notificationBuilder.build())
     }
-    fun throwNotificationForDpAcceptAndReject(flag:Int,store_owner_phone:String){
+    fun throwNotificationForDpAcceptAndReject(flag:Int,store_owner_phone:String,cid:String,stid:String){
         var status:String=""
         if(flag==0){
             status="declined"
@@ -182,8 +182,9 @@ class Notifications : FirebaseMessagingService() {
         else{
             status="accepted"
         }
-        val intent = Intent(application, cart_items::class.java)
-        intent.putExtra("phone",store_owner_phone)
+        val intent = Intent(application, RequestDetail::class.java)
+        intent.putExtra("phone",cid)
+        intent.putExtra("store_id",stid)
         val contentIntent = PendingIntent.getActivity(
             application,
             0,
