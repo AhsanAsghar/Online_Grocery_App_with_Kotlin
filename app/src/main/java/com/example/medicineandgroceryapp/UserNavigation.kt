@@ -307,7 +307,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 } else {
                     latitude = location?.latitude.toString()
                     longitude = location?.longitude.toString()
-                    findViewById<TextView>(R.id.currentaddress).text = location?.longitude.toString() +"," + location?.latitude.toString()
+                    //findViewById<TextView>(R.id.currentaddress).text = location?.longitude.toString() +"," + location?.latitude.toString()
                     val queu = Volley.newRequestQueue(applicationContext)
                     var url: String =
                         "https://grocerymedicineapp.000webhostapp.com/PHPfiles/InsertAddressOfCustomer.php"
@@ -363,7 +363,7 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         override fun onLocationResult(locationResult: LocationResult) {
             var mLastLocation: Location = locationResult.lastLocation
             if(mLastLocation != null){
-                findViewById<TextView>(R.id.currentaddress).text = mLastLocation.longitude.toString() +"," + mLastLocation.latitude.toString()
+                //findViewById<TextView>(R.id.currentaddress).text = mLastLocation.longitude.toString() +"," + mLastLocation.latitude.toString()
 
                 val queu = Volley.newRequestQueue(applicationContext)
                 var url: String =

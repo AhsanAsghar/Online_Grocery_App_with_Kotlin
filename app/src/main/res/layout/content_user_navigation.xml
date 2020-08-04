@@ -59,7 +59,7 @@
         app:layout_constraintTop_toTopOf="@+id/textview1" />
 <!--        app:layout_constraintTop_toBottomOf="@+id/toolbar2" />-->
 
-    <TextView
+    <!--<TextView
         android:id="@+id/currentAddresstextview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -72,9 +72,9 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/spinner"></TextView>
+        app:layout_constraintTop_toTopOf="@id/spinner"></TextView>-->
 
-    <TextView
+    <!--<TextView
         android:id="@+id/currentaddress"
         android:layout_width="0dp"
         android:layout_height="48dp"
@@ -91,7 +91,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/currentAddresstextview" />
+        app:layout_constraintTop_toTopOf="@id/currentAddresstextview" />-->
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -101,6 +101,6 @@
         android:layout_marginTop="35dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/currentaddress" />
+        app:layout_constraintTop_toBottomOf="@id/spinner" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.android.volley.Request
@@ -47,10 +48,11 @@ class FinalActivityForDeliveryPerson : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_final_for_delivery_person)
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_final_activity) as SupportMapFragment
-        if (intent.getStringExtra("phone") != null ) {
             phone = intent.getStringExtra("phone")
-        } else {
-            phone = "+923004579023"
+        val endDelivery = findViewById<Button>(R.id.end_delivery_button)
+
+        endDelivery.setOnClickListener { v->
+            this.finish()
         }
 
 

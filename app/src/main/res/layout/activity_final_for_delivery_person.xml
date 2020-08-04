@@ -72,6 +72,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/StoreLocation" />
+    <Button
+        android:id="@+id/end_delivery_button"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/add_to_cart_green_button"
+        android:text="End Delivery"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/fragment_delivery_person_final_activity"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 
