@@ -134,6 +134,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                     Toast.makeText(this@DeliveryPersonAcceptReject, error.toString(), Toast.LENGTH_SHORT).show()
                 })
             queue.add((request_change_status))
+            this.finish()
         }
         trackButton.setOnClickListener { v->
             val intent = Intent(this@DeliveryPersonAcceptReject,FinalActivityForDeliveryPerson::class.java)
