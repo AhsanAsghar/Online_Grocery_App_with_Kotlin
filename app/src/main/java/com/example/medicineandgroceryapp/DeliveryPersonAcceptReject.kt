@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.view.isVisible
+import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -46,14 +47,13 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val rejectButton = findViewById<Button>(R.id.reject)
         val trackButton = findViewById<Button>(R.id.TrackOrder)
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_accept_reject) as SupportMapFragment
-       // if (intent.getStringExtra("phone") != null && intent.getStringExtra("id") !=null)  {
 
+        //phone = "+923004579023"
+        //store_id = "34"
                 phone = intent.getStringExtra("phone")
                 store_id = intent.getStringExtra("id")
-         //   } else {
-           // phone = "+923004579023"
-            //store_id="40"
-       // }
+       // Toast.makeText(this, "store_id:" +store_id, Toast.LENGTH_LONG).show()
+
 
 
         val queue = Volley.newRequestQueue(applicationContext)
@@ -75,7 +75,6 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                 rejectButton.isEnabled = false
             }
             else{
-                gettingCustomerPhone()
                 trackButton.isEnabled = false
                 acceptButton.isEnabled = true
                 rejectButton.isEnabled = true
@@ -89,6 +88,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         })
         queue.add((request))
 
+        gettingCustomerPhone()
         gettingStoreAddress()
         gettingCustomerAddress()
         gettingStorePhone()
@@ -135,6 +135,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                 })
             queue.add((request_change_status))
             this.finish()
+            deleteDpIdToOrders()
         }
         trackButton.setOnClickListener { v->
             val intent = Intent(this@DeliveryPersonAcceptReject,FinalActivityForDeliveryPerson::class.java)
@@ -331,7 +332,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
            val jsonObject: JSONObject = jsonArray.getJSONObject(0);
            customer_phone = jsonObject.getString("customer_phone")
 
-           Toast.makeText(this@DeliveryPersonAcceptReject, "Customer Phone:"+customer_phone, Toast.LENGTH_LONG ).show()
+           Toast.makeText(this@DeliveryPersonAcceptReject, "Customer_...Phone:"+customer_phone, Toast.LENGTH_LONG ).show()
 
        }, Response.ErrorListener { error ->
            Log.d("json", error.toString())
@@ -341,4 +342,27 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
        queue.add((request))
 
    }
+    fun deleteDpIdToOrders(){
+        val queu = Volley.newRequestQueue(applicationContext)
+        var url: String =
+            "https://grocerymedicineapp.000webhostapp.com/PHPfiles/DeleteDpId.php"
+        val postRequest =
+            object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+                Log.d("response", response.toString())
+                Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }, Response.ErrorListener { error ->
+                Log.d("error", error.toString())
+                Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }) {
+                override fun getParams(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    params.put("phone", phone.toString())
+                    params.put("store_id", store_id.toString())
+                    return params
+                }
+            }
+        queu.add(postRequest)
+    }
 }

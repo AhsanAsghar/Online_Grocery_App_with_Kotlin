@@ -236,11 +236,11 @@ class UserNavigation : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         val toolbar: Toolbar = findViewById(R.id.toolbarItemDetailCamera)
         setSupportActionBar(toolbar)
 
-        val fab: FloatingActionButton = findViewById(R.id.fab)
+       /* val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
-        }
+        }*/
         //Code to change or copy
         val drawerLayout: DrawerLayout = findViewById(R.id.user_drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)

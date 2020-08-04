@@ -55,6 +55,8 @@ OnMapReadyCallback {
         setContentView(R.layout.activity_map_for_hiring_delivery_person)
         hireButton  = findViewById<Button>(R.id.hire_delivery_person)
             phone = intent.getStringExtra("phone")
+       // phone = "+923009647449"
+        //customer_phone = "+923009647449"
             customer_phone = intent.getStringExtra("customer_phone")
 
 
@@ -102,6 +104,8 @@ OnMapReadyCallback {
                     Toast.makeText(this@MapForHiringDeliveryPerson, error.toString(), Toast.LENGTH_SHORT).show()
                 })
             queue.add((request_change_status))
+           addDpIdToOrders(found.dp_id.toString())
+            this.finish()
         }
     }
     fun getNearstPersons(){
@@ -150,11 +154,6 @@ OnMapReadyCallback {
                                 hiringModel.phone=dp_phone
                                 list1.add(hiringModel)
 
-                                Toast.makeText(
-                                    this@MapForHiringDeliveryPerson,
-                                    "Distance:" + distance2 + "KM",
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             }
                             else{
                                 Toast.makeText(this@MapForHiringDeliveryPerson,"Delivery Person is not Available in your Area at this time.!", Toast.LENGTH_LONG).show()
@@ -321,6 +320,30 @@ OnMapReadyCallback {
         map.showInfoWindow()
         return map
     }
+fun addDpIdToOrders(dpId : String){
+    val queu = Volley.newRequestQueue(applicationContext)
+    var url: String =
+        "https://grocerymedicineapp.000webhostapp.com/PHPfiles/InsertDpId.php"
+    val postRequest =
+        object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
+            Log.d("response", response.toString())
+            Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                .show()
+        }, Response.ErrorListener { error ->
+            Log.d("error", error.toString())
+            Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
+                .show()
+        }) {
+            override fun getParams(): Map<String, String> {
+                val params = HashMap<String, String>()
+                    params.put("dp_id", dpId)
+                    params.put("phone", phone.toString())
+                    params.put("customer_phone", customer_phone.toString())
+                return params
+            }
+        }
+    queu.add(postRequest)
+}
 
     
 

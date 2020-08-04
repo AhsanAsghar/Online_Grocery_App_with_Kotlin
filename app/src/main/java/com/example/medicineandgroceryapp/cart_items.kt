@@ -229,6 +229,13 @@ class cart_items : AppCompatActivity() {
                     }
 
                 }
+        trackButton.setOnClickListener { v->
+            val intent = Intent(this@cart_items,DeliveryPersonDetailAndDetection::class.java)
+            intent.putExtra("phone",customerPhone)
+            intent.putExtra("store_id", store_id)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        }
         }
 
 

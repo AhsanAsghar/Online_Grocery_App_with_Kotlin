@@ -271,6 +271,7 @@ class RequestDetail : AppCompatActivity() {
         findDeliveryPerson.setOnClickListener { v ->
         val intent = Intent(this@RequestDetail,MapForHiringDeliveryPerson::class.java)
             intent.putExtra("phone",phoneOfStore)
+            intent.putExtra("customer_phone", customerPhone)
             startActivity(intent)
         }
         checkCustomerName.setOnClickListener { v ->

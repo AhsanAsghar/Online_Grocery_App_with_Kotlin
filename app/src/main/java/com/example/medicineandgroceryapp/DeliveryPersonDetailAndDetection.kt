@@ -39,8 +39,10 @@ class DeliveryPersonDetailAndDetection : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_delivery_person_detail_and_detection)
-            phone = intent.getStringExtra("phone")
-            store_id = intent.getStringExtra("store_id")
+        phone = "+923009647449"
+        store_id = "34"
+        // phone = intent.getStringExtra("phone")
+            //store_id = intent.getStringExtra("store_id")
 
 
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_detail_and_detection) as SupportMapFragment
