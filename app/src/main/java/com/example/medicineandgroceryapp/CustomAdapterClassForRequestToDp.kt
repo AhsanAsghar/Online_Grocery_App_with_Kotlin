@@ -30,6 +30,7 @@ class CustomAdapterClassForRequestToDp(val userList: ArrayList<DataClassForReque
         holder.itemView.setOnClickListener { v ->
             val intent = Intent(user.context,DeliveryPersonAcceptReject ::class.java)
             intent.putExtra("phone",user.phoneOfDeliveryPerson)
+            intent.putExtra("id",user.store_id)
             user.context.startActivity(intent)
         }
     }

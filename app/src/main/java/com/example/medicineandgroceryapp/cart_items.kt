@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_login_with_phone.*
 import org.json.JSONArray
 import org.json.JSONObject
+import org.w3c.dom.Text
 
 class cart_items : AppCompatActivity() {
 
@@ -45,7 +46,9 @@ class cart_items : AppCompatActivity() {
         var store_name: String? = null
         val trackButton : Button = findViewById(R.id.track_delivery_person)
         val requestButton : Button = findViewById(R.id.send_request)
-
+        var deliveryPersonCost: Int = 250
+        val dpCharge = findViewById<TextView>(R.id.price_of_delivery_charges)
+        dpCharge.setText(deliveryPersonCost.toString())
         //Get store Image and name
         val queue = Volley.newRequestQueue(this)
         val url_get_image_name : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/getImageAndRequestOfStores.php?store_id=$store_id"
@@ -115,6 +118,8 @@ class cart_items : AppCompatActivity() {
             Toast.makeText(this@cart_items,error.toString(), Toast.LENGTH_SHORT).show()
         })
         queue.add((request_status))
+        var total_of_items: Int = 0
+        var innerLoppMulitiplicatoin : Int = 0
         // end getting status
         val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/cartItemsGet.php?storeid=$store_id&phone=$customerPhone"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
@@ -136,14 +141,20 @@ class cart_items : AppCompatActivity() {
                     val cart_id = jsonArray.getJSONObject(y).getString("cart_id")
                     val product_id = jsonArray.getJSONObject(y).getString("product_id")
                     val product_name = jsonArray.getJSONObject(y).getString("product_name")
+                    val product_quantity = jsonArray.getJSONObject(y).getString("quantity")
                     val pimageString = jsonArray.getJSONObject(y).getString("product_image")
                     val product_img = stringToBitmap(pimageString)
                     val productPrice = jsonArray.getJSONObject(y).getString("product_price")
-                    users.add(DataClassForCartItems(product_img,product_name, productPrice,cart_id,this,store_id,customerPhone))
+                    innerLoppMulitiplicatoin = productPrice.toInt() * product_quantity.toInt()
+                    total_of_items = total_of_items +  innerLoppMulitiplicatoin
+                    users.add(DataClassForCartItems(product_img,product_name, productPrice + " x " + product_quantity,cart_id,this,store_id,customerPhone))
                 }
                 val adapter = CustomAdapterClassForCartItems(users)
                 recycleOfCategory.adapter = adapter
             }
+            val total = total_of_items + deliveryPersonCost
+            findViewById<TextView>(R.id.total_price).setText(total_of_items.toString() +  " + " +
+            deliveryPersonCost.toString() + " = " + total.toString() )
             progress.dismissDialog()
 
         }, Response.ErrorListener {

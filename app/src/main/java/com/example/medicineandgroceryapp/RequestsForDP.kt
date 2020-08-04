@@ -53,10 +53,11 @@ class RequestsForDP : AppCompatActivity() {
                     Log.d("list", "in")
                     val store_name = jsonArray.getJSONObject(y).getString("store_name")
                     val pimageString = jsonArray.getJSONObject(y).getString("store_image")
+                    val store_id = jsonArray.getJSONObject(y).getString("store_id")
                     var store_image: Bitmap? = null
                     if (pimageString != "null") {
                         store_image = stringToBitmap(pimageString)
-                        users.add(DataClassForRequestToDp(store_image,store_name,this,phone))
+                        users.add(DataClassForRequestToDp(store_image,store_name,this,phone,store_id))
                     }
                     val adapter = CustomAdapterClassForRequestToDp(users)
                     recycleOfCategory.adapter = adapter
