@@ -341,8 +341,8 @@ class delivery_person_profile : AppCompatActivity() {
         val postRequest =
             object : StringRequest(Request.Method.POST, url, Response.Listener { response ->
                 Log.d("response", response.toString())
-                Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
-                    .show()
+                //Toast.makeText(applicationContext, response.toString(), Toast.LENGTH_SHORT)
+                  //  .show()
             }, Response.ErrorListener { error ->
                 Log.d("error", error.toString())
                 Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_SHORT)
