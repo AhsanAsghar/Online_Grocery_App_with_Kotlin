@@ -46,14 +46,14 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
         val rejectButton = findViewById<Button>(R.id.reject)
         val trackButton = findViewById<Button>(R.id.TrackOrder)
         mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_delivery_person_accept_reject) as SupportMapFragment
-        if (intent.getStringExtra("phone") != null && intent.getStringExtra("id") !=null)  {
+       // if (intent.getStringExtra("phone") != null && intent.getStringExtra("id") !=null)  {
 
                 phone = intent.getStringExtra("phone")
                 store_id = intent.getStringExtra("id")
-            } else {
-            phone = "+923004579023"
-            store_id="40"
-        }
+         //   } else {
+           // phone = "+923004579023"
+            //store_id="40"
+       // }
 
 
         val queue = Volley.newRequestQueue(applicationContext)
@@ -134,6 +134,7 @@ class DeliveryPersonAcceptReject : AppCompatActivity() {
                     Toast.makeText(this@DeliveryPersonAcceptReject, error.toString(), Toast.LENGTH_SHORT).show()
                 })
             queue.add((request_change_status))
+            this.finish()
         }
         trackButton.setOnClickListener { v->
             val intent = Intent(this@DeliveryPersonAcceptReject,FinalActivityForDeliveryPerson::class.java)

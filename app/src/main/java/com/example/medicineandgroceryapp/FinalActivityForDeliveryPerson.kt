@@ -116,7 +116,7 @@ class FinalActivityForDeliveryPerson : AppCompatActivity() {
             }
         }, 3000)
         gettingStoreAddress()
-        // gettingCustomerAddress()
+        gettingCustomerAddress()
 
     }
 
