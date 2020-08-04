@@ -111,7 +111,10 @@ class RequestDetail : AppCompatActivity() {
         })
         queue.add((request_status))
         // end getting status
-
+        var innerLoppMulitiplicatoin:Int = 0
+        var total_of_items : Int = 0
+        val deliveryPersonCost = 250
+        findViewById<TextView>(R.id.price_of_delivery_charges_request_detail).setText(deliveryPersonCost.toString())
         //Get products
         val url_get : String = "https://grocerymedicineapp.000webhostapp.com/PHPfiles/cartItemsGet.php?storeid=$store_id&phone=$customerPhone"
         val request : StringRequest = StringRequest(url_get, Response.Listener {
@@ -130,12 +133,15 @@ class RequestDetail : AppCompatActivity() {
                 val product_quantity = jsonArray.getJSONObject(y).getString("quantity")
                 val product_img = stringToBitmap(pimageString)
                 val productPrice = jsonArray.getJSONObject(y).getString("product_price")
-                //innerLoppMulitiplicatoin = productPrice.toInt() * product_quantity.toInt()
-                //total_of_items = total_of_items +  innerLoppMulitiplicatoin
+                innerLoppMulitiplicatoin = productPrice.toInt() * product_quantity.toInt()
+                total_of_items = total_of_items +  innerLoppMulitiplicatoin
                 users.add(DataClassForRequestDetails(product_img,product_name, productPrice + " x " + product_quantity))
             }
             val adapter = CustomAdapterClassForRequestDetail(users)
             recycleOfCategory.adapter = adapter
+            val total = total_of_items + deliveryPersonCost
+            findViewById<TextView>(R.id.total_price_request_detail).setText(total_of_items.toString() +  " + " +
+                    deliveryPersonCost.toString() + " = " + total.toString() )
             progress.dismissDialog()
         }, Response.ErrorListener {
                 error ->
