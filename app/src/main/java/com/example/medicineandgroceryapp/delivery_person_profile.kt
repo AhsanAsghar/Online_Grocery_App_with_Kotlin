@@ -278,7 +278,7 @@ class delivery_person_profile : AppCompatActivity() {
         if (hasLocationPermissions())
         {
             // Have permission, do the thing!
-            Toast.makeText(this, "TODO: Location things", Toast.LENGTH_LONG).show()
+           // Toast.makeText(this, "TODO: Location things", Toast.LENGTH_LONG).show()
             startLocationUpdates()
 
         }

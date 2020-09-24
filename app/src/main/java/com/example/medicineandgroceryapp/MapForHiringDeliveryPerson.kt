@@ -206,7 +206,7 @@ OnMapReadyCallback {
             val jsonArray: JSONArray = jObject?.getJSONArray("response")!!
             val jsonObject: JSONObject = jsonArray.getJSONObject(0);
             store_id = jsonObject.getString("store_id")
-            Toast.makeText(this@MapForHiringDeliveryPerson, "store id:"+store_id, Toast.LENGTH_LONG).show()
+           // Toast.makeText(this@MapForHiringDeliveryPerson, "store id:"+store_id, Toast.LENGTH_LONG).show()
 
 
         }, Response.ErrorListener { error ->
